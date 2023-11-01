@@ -1,0 +1,1622 @@
+extends layout-admin
+
+block content
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        .page-inner.py-5
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold Edit Center
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/center/all') All Centers
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+      .page-inner
+        //- pre= h.dump(countrys)
+        .row
+          .col-md-12
+            form(action=`/admin/center/edit/${center._id}`, method="POST")
+              .card
+                .card-header
+                  .card-title School Details
+                .card-body
+                  .row
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='school_name') School Name
+                        span.required-label *
+                        input#school_name.form-control(type='text' name='school_name' placeholder='Enter School Name' value=center.school_name)
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='school_display_name') School Display Name
+                        span.required-label *
+                        input#school_display_name.form-control(type='text' name='school_display_name' placeholder='Enter School Display Name' value=center.school_display_name)
+              .card
+                .card-header
+                  .card-title Program
+                .card-body
+                  .row
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='country') Select Country
+                        span#str_country.required-label *
+                        select#country.form-control(name='country_id', required='')
+                          option(value='') Select Country
+                          if center.country_id
+                            each country in countrys
+                              option(value=country._id selected=(country._id.toString() == center.country_id.toString())) #{country.country_name}
+                          else
+                            each country in countrys
+                              option(value=country._id) #{country.country_name}
+                      .form-group
+                        label(for='zone') Select Zone
+                        span#str_zone.required-label *
+                        select#zone.form-control(name='zone', required='')
+                          option(value='') Select Zone
+                    .col-md-6.col-lg-6
+                      .form-group
+                        //- .form-check
+                        //- label.form-check-label
+                        //-   input.form-check-input(type='checkbox' name='sel_programcategory_check' id="sel_programcategory_check" )
+                        //-   span.form-check-sign Select All
+                        label(for='country') Select Program Category
+                        span#str_programcategor.required-label *
+                        select#programcategory.form-control(name='programcategory_id', required, multiple='multiple')
+                          //- option(value='') Select Program Category
+                          if center.programcategory_id && center.programcategory_id.length
+                            each programcategory in programcategorys
+                              option(value=programcategory._id selected=(center.programcategory_id.includes(programcategory._id.toString()) == true ? 'selected' : null)) #{programcategory.title}
+                          else
+                            each programcategory in programcategorys
+                              option(value=programcategory._id) #{programcategory.title}
+                      .form-group
+                        //- label.form-check-label
+                        //-   input.form-check-input(type='checkbox' name='sel_program_check' id="sel_program_check" )
+                        //-   span.form-check-sign Select All
+                        label(for='program_name') Select Program Id
+                        span#str_program_id.required-label *
+                        select#program.form-control(name='program_id', required , multiple='multiple')
+                          //- option(value='') Select Program
+                    //- .col-md-6.col-lg-12
+                    //-   .form-group
+                    //-     label(for='action_taken') Select Action
+                    //-     span.required-label *
+                    //-     select#action_planned.form-control(name='action_taken', required='',multiple='multiple' )
+                    //-       each action in actions
+                    //-         option(value=action.name selected=(center.action_taken.includes(action.name) == true ? 'selected' : null)) #{action.name}
+              .card
+                .card-header
+                  .card-title School Details
+                .card-body
+                  .row
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='setup_type') Setup Type
+                        span#str_setup_type.required-label *
+                        select#setup.form-control(name='setup_type', required='')
+                          option(value='retail' selected=(center.setup_type == 'retail' ? 'selected' : null)) Retail
+                          option(value='corporate' selected=(center.setup_type == 'corporate' ? 'selected' : null)) Corporate
+                          option(value='franchise' selected=(center.setup_type == 'franchise' ? 'selected' : null)) Franchise
+                      //- .form-group
+                      //-   label(for='agreement_term_start') Agreement Term Start
+                      //-   .input-group
+                      //-     input#agreement_term_start.form-control(type='date' name='agreement_term_start'  placeholder='Enter Agreement Term'  value=center.agreement_term_start)
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='no_of_room') No Of Room
+                        span#str_no_of_room.required-label *
+                        .input-group
+                          input#no_of_room.form-control(type='text' name='no_of_room' placeholder='Enter  No Of Room' value=center.no_of_room )
+                      //- .form-group
+                      //-   label(for='agreement_term_end') Agreement Term End
+                      //-   .input-group
+                      //-     input#agreement_term_end.form-control(type='date' name='agreement_term_end'  placeholder='Enter Agreement Term' value=center.agreement_term_end )
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='size_of_school') Size Of School
+                        span#str_size_of_school.required-label *
+                        .input-group
+                          input#size_of_school.form-control(type='text' name='size_of_school' placeholder='Enter  Size of School' value=center.size_of_school)
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='agreement_term_start') Agreement Term Start Date
+                        span#str_agreement_term_start.required-label *
+                        .input-group
+                          if center.agreement_term_start
+                            input#agreement_term_start.form-control.custom-input.date(type='text' name='agreement_term_start' required="" autocomplete="off" value=moment(center.agreement_term_start).format('L') onkeydown="return false;")
+                          else
+                            input#agreement_term_start.form-control.custom-input.date(type='text' name='agreement_term_start'  placeholder='Enter Agreement Term' onkeydown="return false;")
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='agreement_term_end') Agreement Term End Date
+                        span#str_agreement_term_end.required-label *
+                        .input-group
+                          if center.agreement_term_end
+                            input#agreement_term_end.form-control.custom-input.date(type='text' name='agreement_term_end'  placeholder='Enter Agreement Term' required="" autocomplete="off" value=moment(center.agreement_term_end).format('L') onkeydown="return false;")
+                          else
+                            input#agreement_term_end.form-control.custom-input.date(type='text' name='agreement_term_end'  placeholder='Enter Agreement Term' onkeydown="return false;")
+                    .col-md-6.col-lg-12
+                      .form-group
+                        label(for='school_description') School Description
+                        span#str_school_description.required-label *
+                        textarea.form-control(rows='5', cols='5', id="school_description", required,name="school_description" ) #{center.school_description}
+                    //- .col-md-6.col-lg-12
+                    //-   .form-group
+                    //-     label(for='school_description') School Description
+                    //-     textarea.form-control(rows='5', cols='5', id="school_description", name="school_description" ) #{center.school_description}
+              .card
+                .card-header
+                  .card-title School Address
+                .card-body
+                  .row
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='house_no') House/Apt
+                        span#str_house_no.required-label *
+                        .input-group
+                          input#house_no.form-control(type='text' name='house_no' placeholder='Enter House Number' required value=center.house_no)
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='school_id') Select State
+                        span#str_state.required-label *
+                        select#state.form-control(name='state' )
+                          option(value='') Select State
+                          each state in states
+                            option(value=`${state.id}|${state.state_name}` selected=(center.state == state.state_name) ) #{state.state_name}
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='city') Select City
+                        span#str_city.required-label *
+                        select#city.form-control(name='city')
+                          option(value='') Select City
+                    //- .col-md-6.col-lg-4
+                    //-   .form-group
+                    //-     label(for='country') Country
+                    //-     .input-group
+                    //-       input#countrys.form-control(type='text' name='country'  placeholder='Enter country' required value=center.country)
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='street') Street/Road/Lane
+                        span#str_street.required-label *
+                        .input-group
+                          input#street.form-control(type='text' name='street' placeholder='Enter  street' value=center.street)
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='area') Area
+                        span#str_area.required-label *
+                        .input-group
+                          input#area.form-control(type='text' name='area' placeholder='Enter area' value=center.area required="")
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='landmark') Landmark
+                        span#str_landmark.required-label *
+                        .input-group
+                          input#landmark.form-control(type='text' name='landmark'  placeholder='Enter Landmark' required value=center.landmark)
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='pincode') Pincode
+                        span#str_pincode.required-label *
+                        .input-group
+                          input#pincode.form-control(type='text' name='pincode'  placeholder='Enter pincode' value=center.pincode)
+              //- .card
+                .card-header
+                  .card-title Action Planned
+                .card-body
+                  .row
+                    .col-md-6.col-lg-12
+                      .form-group
+                        label(for='action_taken') Action Planned / Taken
+                        span.required-label *
+                        select#action_planned.form-control(name='action_taken', required='',multiple='multiple' )
+                          each action in actions
+                            option(value=action.name selected=(center.action_taken.includes(action.name) == true ? 'selected' : null)) #{action.name}
+              .card
+                .card-header
+                  .card-title Center Contact
+                .card-body
+                  .row
+                    .col-md-6.col-lg-3
+                      .form-group
+                        label(for='whatsapp_number') Whatsapp Number
+                        span#str_whatsapp_number.required-label *
+                        .input-group
+                          input#whatsapp_number.form-control(type='text' name='whatsapp_number' placeholder='Enter  Whatsapp Number'  value=center.whatsapp_number)
+                    .col-md-6.col-lg-3
+                      .form-group
+                        label(for='contact_number') Contact Number
+                        span#str_contact_number.required-label *
+                        .input-group
+                          input#contact_number.form-control(type='text' name='contact_number' placeholder='Enter Contact Number' required value=center.contact_number)
+                    .col-md-6.col-lg-2
+                      .form-group
+                        label(for='cor_sal') &nbsp;
+                        select.form-control(name='cor_sal', required='')
+                          option(value='Mr.' selected=(center.cor_sal == 'Mr.' ? 'selected' : null)) Mr.
+                          option(value='Ms.' selected=(center.cor_sal == 'Ms.' ? 'selected' : null)) Ms.
+                          option(value='Mrs.' selected=(center.cor_sal == 'Mrs.' ? 'selected' : null)) Mrs.
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='cor_spoc') SPOC
+                        span#str_cor_spoc.required-label *
+                        .input-group
+                          input#cor_spoc.form-control(type='text' name='cor_spoc'  placeholder='Enter Spoc' required='' value=center.cor_spoc)
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='designation') Designation
+                        span#str_designation.required-label *
+                        .input-group
+                          input#designation.form-control(type='text' name='designation'  placeholder='Enter Designation' value=center.designation required)
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='email_id') Email Id
+                        span#str_email_id.required-label *
+                        .input-group
+                          input#email_id.form-control(type='email' name='email_id'  placeholder='Enter Email Id' required value=center.email_id)
+                    //-   .form-group
+                    //-     label(for='house_no') House/Apt
+                    //-     .input-group
+                    //-       input#house_no.form-control(type='text' name='house_no' placeholder='Enter  House Number' required value=center.house_no)
+                    //- .col-md-6.col-lg-3
+                    //-   .form-group
+                    //-     label(for='landmark') LandMark
+                    //-     .input-group
+                    //-       input#landmark.form-control(type='text' name='landmark'  placeholder='Enter Landmark' required value=center.landmark)
+                    //-   .form-group
+                    //-     label(for='city') City
+                    //-     .input-group
+                    //-       input#city.form-control(type='text' name='city' placeholder='Enter  city' value=center.city)
+                    //- .col-md-6.col-lg-3
+                    //-   .form-group
+                    //-     label(for='country') Country
+                    //-     .input-group
+                    //-       input#country.form-control(type='text' name='country'  placeholder='Enter country' required value=center.country)
+                    //-   .form-group
+                    //-     label(for='street') Street/Road/Lane
+                    //-     .input-group
+                    //-       input#street.form-control(type='text' name='street' placeholder='Enter  street' value=center.street)
+                    //- .col-md-6.col-lg-4
+                    //-   .form-group
+                    //-     label(for='area') Area
+                    //-     .input-group
+                    //-       input#area.form-control(type='text' name='area'  placeholder='Enter area' value=center.area)
+                    //- .col-md-6.col-lg-4
+                    //-   .form-group
+                    //-     label(for='state') State
+                    //-     .input-group
+                    //-       input#state.form-control(type='text' name='state'  placeholder='Enter state' value=center.state)
+                    //- .col-md-6.col-lg-4
+                    //-   .form-group
+                    //-     label(for='pincode') Pincode
+                    //-     .input-group
+                    //-       input#pincode.form-control(type='text' name='pincode'  placeholder='Enter pincode' value=center.pincode )
+              .card
+                .card-header
+                  .card-title Center Operational Hours
+                .card-body
+                  .row
+                    .col-md-6.col-lg-6
+                      #follow_time.form-group
+                          label Monday To Friday Start Time
+                          span#str_mon_to_fri_start_time.required-label *
+                          .input-group
+                            input#mon_to_fri_start_time.form-control(type='text' name='mon_to_fri_start_time' required=""  onkeydown="return false;")
+                            .input-group-append
+                              span.input-group-text
+                                i.fa.fa-clock
+                    .col-md-6.col-lg-6
+                      #follow_time.form-group
+                          label Monday To Friday End Time
+                          span#str_mon_to_fri_end_time.required-label *
+                          .input-group
+                            input#mon_to_fri_end_time.form-control(type='text' name='mon_to_fri_end_time'  required="" onkeydown="return false;")
+                            .input-group-append
+                              span.input-group-text
+                                i.fa.fa-clock
+                    .col-md-6.col-lg-6
+                      #follow_time.form-group
+                          label Saturday Start Time
+                          //- span.required-label *
+                          .input-group
+                            input#saturday_start_time.form-control(type='text' name='saturday_start_time' onkeydown="return false;")
+                            .input-group-append
+                              span.input-group-text
+                                i.fa.fa-clock
+                    .col-md-6.col-lg-6
+                      #follow_time.form-group
+                          label Saturday End Time
+                          //- span.required-label *
+                          .input-group
+                            input#saturday_end_time.form-control(type='text' name='saturday_end_time' onkeydown="return false;")
+                            .input-group-append
+                              span.input-group-text
+                                i.fa.fa-clock
+                    .col-md-6.col-lg-6
+                      #follow_time.form-group
+                          label Sunday Start Time
+                          //- span.required-label *
+                          .input-group
+                            input#sunday_start_time.form-control(type='text' name='sunday_start_time' onkeydown="return false;")
+                            .input-group-append
+                              span.input-group-text
+                                i.fa.fa-clock
+                    .col-md-6.col-lg-6
+                      #follow_time.form-group
+                          label Sunday End Time
+                          //- span.required-label *
+                          .input-group
+                            input#sunday_end_time.form-control(type='text' name='sunday_end_time' onkeydown="return false;")
+                            .input-group-append
+                              span.input-group-text
+                                i.fa.fa-clock
+
+              .card
+                .card-header
+                  .card-title Corporate Details
+                .card-body
+                  .row
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='cor_entity_name') Entity Name
+                        span#str_cor_entity_name.required-label *
+                        .input-group
+                          input#cor_entity_name.form-control(type='text' name='cor_entity_name' placeholder='Enter Entity Name' value=center.cor_entity_name)
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='cor_receipt') Name on Receipt (for Invoices/Receipts)
+                        span#str_cor_receipt.required-label *
+                        .input-group
+                          input#cor_receipt.form-control(type='text' name='cor_receipt'  placeholder='Enter Name on Receipt' value=center.cor_receipt)
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='cor_cor_number') Corporate Contact Number
+                        span#str_cor_cor_number.required-label *
+                        .input-group
+                          input#cor_cor_number.form-control(type='number' name='cor_cor_number' placeholder='Enter Corporate Number' value=center.cor_cor_number)
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='cor_email_id') Corporate Email Id
+                        span#str_cor_email_id.required-label *
+                        .input-group
+                          input#cor_email_id.form-control(type='text' name='cor_email_id'  placeholder='Enter Corporate Email' value=center.cor_email_id)
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='cor_customer_email') Customer Care Email
+                        span#str_cor_customer_email.required-label *
+                        .input-group
+                          input#cor_customer_email.form-control(type='text' name='cor_customer_email' placeholder='Enter Customer Care email' value=center.cor_customer_email)
+                    .col-md-12.col-lg-12
+                      .form-group
+                        label(for='cor_add') Corporate Address
+                        span#str_cor_add.required-label *
+                        .input-group
+                          textarea.form-control(rows='5', cols='5', id="cor_add", required,name="cor_add") #{center.cor_add}
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='cor_state') State
+                        span#str_cor_state.required-label *
+                        select#cor_state.form-control(name='cor_state')
+                          option(value='') Select State
+                          each state in states
+                            option(value=`${state.id}|${state.state_name}` selected=(center.cor_state == state.state_name) ) #{state.state_name}
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='cor_city') City
+                        span#str_cor_city.required-label *
+                        select#cor_city.form-control(name='cor_city')
+                          option(value='') Select City
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='cor_pincode') Pincode
+                        span#str_cor_pincode.required-label *
+                        .input-group
+                          input#cor_pincode.form-control(type='text' name='cor_pincode' placeholder='Enter Corporate Pincode' value=center.cor_pincode required)
+                    .col-md-6.col-lg-3
+                      .form-group
+                        label(for='cor_company_pan') Company PAN
+                        span#str_cor_company_pan.required-label *
+                        .input-group
+                          input#cor_company_pan.form-control(type='text' name='cor_company_pan' placeholder='Enter Company PAN' value=center.cor_company_pan)
+                    .col-md-6.col-lg-3
+                      .form-group
+                        label(for='cor_gst_number') GST Number
+                        span#str_cor_gst_number.required-label *
+                        .input-group
+                          input#cor_gst_number.form-control(type='text' name='cor_gst_number' placeholder='Enter GST Number' value=center.cor_gst_number)
+                    .col-md-6.col-lg-3
+                      .form-group
+                        label(for='cor_gst_address') GST Address
+                        span#str_cor_gst_address.required-label *
+                        .input-group
+                          input#cor_gst_address.form-control(type='text' name='cor_gst_address' placeholder='Enter GST Address' value=center.cor_gst_address)
+                    .col-md-6.col-lg-3
+                      .form-group
+                        label(for='cor_company_cin') Company CIN
+                        span#str_cor_company_cin.required-label *
+                        .input-group
+                          input#cor_company_cin.form-control(type='text' name='cor_company_cin'  placeholder='Enter Company CIN' value=center.cor_company_cin)
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='activities_portal') Activities Portal
+                        span#str_activities_portal.required-label *
+                        .input-group
+                          input#activities_portal.form-control(type='url' name='activities_portal' placeholder='Enter Activities Portal' value=center.activities_portal)
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='website_url') Website URL
+                        span#str_website_url.required-label *
+                        .input-group
+                          input#website_url.form-control(type='url' name='website_url' placeholder='Enter Website Url' value=center.website_url)
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='center_video_url') Center Video Url
+                        span#str_center_video_url.required-label *
+                        .input-group
+                          input#center_video_url.form-control(type='url' name='center_video_url' placeholder='Enter Center Video url' value=center.center_video_url)
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='cor_video_url_first') Video URL 1
+                        span#str_cor_video_url_first.required-label *
+                        .input-group
+                          input#cor_video_url_first.form-control(type='url' name='cor_video_url_first' placeholder='Enter Center Video Url 1' value=center.cor_video_url_first required)
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='cor_video_url_second') Video URL 2
+                        span#str_cor_video_url_second.required-label *
+                        .input-group
+                          input#cor_video_url_second.form-control(type='url' name='cor_video_url_second' placeholder='Enter Center Video Url 2' value=center.cor_video_url_second required)
+              .card
+                .card-header
+                  .card-title School Bank Details
+                .card-body
+                  .row
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='sch_bank_name') Bank Name
+                        span#str_sch_bank_name.required-label *
+                        .input-group
+                          input#sch_bank_name.form-control(type='text' name='sch_bank_name' placeholder='Enter Bank Name' value=center.sch_bank_name required)
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='sch_branch_address') Branch Address
+                        span#str_sch_branch_address.required-label *
+                        .input-group
+                          input#sch_branch_address.form-control(type='int' name='sch_branch_address' placeholder='Enter Branch Address' value=center.sch_branch_address required)
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='sch_account_number') Account Number
+                        span#str_sch_account_number.required-label *
+                        .input-group
+                          input#sch_account_number.form-control(type='int' name='sch_account_number' placeholder='Enter Account Number' value=center.sch_account_number required)
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='sch_ifsc') Branch IFSC Code
+                        span#str_sch_ifsc.required-label *
+                        .input-group
+                          input#sch_ifsc.form-control(type='text' name='sch_ifsc' placeholder='Enter Ifsc' value=center.sch_ifsc required)
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='sch_branch_name') Branch Name
+                        span#str_sch_branch_name.required-label *
+                        .input-group
+                          input#sch_branch_name.form-control(type='text' name='sch_branch_name' placeholder='Enter Branch Name' value=center.sch_branch_name required)
+
+              .card
+                .card-header
+                  .card-title Time Table
+                .card-body
+                  .row
+                    .col-md-6.col-lg-3
+                      .form-group
+                        label(for='sch_document_before') Can see Documents Before(days)
+                        span#str_sch_document_before.required-label *
+                        .input-group
+                          input#sch_document_before.form-control.custom-input.date(type='number' name='sch_document_before' min="0" oninput="this.value = Math.abs(this.value)" required="" placeholder='Enter Documents Before' autocomplete="off" value=center.sch_document_before)
+                    .col-md-6.col-lg-3
+                      .form-group
+                        label(for='sch_timetable_before') Can see Timetable Before(days)
+                        span#str_sch_timetable_before.required-label *
+                        .input-group
+                          input#sch_timetable_before.form-control.custom-input.date(type='number' name='sch_timetable_before' min="0" oninput="this.value = Math.abs(this.value)" placeholder='Enter Timetable Before' required="" autocomplete="off" value=center.sch_timetable_before)
+                    .col-md-6.col-lg-3
+                      .form-group
+                        label(for='sch_document_after') Can see Documents After(days)
+                        span#str_sch_document_after.required-label *
+                        .input-group
+                          input#sch_document_after.form-control.custom-input.date(type='number' name='sch_document_after' min="0" oninput="this.value = Math.abs(this.value)" placeholder='Enter Documents After' required="" autocomplete="off" value=center.sch_document_after)
+                    .col-md-6.col-lg-3
+                      .form-group
+                        label(for='sch_timetable_after') Can see Timetable After(days)
+                        span#str_sch_timetable_after.required-label *
+                        .input-group
+                          input#sch_timetable_after.form-control.custom-input.date(type='number' name='sch_timetable_after' min="0" oninput="this.value = Math.abs(this.value)" placeholder='Enter Timetable After' required="" autocomplete="off" value=center.sch_timetable_after)
+
+              .card
+                .card-header
+                  .card-title Status (Active/In-active)
+                .card-body
+                  .row
+                    .col-md-12.col-lg-12
+                      .form-group.form-show-validation.row
+                        label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='status')
+                          | Status
+                          span.required-label *
+                        .col-lg-7.col-md-9.col-sm-8
+                          .selectgroup.w-100
+                            label.selectgroup-item
+                              input.selectgroup-input(type='radio' name='status' value='active' id="status" checked=center.status=="active" required)
+                              span.selectgroup-button Active
+                            label.selectgroup-item
+                              input.selectgroup-input(type='radio' name='status' value='inactive' id="status" checked=center.status=="inactive")
+                              span.selectgroup-button In-active
+
+              .card-action
+                .row
+                  .col-md-12
+                    button.btn.btn-color(type="submit") Save Changes
+
+  block script
+    script(type='text/javascript' src='https://cdn.jsdelivr.net/momentjs/latest/moment.min.js')
+    script(type='text/javascript' src='https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js')
+    script(type='text/javascript' src='/admin/assets/js/plugin/datepicker/bootstrap-datetimepicker.min.js')
+  script.
+
+    var zones = !{JSON.stringify(zones)}
+    var center = !{JSON.stringify(center)}
+    var programs = !{JSON.stringify(programs)}
+
+    $(document).ready(function () {
+
+      if (center.status == "active") {
+        $("#str_country").show();
+        $("#str_zone").show();
+        $("#str_programcategor").show();
+        $("#str_program_id").show();
+        $("#str_setup_type").show();
+        $("#str_no_of_room").show();
+        $("#str_size_of_school").show();
+        $("#str_agreement_term_start").show();
+        $("#str_agreement_term_end").show();
+        $("#str_school_description").show();
+        $("#str_house_no").show();
+        $("#str_state").show();
+        $("#str_city").show();
+        $("#str_street").show();
+        $("#str_area").show();
+        $("#str_landmark").show();
+        $("#str_pincode").show();
+        $("#str_whatsapp_number").show();
+        $("#str_contact_number").show();
+        $("#str_cor_spoc").show();
+        $("#str_designation").show();
+        $("#str_email_id").show();
+        $("#str_mon_to_fri_start_time").show();
+        $("#str_mon_to_fri_end_time").show();
+        $("#str_cor_entity_name").show();
+        $("#str_cor_receipt").show();
+        $("#str_cor_cor_number").show();
+        $("#str_cor_email_id").show();
+        $("#str_cor_customer_email").show();
+        $("#str_cor_add").show();
+        $("#str_cor_state").show();
+        $("#str_cor_city").show();
+        $("#str_cor_pincode").show();
+        $("#str_cor_company_pan").show();
+        $("#str_cor_gst_number").show();
+        $("#str_cor_gst_address").show();
+        $("#str_cor_company_cin").show();
+        $("#str_activities_portal").show();
+        $("#str_website_url").show();
+        $("#str_center_video_url").show();
+        $("#str_cor_video_url_first").show();
+        $("#str_cor_video_url_second").show();
+        $("#str_sch_bank_name").show();
+        $("#str_sch_branch_address").show();
+        $("#str_sch_account_number").show();
+        $("#str_sch_ifsc").show();
+        $("#str_sch_branch_name").show();
+        $("#str_sch_document_before").show();
+        $("#str_sch_timetable_before").show();
+        $("#str_sch_document_after").show();
+        $("#str_sch_timetable_after").show();
+        //- $('#school_name').prop('required',true);
+        //- alert('active')
+        // required true
+        $("#country").prop("required", true);
+        $("#programcategory").prop("required", true);
+        $("#zone").prop("required", true);
+        $("#program").prop("required", true);
+        $("#setup_type").prop("required", true);
+        $("#no_of_room").prop("required", true);
+        $("#size_of_school").prop("required", true);
+        $("#agreement_term_start").prop("required", true);
+        $("#agreement_term_end").prop("required", true);
+        $("#school_description").prop("required", true);
+        $("#house_no").prop("required", true);
+        $("#state").prop("required", true);
+        $("#city").prop("required", true);
+        $("#street").prop("required", true);
+        $("#area").prop("required", true);
+        $("#landmark").prop("required", true);
+        $("#pincode").prop("required", true);
+        $("#whatsapp_number").prop("required", true);
+        $("#contact_number").prop("required", true);
+        $("#cor_spoc").prop("required", true);
+        $("#designation").prop("required", true);
+        $("#email_id").prop("required", true);
+        $("#mon_to_fri_start_time").prop("required", true);
+        $("#mon_to_fri_end_time").prop("required", true);
+        $("#cor_entity_name").prop("required", true);
+        $("#cor_receipt").prop("required", true);
+        $("#cor_cor_number").prop("required", true);
+        $("#cor_email_id").prop("required", true);
+        $("#cor_customer_email").prop("required", true);
+        $("#cor_add").prop("required", true);
+        $("#cor_state").prop("required", true);
+        $("#cor_city").prop("required", true);
+        $("#cor_pincode").prop("required", true);
+        $("#cor_company_pan").prop("required", true);
+        $("#cor_gst_number").prop("required", true);
+        $("#cor_gst_address").prop("required", true);
+        $("#cor_company_cin").prop("required", true);
+        $("#activities_portal").prop("required", true);
+        $("#website_url").prop("required", true);
+        $("#center_video_url").prop("required", true);
+        $("#cor_video_url_first").prop("required", true);
+        $("#cor_video_url_second").prop("required", true);
+        $("#sch_bank_name").prop("required", true);
+        $("#sch_branch_address").prop("required", true);
+        $("#sch_account_number").prop("required", true);
+        $("#sch_ifsc").prop("required", true);
+        $("#sch_branch_name").prop("required", true);
+        $("#sch_document_before").prop("required", true);
+        $("#sch_timetable_before").prop("required", true);
+        $("#sch_document_after").prop("required", true);
+        $("#sch_timetable_after").prop("required", true);
+      } else {
+        $("#str_country").hide();
+        $("#str_zone").hide();
+        $("#str_programcategor").hide();
+        $("#str_program_id").hide();
+        $("#str_setup_type").hide();
+        $("#str_no_of_room").hide();
+        $("#str_size_of_school").hide();
+        $("#str_agreement_term_start").hide();
+        $("#str_agreement_term_end").hide();
+        $("#str_school_description").hide();
+        $("#str_house_no").hide();
+        $("#str_state").hide();
+        $("#str_city").hide();
+        $("#str_street").hide();
+        $("#str_area").hide();
+        $("#str_landmark").hide();
+        $("#str_pincode").hide();
+        $("#str_whatsapp_number").hide();
+        $("#str_contact_number").hide();
+        $("#str_cor_spoc").hide();
+        $("#str_designation").hide();
+        $("#str_email_id").hide();
+        $("#str_mon_to_fri_start_time").hide();
+        $("#str_mon_to_fri_end_time").hide();
+        $("#str_cor_entity_name").hide();
+        $("#str_cor_receipt").hide();
+        $("#str_cor_cor_number").hide();
+        $("#str_cor_email_id").hide();
+        $("#str_cor_customer_email").hide();
+        $("#str_cor_add").hide();
+        $("#str_cor_state").hide();
+        $("#str_cor_city").hide();
+        $("#str_cor_pincode").hide();
+        $("#str_cor_company_pan").hide();
+        $("#str_cor_gst_number").hide();
+        $("#str_cor_gst_address").hide();
+        $("#str_cor_company_cin").hide();
+        $("#str_activities_portal").hide();
+        $("#str_website_url").hide();
+        $("#str_center_video_url").hide();
+        $("#str_cor_video_url_first").hide();
+        $("#str_cor_video_url_second").hide();
+        $("#str_sch_bank_name").hide();
+        $("#str_sch_branch_address").hide();
+        $("#str_sch_account_number").hide();
+        $("#str_sch_ifsc").hide();
+        $("#str_sch_branch_name").hide();
+        $("#str_sch_document_before").hide();
+        $("#str_sch_timetable_before").hide();
+        $("#str_sch_document_after").hide();
+        $("#str_sch_timetable_after").hide();
+        // required false
+        $("#country").prop("required", false);
+        $("#programcategory").prop("required", false);
+        $("#zone").prop("required", false);
+        $("#program").prop("required", false);
+        $("#setup_type").prop("required", false);
+        $("#no_of_room").prop("required", false);
+        $("#size_of_school").prop("required", false);
+        $("#agreement_term_start").prop("required", false);
+        $("#agreement_term_end").prop("required", false);
+        $("#school_description").prop("required", false);
+        $("#house_no").prop("required", false);
+        $("#state").prop("required", false);
+        $("#city").prop("required", false);
+        $("#street").prop("required", false);
+        $("#area").prop("required", false);
+        $("#landmark").prop("required", false);
+        $("#pincode").prop("required", false);
+        $("#whatsapp_number").prop("required", false);
+        $("#contact_number").prop("required", false);
+        $("#cor_spoc").prop("required", false);
+        $("#designation").prop("required", false);
+        $("#email_id").prop("required", false);
+        $("#mon_to_fri_start_time").prop("required", false);
+        $("#mon_to_fri_end_time").prop("required", false);
+        $("#cor_entity_name").prop("required", false);
+        $("#cor_receipt").prop("required", false);
+        $("#cor_cor_number").prop("required", false);
+        $("#cor_email_id").prop("required", false);
+        $("#cor_customer_email").prop("required", false);
+        $("#cor_add").prop("required", false);
+        $("#cor_state").prop("required", false);
+        $("#cor_city").prop("required", false);
+        $("#cor_pincode").prop("required", false);
+        $("#cor_company_pan").prop("required", false);
+        $("#cor_gst_number").prop("required", false);
+        $("#cor_gst_address").prop("required", false);
+        $("#cor_company_cin").prop("required", false);
+        $("#activities_portal").prop("required", false);
+        $("#website_url").prop("required", false);
+        $("#center_video_url").prop("required", false);
+        $("#cor_video_url_first").prop("required", false);
+        $("#cor_video_url_second").prop("required", false);
+        $("#sch_bank_name").prop("required", false);
+        $("#sch_branch_address").prop("required", false);
+        $("#sch_account_number").prop("required", false);
+        $("#sch_ifsc").prop("required", false);
+        $("#sch_branch_name").prop("required", false);
+        $("#sch_document_before").prop("required", false);
+        $("#sch_timetable_before").prop("required", false);
+        $("#sch_document_after").prop("required", false);
+        $("#sch_timetable_after").prop("required", false);
+      }
+
+      $('input:radio[name="status"]').change(function() {
+        if ($(this).val() == 'active') {
+          $("#str_country").show();
+          $("#str_zone").show();
+          $("#str_programcategor").show();
+          $("#str_program_id").show();
+          $("#str_setup_type").show();
+          $("#str_no_of_room").show();
+          $("#str_size_of_school").show();
+          $("#str_agreement_term_start").show();
+          $("#str_agreement_term_end").show();
+          $("#str_school_description").show();
+          $("#str_house_no").show();
+          $("#str_state").show();
+          $("#str_city").show();
+          $("#str_street").show();
+          $("#str_area").show();
+          $("#str_landmark").show();
+          $("#str_pincode").show();
+          $("#str_whatsapp_number").show();
+          $("#str_contact_number").show();
+          $("#str_cor_spoc").show();
+          $("#str_designation").show();
+          $("#str_email_id").show();
+          $("#str_mon_to_fri_start_time").show();
+          $("#str_mon_to_fri_end_time").show();
+          $("#str_cor_entity_name").show();
+          $("#str_cor_receipt").show();
+          $("#str_cor_cor_number").show();
+          $("#str_cor_email_id").show();
+          $("#str_cor_customer_email").show();
+          $("#str_cor_add").show();
+          $("#str_cor_state").show();
+          $("#str_cor_city").show();
+          $("#str_cor_pincode").show();
+          $("#str_cor_company_pan").show();
+          $("#str_cor_gst_number").show();
+          $("#str_cor_gst_address").show();
+          $("#str_cor_company_cin").show();
+          $("#str_activities_portal").show();
+          $("#str_website_url").show();
+          $("#str_center_video_url").show();
+          $("#str_cor_video_url_first").show();
+          $("#str_cor_video_url_second").show();
+          $("#str_sch_bank_name").show();
+          $("#str_sch_branch_address").show();
+          $("#str_sch_account_number").show();
+          $("#str_sch_ifsc").show();
+          $("#str_sch_branch_name").show();
+          $("#str_sch_document_before").show();
+          $("#str_sch_timetable_before").show();
+          $("#str_sch_document_after").show();
+          $("#str_sch_timetable_after").show();
+          //- $('#school_name').prop('required',true);
+          //- alert('active')
+          // required true
+          $("#country").prop("required", true);
+          $("#programcategory").prop("required", true);
+          $("#zone").prop("required", true);
+          $("#program").prop("required", true);
+          $("#setup_type").prop("required", true);
+          $("#no_of_room").prop("required", true);
+          $("#size_of_school").prop("required", true);
+          $("#agreement_term_start").prop("required", true);
+          $("#agreement_term_end").prop("required", true);
+          $("#school_description").prop("required", true);
+          $("#house_no").prop("required", true);
+          $("#state").prop("required", true);
+          $("#city").prop("required", true);
+          $("#street").prop("required", true);
+          $("#area").prop("required", true);
+          $("#landmark").prop("required", true);
+          $("#pincode").prop("required", true);
+          $("#whatsapp_number").prop("required", true);
+          $("#contact_number").prop("required", true);
+          $("#cor_spoc").prop("required", true);
+          $("#designation").prop("required", true);
+          $("#email_id").prop("required", true);
+          $("#mon_to_fri_start_time").prop("required", true);
+          $("#mon_to_fri_end_time").prop("required", true);
+          $("#cor_entity_name").prop("required", true);
+          $("#cor_receipt").prop("required", true);
+          $("#cor_cor_number").prop("required", true);
+          $("#cor_email_id").prop("required", true);
+          $("#cor_customer_email").prop("required", true);
+          $("#cor_add").prop("required", true);
+          $("#cor_state").prop("required", true);
+          $("#cor_city").prop("required", true);
+          $("#cor_pincode").prop("required", true);
+          $("#cor_company_pan").prop("required", true);
+          $("#cor_gst_number").prop("required", true);
+          $("#cor_gst_address").prop("required", true);
+          $("#cor_company_cin").prop("required", true);
+          $("#activities_portal").prop("required", true);
+          $("#website_url").prop("required", true);
+          $("#center_video_url").prop("required", true);
+          $("#cor_video_url_first").prop("required", true);
+          $("#cor_video_url_second").prop("required", true);
+          $("#sch_bank_name").prop("required", true);
+          $("#sch_branch_address").prop("required", true);
+          $("#sch_account_number").prop("required", true);
+          $("#sch_ifsc").prop("required", true);
+          $("#sch_branch_name").prop("required", true);
+          $("#sch_document_before").prop("required", true);
+          $("#sch_timetable_before").prop("required", true);
+          $("#sch_document_after").prop("required", true);
+          $("#sch_timetable_after").prop("required", true);
+        } else {
+          $("#str_country").hide();
+          $("#str_zone").hide();
+          $("#str_programcategor").hide();
+          $("#str_program_id").hide();
+          $("#str_setup_type").hide();
+          $("#str_no_of_room").hide();
+          $("#str_size_of_school").hide();
+          $("#str_agreement_term_start").hide();
+          $("#str_agreement_term_end").hide();
+          $("#str_school_description").hide();
+          $("#str_house_no").hide();
+          $("#str_state").hide();
+          $("#str_city").hide();
+          $("#str_street").hide();
+          $("#str_area").hide();
+          $("#str_landmark").hide();
+          $("#str_pincode").hide();
+          $("#str_whatsapp_number").hide();
+          $("#str_contact_number").hide();
+          $("#str_cor_spoc").hide();
+          $("#str_designation").hide();
+          $("#str_email_id").hide();
+          $("#str_mon_to_fri_start_time").hide();
+          $("#str_mon_to_fri_end_time").hide();
+          $("#str_cor_entity_name").hide();
+          $("#str_cor_receipt").hide();
+          $("#str_cor_cor_number").hide();
+          $("#str_cor_email_id").hide();
+          $("#str_cor_customer_email").hide();
+          $("#str_cor_add").hide();
+          $("#str_cor_state").hide();
+          $("#str_cor_city").hide();
+          $("#str_cor_pincode").hide();
+          $("#str_cor_company_pan").hide();
+          $("#str_cor_gst_number").hide();
+          $("#str_cor_gst_address").hide();
+          $("#str_cor_company_cin").hide();
+          $("#str_activities_portal").hide();
+          $("#str_website_url").hide();
+          $("#str_center_video_url").hide();
+          $("#str_cor_video_url_first").hide();
+          $("#str_cor_video_url_second").hide();
+          $("#str_sch_bank_name").hide();
+          $("#str_sch_branch_address").hide();
+          $("#str_sch_account_number").hide();
+          $("#str_sch_ifsc").hide();
+          $("#str_sch_branch_name").hide();
+          $("#str_sch_document_before").hide();
+          $("#str_sch_timetable_before").hide();
+          $("#str_sch_document_after").hide();
+          $("#str_sch_timetable_after").hide();
+          // required false
+          $("#country").prop("required", false);
+          $("#programcategory").prop("required", false);
+          $("#zone").prop("required", false);
+          $("#program").prop("required", false);
+          $("#setup_type").prop("required", false);
+          $("#no_of_room").prop("required", false);
+          $("#size_of_school").prop("required", false);
+          $("#agreement_term_start").prop("required", false);
+          $("#agreement_term_end").prop("required", false);
+          $("#school_description").prop("required", false);
+          $("#house_no").prop("required", false);
+          $("#state").prop("required", false);
+          $("#city").prop("required", false);
+          $("#street").prop("required", false);
+          $("#area").prop("required", false);
+          $("#landmark").prop("required", false);
+          $("#pincode").prop("required", false);
+          $("#whatsapp_number").prop("required", false);
+          $("#contact_number").prop("required", false);
+          $("#cor_spoc").prop("required", false);
+          $("#designation").prop("required", false);
+          $("#email_id").prop("required", false);
+          $("#mon_to_fri_start_time").prop("required", false);
+          $("#mon_to_fri_end_time").prop("required", false);
+          $("#cor_entity_name").prop("required", false);
+          $("#cor_receipt").prop("required", false);
+          $("#cor_cor_number").prop("required", false);
+          $("#cor_email_id").prop("required", false);
+          $("#cor_customer_email").prop("required", false);
+          $("#cor_add").prop("required", false);
+          $("#cor_state").prop("required", false);
+          $("#cor_city").prop("required", false);
+          $("#cor_pincode").prop("required", false);
+          $("#cor_company_pan").prop("required", false);
+          $("#cor_gst_number").prop("required", false);
+          $("#cor_gst_address").prop("required", false);
+          $("#cor_company_cin").prop("required", false);
+          $("#activities_portal").prop("required", false);
+          $("#website_url").prop("required", false);
+          $("#center_video_url").prop("required", false);
+          $("#cor_video_url_first").prop("required", false);
+          $("#cor_video_url_second").prop("required", false);
+          $("#sch_bank_name").prop("required", false);
+          $("#sch_branch_address").prop("required", false);
+          $("#sch_account_number").prop("required", false);
+          $("#sch_ifsc").prop("required", false);
+          $("#sch_branch_name").prop("required", false);
+          $("#sch_document_before").prop("required", false);
+          $("#sch_timetable_before").prop("required", false);
+          $("#sch_document_after").prop("required", false);
+          $("#sch_timetable_after").prop("required", false);
+        }
+      });
+
+      //- $(`#agreement_term_start`).daterangepicker({
+      //-   singleDatePicker: true,
+      //-   showDropdowns: true,
+      //-   //- minYear: moment().year(),
+      //-   //- maxYear: parseInt(moment().format('YYYY'),10),
+      //-   autoApply: true
+      //- });
+      $(`#agreement_term_start`).daterangepicker({
+        autoUpdateInput: false,
+        singleDatePicker: true,
+        //- minYear: parseInt(moment().format('YYYY'),10),
+        showDropdowns: true,
+        autoApply: true
+      });
+      $('#agreement_term_start').on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('MM/DD/YYYY'));
+      });
+      //- $(`#agreement_term_end`).daterangepicker({
+      //-   singleDatePicker: true,
+      //-   showDropdowns: true,
+      //-   //- minYear: moment().year(),
+      //-   //- maxYear: parseInt(moment().format('YYYY'),10),
+      //-   autoApply: true
+      //- });
+      $(`#agreement_term_end`).daterangepicker({
+        autoUpdateInput: false,
+        singleDatePicker: true,
+        //- minYear: parseInt(moment().format('YYYY'),10),
+        showDropdowns: true,
+        autoApply: true
+      });
+      $('#agreement_term_end').on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('MM/DD/YYYY'));
+      });
+      $('#mon_to_fri_start_time').datetimepicker({
+        format: 'h:mm A',
+        defaultDate: moment(new Date()).hours(moment(center.mon_to_fri_start_time, "h:mm A").format("HH")).minutes(moment(center.mon_to_fri_start_time, "h:mm A").format("mm")).seconds(0).milliseconds(0)
+      });
+      $("#mon_to_fri_start_time").keyup(function (e) {
+        if (e.keyCode == 8) {
+            //- alert('Backspace Key Pressed');
+            $('#mon_to_fri_start_time').val('')
+        }
+      });
+      $('#mon_to_fri_end_time').datetimepicker({
+        format: 'h:mm A',
+        defaultDate: moment(new Date()).hours(moment(center.mon_to_fri_end_time, "h:mm A").format("HH")).minutes(moment(center.mon_to_fri_end_time, "h:mm A").format("mm")).seconds(0).milliseconds(0)
+      });
+      $("#mon_to_fri_end_time").keyup(function (e) {
+        if (e.keyCode == 8) {
+            //- alert('Backspace Key Pressed');
+            $('#mon_to_fri_end_time').val('')
+        }
+      });
+      $('#saturday_start_time').datetimepicker({
+        format: 'h:mm A',
+        defaultDate: moment(new Date()).hours(moment(center.saturday_start_time, "h:mm A").format("HH")).minutes(moment(center.saturday_start_time, "h:mm A").format("mm")).seconds(0).milliseconds(0)
+      });
+      $("#saturday_start_time").keyup(function (e) {
+        if (e.keyCode == 8) {
+            //- alert('Backspace Key Pressed');
+            $('#saturday_start_time').val('')
+        }
+      });
+      $('#saturday_end_time').datetimepicker({
+        format: 'h:mm A',
+        defaultDate: moment(new Date()).hours(moment(center.saturday_end_time, "h:mm A").format("HH")).minutes(moment(center.saturday_end_time, "h:mm A").format("mm")).seconds(0).milliseconds(0)
+      });
+      $("#saturday_end_time").keyup(function (e) {
+        if (e.keyCode == 8) {
+            //- alert('Backspace Key Pressed');
+            $('#saturday_end_time').val('')
+        }
+      });
+      $('#sunday_start_time').datetimepicker({
+        format: 'h:mm A',
+        defaultDate: moment(new Date()).hours(moment(center.sunday_start_time, "h:mm A").format("HH")).minutes(moment(center.sunday_start_time, "h:mm A").format("mm")).seconds(0).milliseconds(0)
+      });
+      $("#sunday_start_time").keyup(function (e) {
+        if (e.keyCode == 8) {
+            //- alert('Backspace Key Pressed');
+            $('#sunday_start_time').val('')
+        }
+      });
+      $('#sunday_end_time').datetimepicker({
+        format: 'h:mm A',
+        defaultDate: moment(new Date()).hours(moment(center.sunday_end_time, "h:mm A").format("HH")).minutes(moment(center.sunday_end_time, "h:mm A").format("mm")).seconds(0).milliseconds(0)
+      });
+      $("#sunday_end_time").keyup(function (e) {
+        if (e.keyCode == 8) {
+            //- alert('Backspace Key Pressed');
+            $('#sunday_end_time').val('')
+        }
+      });
+      //- $(`#sch_timetable_before`).daterangepicker({
+      //-   singleDatePicker: true,
+      //-   showDropdowns: true,
+      //-   //- minYear: moment().year(),
+      //-   //- maxYear: parseInt(moment().format('YYYY'),10),
+      //-   autoApply: true
+      //- });
+      //- $(`#sch_document_before`).daterangepicker({
+      //-   singleDatePicker: true,
+      //-   showDropdowns: true,
+      //-   //- minYear: moment().year(),
+      //-   //- maxYear: parseInt(moment().format('YYYY'),10),
+      //-   autoApply: true
+      //- });
+      //- $(`#sch_timetable_after`).daterangepicker({
+      //-   singleDatePicker: true,
+      //-   showDropdowns: true,
+      //-   //- minYear: moment().year(),
+      //-   //- maxYear: parseInt(moment().format('YYYY'),10),
+      //-   autoApply: true
+      //- });
+      //- $(`#sch_document_after`).daterangepicker({
+      //-   singleDatePicker: true,
+      //-   showDropdowns: true,
+      //-   //- minYear: moment().year(),
+      //-   //- maxYear: parseInt(moment().format('YYYY'),10),
+      //-   autoApply: true
+      //- });
+      $('#programcategory').select2({
+        placeholder: "Select Program Category",
+        theme: "bootstrap"
+      });
+      $("#sel_programcategory_check").click(function(){
+        if($("#sel_programcategory_check").is(':checked') ){
+          $("#programcategory > option").prop("selected","selected");
+          $("#programcategory").trigger("change");
+        }else{
+          $("#programcategory > option").removeAttr("selected");
+          $("#programcategory").trigger("change");
+        }
+      });
+      $('#state').select2({
+        placeholder: "Select State",
+        theme: "bootstrap"
+      });
+      $('#cor_state').select2({
+        placeholder: "Select State",
+        theme: "bootstrap"
+      });
+      $('#cor_city').select2({
+        placeholder: "Select State",
+        theme: "bootstrap"
+      });
+      $('#setup').select2({
+        theme: "bootstrap"
+      });
+      $('#program').select2({
+        placeholder: "Select Program",
+        theme: "bootstrap"
+      });
+      $("#sel_program_check").click(function(){
+        if($("#sel_program_check").is(':checked') ){
+          $("#program > option").prop("selected","selected");
+          $("#program").trigger("change");
+        }else{
+          $("#program > option").removeAttr("selected");
+          $("#program").trigger("change");
+        }
+      });
+      $('#country').select2({
+        placeholder: "Select Country",
+        theme: "bootstrap"
+      });
+      $('#zone').select2({
+        placeholder: "Select Zone",
+        theme: "bootstrap"
+      });
+      $('#city').select2({
+        placeholder: "Select City",
+        theme: "bootstrap"
+      });
+      $('#action_planned').select2({
+        placeholder: "Select Action",
+        theme: "bootstrap",
+        closeOnSelect: false
+      });
+      if (center && center.state) {
+        $.ajax({
+          method: 'POST',
+          url: `/admin/center/city`,
+          data: {
+            type: center.state
+          },
+          dataType: 'json',
+          success: function (response) {
+            //- console.log(response,"response")
+
+            $("#city").empty();
+            $("#city").append(`<option value=''>Select city</option>`);
+
+            var len = response.data.length;
+            for (var i = 0; i < len; i++) {
+              var id = response.data[i]['_id'];
+              var city_name = response.data[i]['city_name'];
+              var city_id = response.data[i]['id']
+              if(center.city){
+
+                if (center.city == city_name) {
+                  $("#city").append(`<option value='${city_id}|${city_name}' selected=(${(center.city == city_name) == true ? 'selected' : null}>${city_name}</option>`);
+                }else{
+                  $("#city").append(`<option value='${city_id}|${id}'>${city_name}</option>`);
+                }
+              }else{
+                $("#city").append(`<option value='${city_id}|${id}'>${city_name}</option>`);
+              }
+
+            }
+            // $(".testi_class").select2("refresh");
+          }
+        });
+      }
+      if (center && center.cor_state) {
+        $.ajax({
+          method: 'POST',
+          url: `/admin/center/city`,
+          data: {
+            type: center.state
+          },
+          dataType: 'json',
+          success: function (response) {
+            //- console.log(response,"response")
+
+            $("#cor_city").empty();
+            $("#cor_city").append(`<option value=''>Select city</option>`);
+
+            var len = response.data.length;
+            for (var i = 0; i < len; i++) {
+              var id = response.data[i]['_id'];
+              var city_name = response.data[i]['city_name'];
+              var city_id = response.data[i]['id']
+              if(center.city){
+
+                if (center.city == city_name) {
+                  $("#cor_city").append(`<option value='${city_id}|${city_name}' selected=(${(center.city == city_name) == true ? 'selected' : null}>${city_name}</option>`);
+                }else{
+                  $("#cor_city").append(`<option value='${city_id}|${id}'>${city_name}</option>`);
+                }
+              }else{
+                $("#cor_city").append(`<option value='${city_id}|${id}'>${city_name}</option>`);
+              }
+
+            }
+            // $(".testi_class").select2("refresh");
+          }
+        });
+      }
+      $(document).on('change', '#state', function () {
+        var stateId = $(this).val();
+        var id = stateId.split("|")[1];
+        //- console.log(id,"city")
+
+        $.ajax({
+          method: 'POST',
+          url: `/admin/center/city`,
+          data: {
+            type: id
+          },
+          dataType: 'json',
+          success: function (response) {
+            //- console.log(response,"response")
+
+            $("#city").empty();
+            $("#city").append(`<option value=''>Select city</option>`);
+
+            var len = response.data.length;
+            for (var i = 0; i < len; i++) {
+              var id = response.data[i]['_id'];
+              var city_name = response.data[i]['city_name'];
+              var city_id = response.data[i]['id']
+              if(center.city){
+
+                if (center.city == city_name) {
+                  $("#city").append(`<option value='${city_id}|${city_name}' selected=(${(center.city == city_name) == true ? 'selected' : null}>${city_name}</option>`);
+                }else{
+                  $("#city").append(`<option value='${city_id}|${city_name}'>${city_name}</option>`);
+                }
+              }else{
+                $("#city").append(`<option value='${city_id}|${city_name}'>${city_name}</option>`);
+              }
+            }
+          }
+        });
+      });
+      $(document).on('change', '#cor_state', function () {
+        var stateId = $(this).val();
+        var id = stateId.split("|")[1];
+        //- console.log(id,"city")
+
+        $.ajax({
+          method: 'POST',
+          url: `/admin/center/city`,
+          data: {
+            type: id
+          },
+          dataType: 'json',
+          success: function (response) {
+            console.log(response,"response")
+
+            $("#cor_city").empty();
+            $("#cor_city").append(`<option value=''>Select city</option>`);
+
+            var len = response.data.length;
+            for (var i = 0; i < len; i++) {
+              var id = response.data[i]['_id'];
+              var city_name = response.data[i]['city_name'];
+              var city_id = response.data[i]['id']
+
+              //- console.log(response,"responssse")
+              //- console.log(id,"id")
+              //- console.log(city_name,"ststae_name")
+              //- console.log(city_id,"state_id")
+
+
+
+            if(center.cor_city){
+
+                if (center.cor_city == city_name) {
+                  $("#cor_city").append(`<option value='${city_id}|${city_name}' selected=(${(center.cor_city == city_name) == true ? 'selected' : null}>${city_name}</option>`);
+                }else{
+                  $("#cor_city").append(`<option value='${city_id}|${city_name}'>${city_name}</option>`);
+                }
+              }else{
+                $("#cor_city").append(`<option value='${city_id}|${city_name}'>${city_name}</option>`);
+              }
+
+              //- $("#city").append(`<option value='${city_id}|${id}'>${city_name}</option>`);
+
+            }
+            // $(".testi_class").select2("refresh");
+          }
+        });
+      });
+      //- console.log(center.programcategory_id)
+
+      //- $('.select2-selection__choice__remove').click(function(){
+      //-   var removeId2
+      //-   var removeId = $(this).parent().attr('title')
+      //-   var value_option = $('#programcategory option').filter(function () {
+      //-     if ($(this).text() == removeId){
+      //-     removeId2 = $(this).val()
+
+      //-     }
+      //-   });
+      //-   let newId
+      //-   for(let i =0 ; i<center.programcategory_id.length; i++){
+      //-     if(center.programcategory_id[i] != removeId2){
+      //-       newId = center.programcategory_id[i]
+      //-     }
+      //-   }
+      //-   console.log(removeId2,"meet")
+
+      //-   //- alert("hrllo");
+      //-   //- var id = $(this).val();
+      //-   console.log(id,"cliekckks")
+      //-   for (var i = 0; i < programs.length; i++) {
+      //-   var programid = programs[i]['programcategory_id'];
+      //-   var name = programs[i]['program_name'];
+
+      //-   // console.log(page.testimonials.includes(id));
+      //-   console.log(programid)
+      //-   if(programid.includes(newId)){
+      //-     console.log("matched")
+      //-     $("#program").empty();
+      //-     $("#program").append(`<option value='${newId}' selected=(${programid.includes(newId) == true ? 'selected' : null})>${name}</option>`);
+      //-   }
+      //- }
+
+      //- })
+      //- $('.select2-selection__choice__remove').click(function(){
+      //-   $(document).on('change', '#programcategory', function () {
+      //-     var ids = $(this).val();
+      //-     //- console.log(ids,"testing")
+      //-     $("#program").empty();
+      //-     for (var i = 0; i < programs.length; i++){
+      //-       if(ids == programs[i].programcategory_id){
+      //-         //- console.log(programs[i]._id,"opopop")
+      //-         if (center.program_id.includes(programs[i]._id)) {
+      //-           $("#program").append(`<option value='${programs[i]._id}' selected=(${center.program_id.includes(programs[i]._id) == true ? 'selected' : null})>${programs[i].program_name}</option>`);
+      //-         }else{
+
+      //-             $("#program").append(`<option value='${programs[i]._id}'>${programs[i].program_name}</option>`)
+
+      //-         }
+      //-       }
+      //-     }
+      //-   })
+      //- })
+      //- $('#programcategory').on('select2:close', function (e)
+      //- {
+      //-   $(document).on('change', '#programcategory', function () {
+      //-     var id = $(this).val();
+      //-     console.log(id,"testing")
+      //-   })
+      //-   //- console.log("closesse")
+      //-   //- console.log(e,"closeses")
+      //- });
+
+      //- console.log(zones,"zones")
+      //- console.log(center.zone,"center")
+      for (var i = 0; i < zones.length; i++) {
+        var id = zones[i]['_id'];
+        var name = zones[i]['name'];
+
+        // console.log(page.testimonials.includes(id));
+
+        if (center.zone_id && center.zone_id.includes(id)) {
+          $("#zone").append(`<option value='${id}' selected=(${center.zone_id.includes(id) == true ? 'selected' : null})>${name}</option>`);
+        }
+      }
+      $(document).on('change', '#program', function () {
+        let programList = $("#program option").length;
+        var valueLength = $(this).val() ? $(this).val().length : 0;
+          if (programList == valueLength) {
+            $('#sel_program_check').prop('checked',true);
+          } else {
+            $('#sel_program_check').prop('checked',false);
+          }
+          //- $('#sel_program_check').prop('checked',false);
+      })
+      $(document).on('change', '#country', function () {
+      var id = $(this).val();
+      //- console.log(id)
+
+      $.ajax({
+        method: 'POST',
+        url: `/admin/center/dropdown`,
+        data: {
+          type: id
+        },
+        dataType: 'json',
+        success: function (response) {
+          //- console.log(response,"response")
+
+          $("#zone").empty();
+          $("#zone").append(`<option value=''>Select Zone</option>`);
+
+          var len = response.data.length;
+          if (len == 0) {
+            $("#zone").append(`<option value='' disabled>No data found</option>`);
+          }
+          for (var i = 0; i < len; i++) {
+            var id = response.data[i]['_id'];
+            var name = response.data[i]['name'];
+
+            //- console.log(response,"response")
+            //- console.log(id,"id")
+            //- console.log(name,"name")
+
+
+            // $(".testi_class").append("<option value='" + id + "'>" + name + "</option>");
+
+            $("#zone").append(`<option value='${id}'>${name}</option>`);
+          }
+          // $(".testi_class").select2("refresh");
+        }
+      });
+    });
+
+    for (var i = 0; i < programs.length; i++) {
+        var id = programs[i]['_id'];
+        var name = programs[i]['program_name'];
+        var programid = programs[i]['programcategory_id'];
+
+        //- // console.log(page.testimonials.includes(id));
+        //- console.log(name,"program_name")
+
+        if (center.program_id && center.program_id.includes(id)) {
+          $("#program").append(`<option value='${id}' selected=(${center.program_id.includes(id) == true ? 'selected' : null})>${name}</option>`);
+        }else{
+          if(center.programcategory_id && center.programcategory_id.includes(programid)){
+            $("#program").append(`<option value='${id}'>${name}</option>`)
+          }
+        }
+      }
+      //- let arrayy = []
+      //- $('#programcategory').on('select2:selecting', function(e){
+      //-   let arrayy = []
+      //-   //- //- console.log(e.params.args.data.id,"selectedidddddd")
+      //-   var items= $(this).val();
+      //-   //- console.log(items,"iteams")
+
+      //-   let  id = e.params.args.data.id;
+      //-   console.log(arrayy.length)
+      //-   if(arrayy.length === 0){
+      //-     console.log("zero")
+      //-     arrayy.push(id);
+      //-   }else{
+      //-     for(let i =0; i<arrayy.length; i++){
+      //-       console.log(arrayy[i],"loop")
+      //-       if(id === arrayy[i]){
+      //-         console.log("id already exist")
+      //-       }else{
+      //-         console.log("id not exist")
+      //-         arrayy.push(id);
+      //-         console.log(arrayy,"aaa")
+      //-       }
+      //-     }
+      //-   }
+
+      //-   //- arrayy.push(id);
+      //-   //- console.log(arrayy,"arrayy")
+      //-    $.ajax({
+      //-   method: 'POST',
+      //-   url: `/admin/center/programdropdown`,
+      //-   data: {
+      //-     type: arrayy         //id
+      //-   },
+      //-   dataType: 'json',
+      //-   success: function (response) {
+      //-     //- console.log(response,"response")
+
+      //-     $("#program").empty();
+      //-     $("#program").append(`<option value=''>Select Program</option>`);
+
+      //-     var len = response.data.length;
+      //-     if (len == 0) {
+      //-       //- $("#program").append(`<option value='' disabled>No data found</option>`);
+      //-     }
+      //-     for (var i = 0; i < len; i++) {
+      //-       var id = response.data[i]['_id'];
+      //-       var name = response.data[i]['program_name'];
+      //-       var programid = programs[i]['programcategory_id'];
+
+      //-       //- console.log(response,"response")
+      //-       //- console.log(id,"id")
+      //-       //- console.log(name,"name")
+
+      //-       if (center.program_id.includes(id)) {
+      //-         //- console.log('id hai');
+      //-         $("#program").append(`<option value='${id}' selected>${name}</option>`);
+      //-       }else{
+      //-         //- console.log('id nahi hai');
+      //-         //- $("#program").append(`<option value='${id}'>${name}</option>`);
+      //-         if(center.programcategory_id.includes(programid)){
+      //-           $("#program").append(`<option value='${id}'>${name}</option>`)
+      //-         }
+      //-       }
+
+
+      //-       // $(".testi_class").append("<option value='" + id + "'>" + name + "</option>");
+
+      //-       //- $("#program").append(`<option value='${id}'>${name}</option>`);
+      //-     }
+      //-     // $(".testi_class").select2("refresh");
+      //-   }
+      //- });
+
+      //- })
+
+
+    $(document).on('change', '#programcategory', function () {
+      var id = $(this).val();
+      //- console.log(id,"idds")
+      let programcategorysList = $("#programcategory option").length;
+        var valueLength = $(this).val() ? $(this).val().length : 0;
+          if (programcategorysList == valueLength) {
+            $('#sel_programcategory_check').prop('checked',true);
+          } else {
+            $('#sel_programcategory_check').prop('checked',false);
+          }
+          $('#sel_program_check').prop('checked',false);
+      if(!id){
+        $("#program").empty();
+        $("#program").append(`<option value=''>Select Program</option>`);
+        //- console.log("if")
+
+      }
+
+      //- for (var i = 0; i < programs.length; i++) {
+      //-   var programid = programs[i]['programcategory_id'];
+      //-   var name = programs[i]['program_name'];
+
+      //-   // console.log(page.testimonials.includes(id));
+      //-   //- console.log(programid)
+      //-   if(programid.includes(id)){
+      //-     console.log("matched")
+      //-     $("#program").empty();
+      //-     $("#program").append(`<option value='${id}' selected=(${programid.includes(id) == true ? 'selected' : null})>${name}</option>`);
+      //-   }
+      //- }
+
+      $.ajax({
+        method: 'POST',
+        url: `/admin/center/programdropdown`,
+        data: {
+          type: id
+        },
+        dataType: 'json',
+        success: function (response) {
+          //- console.log(response,"response")
+
+          $("#program").empty();
+          //- $("#program").append(`<option value=''>Select Program</option>`);
+
+          var len = response.data.length;
+          if (len == 0) {
+            $("#program").append(`<option value='' disabled>No data found</option>`);
+          }
+          for (var i = 0; i < len; i++) {
+            var id = response.data[i]['_id'];
+            var name = response.data[i]['program_name'];
+
+            //- console.log(response,"response")
+            //- console.log(id,"id")
+            //- console.log(name,"name")
+
+
+            // $(".testi_class").append("<option value='" + id + "'>" + name + "</option>");
+
+            //- $("#program").append(`<option value='${id}'>${name}</option>`);
+            if (center.program_id && center.program_id.includes(id)) {
+              $("#program").append(`<option value='${id}' selected=(${center.program_id.includes(id) == true ? 'selected' : null})>${name}</option>`);
+            }else{
+
+                $("#program").append(`<option value='${id}'>${name}</option>`)
+
+            }
+          }
+          // $(".testi_class").select2("refresh");
+        }
+      });
+    });
+    })

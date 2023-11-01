@@ -1,0 +1,623 @@
+extends layout-admin
+
+block content
+  #cover-spin
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        div(style="padding:5px 20px 0px 20px;")
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold Send Response
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              //- a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/program/add') Add Program
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+      .page-inner(style="margin-bottom: 50px;")
+        .justify-content-between(style="margin-bottom: 20px;padding:0px 20px;")
+          .list-group.list-group-messages.list-group-flush
+            .list-group-item.unread
+              .list-group-item-figure
+                //-span.rating.rating-sm.mr-3
+                  input#star2(type='checkbox' value='1' checked='')
+                  label(for='star2')
+                    span.fa.fa-star
+                //- a.user-avatar(href='conversations.html')
+                  .avatar.avatar-offline
+                    img.avatar-img.rounded-circle(src='../assets/img/chadengle.jpg' alt='...')
+              .list-group-item-body
+                .row
+                  .col-12
+                    a.quick-response-lead-name(href=`/admin/responses/send/${message._id}`,style="margin-top:10px;") #{message.title}
+                    if message.attachment && message.attachment.length
+                      button.btn.pull-right.btn-color.btm-block(type="button" onclick=`viewAttachment('${message._id}')` style="margin-bottom:20px;") View Attachment(s)
+                    textarea.form-control.quick-response-lead-message-box(rows='10', cols='10', id="msg", name="msg" required) #{message.msg}
+                    p(style="margin-top: 5px;cursor:pointer;display:inline-block;float:right;" onclick=`editMessageAdd(${JSON.stringify(message.msg)});`) Edit Message Template
+                    .clearfix
+                    if message.attachment && message.attachment.length
+                      p(style="margin-top: -43px;") Note: Attachment will not be sent via Whatsapp.
+                    if super_admin
+                      .card-body(style="padding:0px 15px !important")
+                        .container
+                          .row
+                            .col-md-3
+                              .form-group
+                                label(for='stage',style="margin-bottom:0px;") Lead Stage
+                                select#stage(name='stage' data-container="body" data-live-search="true" ).selectpicker
+                                  option(value='') Select Stage
+                                  option(value="New Lead") 1. New Lead
+                                  option(value="Enquiry Received") 2. Enquiry Received
+                                  option(value="Tour Booked") 3. Tour Booked
+                                  option(value="Closed-Lead Lost") 4. Closed-Lead Lost
+                                  option(value="Post Tour") 5. Post Tour
+                                  option(value="Closed-Enquiry Lost") 6. Closed-Enquiry Lost
+                                  option(value="Closed - Won") 7. Closed - Won
+                            .col-md-4
+                              .form-group
+                                label(for='status',style="margin-bottom:0px;") Status
+                                select#status(name='status[]' multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
+                                  each statuses in statusess
+                                    option(value=statuses._id) #{statuses.name}
+                            .col-md-3
+                              .form-group
+                                label(for='program',style="margin-bottom:0px;") Program
+                                select#program(name='program[]' multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
+                                  each program in programs
+                                    option(value=program._id) #{program.program_name}
+                            .col-md-2
+                              .form-group
+                                button.btn.btn-primary#clear_filter(type="button" style='margin-top:20px;')
+                                  | &nbsp;Clear Filter
+                  if !super_admin
+                    .row
+                      .col-12
+                        .bg-white#super_admin(style="margin-top: 0px !important;")
+                          .nav-scroller
+                            .nav.nav-tabs.nav-line.nav-color-secondary(style="margin-left: 15px;")
+                              //- a.nav-link.active.show#existing_client(data-toggle='tab' href='#tab1' ,style="margin:0px;padding:15px 20px !important;") Message sent list
+                                //- span.count.ml-1 (#{messages.length})
+                              a.nav-link.active#other_client.nav-tab-cls(data-toggle='tab' href='#tab2',style="margin:0px;padding:15px 20px !important;") Lead list
+                              a.nav-link.show#existing_client.nav-tab-cls(data-toggle='tab' href='#tab1' ,style="margin:0px;padding:15px 20px !important;") Message sent list
+                        .bg-white#export_button
+                          .nav-scroller
+                            .nav.nav-tabs.nav-line.nav-color-secondary
+                              button.btn.btn-color.btm-block(type="button") Send
+                    .table-responsive#existing_client_data(style="margin-top:20px;padding:10px;")
+                      .card-body(style="padding:0px 15px !important")
+                        .container
+                          .row
+                            .col-md-3
+                              .form-group
+                                label(for='stage',style="margin-bottom:0px;") Lead Stage
+                                select#stage_2(name='stage_2' data-container="body" data-live-search="true" ).selectpicker
+                                  option(value='') Select Stage
+                                  option(value="New Lead") 1. New Lead
+                                  option(value="Enquiry Received") 2. Enquiry Received
+                                  option(value="Tour Booked") 3. Tour Booked
+                                  option(value="Closed-Lead Lost") 4. Closed-Lead Lost
+                                  option(value="Post Tour") 5. Post Tour
+                                  option(value="Closed-Enquiry Lost") 6. Closed-Enquiry Lost
+                                  option(value="Closed - Won") 7. Closed - Won
+                            .col-md-4
+                              .form-group
+                                label(for='status',style="margin-bottom:0px;") Status
+                                select#status_2(name='status_2[]' multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
+                                  each statuses in statusess
+                                    option(value=statuses._id) #{statuses.name}
+                            .col-md-3
+                              .form-group
+                                label(for='program',style="margin-bottom:0px;") Program
+                                select#program_2(name='program_2[]' multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
+                                  each program in programs
+                                    option(value=program._id) #{program.program_name}
+                            .col-md-2
+                              .form-group
+                                button.btn.btn-primary#clear_filter(type="button" style='margin-top:20px;')
+                                  | &nbsp;Clear Filter
+                      table#basic-datatables.display.table.table-bordered.table-head-bg-info.mt-4.table-hover.dataTable.quick-response-msg-table-share(role='grid', aria-describedby='basic-datatables_info',style="width:100%")
+                        thead
+                          tr(role='row')
+                            //- th LD Date
+                            th Lead Id
+                            th Date
+                            th Lead Name
+                            th First Name
+                            th Last Name
+                            //- th Stage
+                            th Email
+                            th Whatsapp No
+                            if !super_admin
+                              th(data-orderable="false") Last Sent
+                            th(data-orderable="false") Share
+                        tbody
+                            //- each lead in leads
+                            //-   a(href="#")
+                            //-     tr.odd(role='row')
+                            //-       //- td.sorting_1 #{moment(lead.lead_date).format("MMM Do YY")}
+                            //-       th #{lead.lead_no}
+                            //-       th #{moment(lead.createdAt).format('L')}
+                            //-       th #{lead.parent_name ? lead.parent_name : "Not Provided"}
+                            //-       td #{lead.child_first_name ? lead.child_first_name : "Not Provided"}
+                            //-       td #{lead.child_last_name ? lead.child_last_name : "Not Provided"}
+                            //-       td #{lead.stage ? lead.stage : "Not Provided"}
+                            //-       td #{lead.parent_email ? lead.parent_email : "Not Provided"}
+                            //-       td #{lead.parent_whatsapp ? lead.parent_whatsapp : "Not Provided"}
+                                  //- td #{moment(lead.follow_ups_id.slice(-1)[0].follow_up_date).format("MMM Do YY")}
+                                  //- td #{lead.parent_name}
+                                  //- td #{lead.child_first_name}
+                                  //- td #{lead.lead_category}
+                                  //- td #{lead.center_id.center_name}
+                                  //- td #{lead.follow_ups_id.slice(-1)[0].follow_status}
+                                  //- td #{lead.follow_ups_id.slice(-1)[0].follow_sub_status}
+                                  td
+                                    //- a.btn.btn-link.btn-primary(href=`/admin/lead/view/detail/${lead._id}`)
+                                    //-   i.fa.fa-eye
+                                    //- a.btn.btn-link.btn-primary(href=`/admin/lead/add/followup/${lead._id}`)
+                                    //-   i.fa.fa-plus
+                                    a.btn.btn-link.btn-primary( href=`/admin/responses/whatsapp/${lead._id}|${message._id}|${'whatsapp'}`)
+                                      i.fab.fa-whatsapp
+                                    a.btn.btn-link.btn-primary(href=`/admin/responses/whatsapp/${lead._id}|${message._id}|${'email'}`)
+                                      i.fa.fa-envelope
+                    .table-responsive#other_client_data(style="margin-top:20px;")
+                      .card-body(style="padding:0px 15px !important")
+                        .container
+                          .row
+                            .col-md-3
+                              .form-group
+                                label(for='stage',style="margin-bottom:0px;") Lead Stage
+                                select#stage_1(name='stage_1' data-container="body" data-live-search="true" ).selectpicker
+                                  option(value='') Select Stage
+                                  option(value="New Lead") 1. New Lead
+                                  option(value="Enquiry Received") 2. Enquiry Received
+                                  option(value="Tour Booked") 3. Tour Booked
+                                  option(value="Closed-Lead Lost") 4. Closed-Lead Lost
+                                  option(value="Post Tour") 5. Post Tour
+                                  option(value="Closed-Enquiry Lost") 6. Closed-Enquiry Lost
+                                  option(value="Closed - Won") 7. Closed - Won
+                            .col-md-4
+                              .form-group
+                                label(for='status',style="margin-bottom:0px;") Status
+                                select#status_1(name='status_1[]' multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
+                                  each statuses in statusess
+                                    option(value=statuses._id) #{statuses.name}
+                            .col-md-3
+                              .form-group
+                                label(for='program',style="margin-bottom:0px;") Program
+                                select#program_1(name='program_1[]' multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
+                                  each program in programs
+                                    option(value=program._id) #{program.program_name}
+                            .col-md-2
+                              .form-group
+                                button.btn.btn-primary#clear_filter(type="button" style='margin-top:20px;')
+                                  | &nbsp;Clear Filter
+                      table#basic-client_data.display.table.table-bordered.table-head-bg-info.mt-4.table-hover.dataTable.quick-response-msg-table-share(role='grid', aria-describedby='basic-datatables_info',style="width:100%;")
+                        thead
+                          tr(role='row')
+                            //- th LD Date
+                            th Lead Id
+                            th Date
+                            th Lead Name
+                            th First Name
+                            th Last Name
+                            //- th Stage
+                            th Email
+                            th Whatsapp No
+                            th(data-orderable="false") Share
+                        tbody
+                  else
+                    .table-responsive(style="margin-top:20px;padding:10px;")
+                      table#basic-datatables-admin.display.table.table-bordered.table-head-bg-info.mt-4.table-hover.dataTable.quick-response-msg-table-share(role='grid', aria-describedby='basic-datatables_info',style="width:100%")
+                        thead
+                          tr(role='row')
+                            //- th LD Date
+                            th Lead Id
+                            th Date
+                            th Lead Name
+                            th First Name
+                            th Last Name
+                            //- th Stage
+                            th Email
+                            th Whatsapp No
+                            if !super_admin
+                              th(data-orderable="false") Last Sent
+                            th(data-orderable="false") Share
+                        tbody
+
+
+                .row
+
+  block script
+    //- script(src="//cdn.ckeditor.com/4.20.0/basic/ckeditor.js")
+    script(type='text/javascript' src='https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js')
+    link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css")
+    script(src="/admin/custom/tinymce/tinymce.min.js")
+    script(src='/admin/assets/js/common.js')
+    //- script(src="/admin/assets/js/core/bootstrap.min.js")
+
+  script.
+    var message = !{JSON.stringify(message)}
+    $('#other_client_data').css('display', 'none')
+    $('#export_button').css('display', 'none')
+    //- console.log(message,"message1212")
+    function redirectTodownload () {
+      var filename = message.attachment;
+      window.open(filename, '_blank');
+      return;
+      // below is the code for download a file.
+      console.log(filename,"downloaddclosaaj")
+      var fileName = filename.substring(filename.lastIndexOf('/')+1);
+      window.location.href = `/admin/responses/downloadfile/${fileName}`;
+    }
+    function editMessageAdd(msg) {
+      //- alert('hey');
+      //- console.log(msg);
+      $.fancybox.open(`
+        <form method="POST" style="display: inline-block; width: 100%; max-width: 660px;" class="fancybox-content">
+          <h2 class="mb-3">Edit Message Template</strong></h2>
+          <p style="display: none">
+            <input type='hidden' name="employee_id" class="form-control"></input>
+          </p>
+          <input type='hidden' name="old_center_name" id="old_center_name" class="form-control" value=""></input>
+          <p>
+            <div class="col-md-12">
+              <div class="form-group form-group-default">
+                <label>Title:</label>
+                <input type='text' name="msg_title" id="msg_title" class="form-control" value=""></input>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="form-group form-group-default">
+                <label>New Message:</label>
+                <textarea class="form-control" id="comment" rows="7">${msg}</textarea>
+              </div>
+            </div>
+          </p>
+          <p class="mb-0">
+            <button class="btn btn-primary btn-block password_btn" id="submit-btn" onclick="saveMessage();" type="button" disabled=true>Submit</button>
+          </p>
+        </form>
+      `);
+      $("#msg_title").keyup(function(){
+        let msgCom = $("#comment").val();
+        if (msgCom) {
+            $('#submit-btn').prop('disabled', false);
+          }
+        $("#comment").keyup(function(){
+          if (msgCom) {
+            $('#submit-btn').prop('disabled', false);
+          }
+        })
+      });
+    }
+    function saveMessage() {
+      $.fancybox.close();
+      sall ("Please wait...", 12000);
+      const msgTit = $("#msg_title").val();
+      const msgComm = $("#comment").val();
+      //- console.log("msgTit------", msgTit);
+      //- console.log("msgComm------", msgComm);
+      //- return;
+      $.ajax({
+        method: 'POST',
+        url: `/admin/message/add/from/direct/lead/msg`,
+        data: {
+          msg_title: msgTit,
+          msg_desc: msgComm,
+          pdf_file: message.attachment || [],
+          status: message.status
+        },
+        dataType: 'json',
+        success: function (response) {
+          //- console.log(response,"-----response");
+          //- swal.close();
+          window.location.href = `/admin/responses/send/${response.data._id}`;
+        }
+      });
+    }
+    function sall (msg, time) {
+      var SweetAlert2Demo = function () {
+        //== Demos
+        var initDemos = function () {
+          swal(msg, {
+            buttons: false,
+            timer: time,
+            backdrop:true,
+            closeOnClickOutside: false,
+            closeOnEsc: false
+          })
+        };
+
+        return {
+            //== Init
+            init: function () {
+              initDemos();
+            },
+          };
+        }();
+      jQuery(document).ready(function () {
+        SweetAlert2Demo.init();
+      });
+    };
+
+    $(document).ready(function () {
+      $("#stage").selectpicker();
+      $("#status").selectpicker();
+      $("#program").selectpicker();
+      $("#stage_1").selectpicker();
+      $("#status_1").selectpicker();
+      $("#program_1").selectpicker();
+      $("#stage_2").selectpicker();
+      $("#status_2").selectpicker();
+      $("#program_2").selectpicker();
+      $('#msg').on('keyup', function() {
+        //- window.onbeforeunload = function() {
+        //-   return '';
+        //- };
+        var targetWord = '@client_name'; // change this to your target word
+        var text = $(this).val();
+        //- console.log(text);
+        var highlightedText = text.replace(new RegExp(targetWord, 'gi'), '<span class="highlight">' + targetWord + '</span>');
+        $(this).html(highlightedText);
+      });
+      var table1 = {};
+      var table2 = {};
+      $('#other_client').click(function(e){
+        $("#stage_1").val('default').selectpicker("refresh");
+        $("#status_1").val('default').selectpicker("refresh");
+        $("#program_1").val('default').selectpicker("refresh");
+        //- console.log("other_client")
+        //- table2.destroy();
+        console.log(Object.keys(table2).length)
+        if(Object.keys(table2).length) {
+          table2.destroy();
+        }
+        $('#existing_client_data').css('display', 'none')
+        $('#other_client_data').css('display', 'block')
+        table1 = $('#basic-client_data').DataTable({
+          bProcessing: true,
+          bServerSide: true,
+          pagination: true,
+          ordering: true,
+          order: [[1, 'desc']],
+          language: {
+            searchPlaceholder: "By ID, Name, Number, Email.."
+          },
+          sAjaxSource: `/admin/responses/otherclient/${message._id}`,
+          fnServerParams: function ( data2 ) {
+            data2.push({
+              "name": "status_1",
+              "value": $('#status_1').val()
+            });
+            data2.push({
+              "name": "program_1",
+              "value": $('#program_1').val()
+            });
+          }
+      });
+      //- table.destroy();
+      })
+
+      $('#stage').on('change', function () {
+        table
+          .columns(1)
+          .search(this.value)
+          .draw();
+        $("#clr_stage").css('visibility', 'visible');
+      });
+      $('#status').on('change', function () {
+        table
+          .columns(2)
+          .search(this.value)
+          .draw();
+        $("#clr_stage").css('visibility', 'visible');
+      });
+      $('#program').on('change', function () {
+        table
+          .columns(3)
+          .search(this.value)
+          .draw();
+        $("#clr_stage").css('visibility', 'visible');
+      });
+      $('#stage_1').on('change', function () {
+        table1
+          .columns(1)
+          .search(this.value)
+          .draw();
+        $("#clr_stage").css('visibility', 'visible');
+      });
+      $('#status_1').on('change', function () {
+        table1
+          .columns(2)
+          .search(this.value)
+          .draw();
+        $("#clr_stage").css('visibility', 'visible');
+      });
+      $('#program_1').on('change', function () {
+        table1
+          .columns(3)
+          .search(this.value)
+          .draw();
+        $("#clr_stage").css('visibility', 'visible');
+      });
+      $('#stage_2').on('change', function () {
+        table2
+          .columns(1)
+          .search(this.value)
+          .draw();
+        $("#clr_stage").css('visibility', 'visible');
+      });
+      $('#status_2').on('change', function () {
+        table2
+          .columns(2)
+          .search(this.value)
+          .draw();
+        $("#clr_stage").css('visibility', 'visible');
+      });
+      $('#program_2').on('change', function () {
+        table2
+          .columns(3)
+          .search(this.value)
+          .draw();
+        $("#clr_stage").css('visibility', 'visible');
+      });
+      $('#clear_filter').click(function() {
+        window.location.reload();
+        return;
+      })
+
+      $('#existing_client').click(function(e){
+        $("#stage_2").val('default').selectpicker("refresh");
+        $("#status_2").val('default').selectpicker("refresh");
+        $("#program_2").val('default').selectpicker("refresh");
+        //- console.log("existing_client")
+        table1.destroy();
+        $('#other_client_data').css('display', 'none')
+        $('#existing_client_data').css('display', 'block')
+        table2 =  $('#basic-datatables').DataTable({
+          bProcessing: true,
+          bServerSide: true,
+          pagination: true,
+          ordering: true,
+          order: [[1, 'desc']],
+          language: {
+            searchPlaceholder: "By ID, Name, Number, Email.."
+          },
+          sAjaxSource: `/admin/responses/messagedatatable/${message._id}`,
+          fnServerParams: function ( data ) {
+            data.push({
+              "name": "status_2",
+              "value": $('#status_2').val()
+            });
+            data.push({
+              "name": "program_2",
+              "value": $('#program_2').val()
+            });
+          }
+        });
+      })
+
+      $(".nav-tab-cls").each(function(){
+        if($(this).hasClass('active')){
+          var id = $(this).attr('id');
+           $('#'+id).trigger('click');
+        }
+      });
+      //- $('#checkboxid').click(function(e){
+      //-   console.log("checkboxid")
+      //-   $('#export_button').css('display', 'block')
+      //- })
+      //- $('#checkboxid').click(function(e) {
+      //-   alert('checkboxid checked!');
+      //- });
+      var table = $('#basic-datatables-admin').DataTable({
+        bProcessing: true,
+        bServerSide: true,
+        pagination: true,
+        ordering: true,
+        order: [[1, 'desc']],
+        language: {
+          searchPlaceholder: "By ID, Name, Number, Email.."
+        },
+        sAjaxSource: `/admin/responses/messagedatatable/${message._id}`,
+        fnServerParams: function ( data ) {
+          data.push({
+            "name": "status",
+            "value": $('#status').val()
+          });
+          data.push({
+            "name": "program",
+            "value": $('#program').val()
+          });
+        }
+      });
+
+      $(".dim").click(function(e) {
+        alert('hey')
+      })
+    })
+    function redirectToallmessage (message_id, dim_id) {
+      //- alert('hey')
+      //- console.log(dim_id);
+      //- console.log(message_id);
+      let checkMedium = message_id.split("|")[2];
+      //- console.log(checkMedium);
+      if (checkMedium == "whatsapp") {
+        $(`.${dim_id} .fab.fa-whatsapp`).css({ "color": "#c5c5c5" });
+      } else {
+        $(`.${dim_id} .fa.fa-envelope`).css({ "color": "#c5c5c5" });
+      }
+      $(`.${dim_id}`).prop("onclick", null).off("click");
+      let msg = $('#msg').val()
+      let attachment = (message.attachment && message.attachment.length) ? message.attachment : []
+      let messageData = {"msg" : msg, "attachment" :attachment, "subject": $(".quick-response-lead-name").text()}
+      //- console.log(messageData,"dataa")
+      //- console.log(message_id,"datmessage_idaa")
+      $('#cover-spin').show(0);
+      var data = $('#msg').text();
+      var value = $('#msg').val();
+      if (value) {
+        $.ajax({
+          method: 'POST',
+          url: `/admin/responses/whatsapp/${message_id}`,
+          data: {
+            type: messageData
+          },
+          dataType: 'json',
+          success: function (response) {
+            //- console.log(response.msg,"responnnnnnn")
+            if(response.msg === "email"){
+              $('#cover-spin').hide(0);
+              $("#contact-alert-overlay").show();
+              $("#contact-alert").show();
+              swal("Mail Sent!", {
+                buttons: false,
+                timer: 2000,
+                backdrop:true,
+                closeOnClickOutside: false,
+                closeOnEsc: false
+              });
+              //- window.open(`mailto:${response.email}?subject=Kido!&body=${response.newmsg}`, '_blank');
+              //- window.open`mailto:${response.email}?subject=Kido!&body=${response.newmsg}`, null, "width=600, height=400, location=0, menubar=0, resizeable=0, scrollbars=0, status=0, titlebar=0, toolbar=0");
+
+            }else{
+            //- console.log(response.data,"respponse")
+            $('#cover-spin').hide(0);
+            window.open(response.data, '_blank');
+            //- return
+            }
+            return
+          }
+        })
+      } else {
+        alert('Please provide message!');
+        return;
+      }
+      //- console.log(message_id,"////")
+      //- window.location.href = `/admin/responses/whatsapp/${message_id}`;
+
+    }
+    //- let array = []
+    //- function redirectTocheckbox (message_id) {
+    //-   //- let id = {message_id};
+    //-   //- array.push(message_id)
+    //-   let lead_id = message_id.split("|")[0]
+    //-   if(array.length){
+    //-     for(let i = 0; i<array.length; i++){
+    //-       if(array[i] === lead_id){
+    //-         console.log(array[i],"matched")
+    //-         array.filter(e => e !== message_id)
+    //-       }else{
+    //-         console.log("else")
+    //-         array.push(lead_id)
+    //-       }
+    //-     }
+    //-   }else{
+    //-     array.push(lead_id)
+    //-   }
+    //-   //- console.log(lead_id)
+    //-   //- array.push(lead_id)
+    //-   console.log(array,"array")
+    //-    $('#export_button').css('display', 'block')
+    //-   //- window.location.href = `/admin/responses/whatsapp/${message_id}`;
+    //- }
+    //- console.log(array,"array")

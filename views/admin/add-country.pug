@@ -1,0 +1,42 @@
+extends layout-admin
+
+block content
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        .page-inner.py-5
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold Add Country
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/country/all') All Country
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+      .page-inner
+        .row
+          .col-md-12
+            .card
+              form(action="/admin/country/add", method="POST")
+                .card-body
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='country_name')
+                      | Country Name
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#country_name.form-control(type='text', name='country_name', placeholder='Enter Country Name', required='')
+                  .form-group.form-show-validation.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='country_id')
+                      | Status
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      .selectgroup.w-100
+                        label.selectgroup-item
+                          input.selectgroup-input(type='radio' name='status' value='active' checked='' required)
+                          span.selectgroup-button Active
+                        label.selectgroup-item
+                          input.selectgroup-input(type='radio' name='status' value='inactive')
+                          span.selectgroup-button Inactive
+                .card-action
+                  .row
+                    .col-md-12
+                      button.btn.btn-color(type="submit") Add Country

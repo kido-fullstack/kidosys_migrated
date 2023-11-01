@@ -1,0 +1,65 @@
+extends layout-admin
+
+block content
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        .page-inner.py-5
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold View All Clients
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              if session.user.type == 'super admin'
+                a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/client/add') Add Client
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+      .page-inner
+        .row
+          .col-md-12
+            .card.card-with-nav
+              .card-body
+                //- +searchUsers()
+                //- pre= h.dump(clients)
+                .table-responsive
+                  .col-sm-12
+                    table#basic-datatables.display.table.table-striped.table-hover.dataTable(role='grid', aria-describedby='basic-datatables_info')
+                      thead
+                        tr(role='row')
+                          th Name
+                          th Company Name
+                          th Spoc
+                          th Email
+                          th Mobile
+                          th Landline 1
+                          th Landline 2
+                          th Landline 3
+                          th Status
+                          th Action
+                      tbody
+                        each user in clients
+                          a(href="#")
+                            tr.odd(role='row')
+                              td.sorting_1 #{user.name}
+                              td #{user.company_name}
+                              td #{user.spoc}
+                              td #{user.email}
+                              td #{user.mobile}
+                              td #{user.landline_1}
+                              td #{user.landline_2}
+                              td #{user.landline_3}
+                              td #{user.status == 'active' ? 'Active' : 'Inactive'}
+                              td
+                                if session.user.type == 'super admin'
+                                  a.btn.btn-link.btn-primary(href=`/admin/client/edit/${user._id}`)
+                                    i.fa.fa-edit
+                                else
+                                  a.btn.btn-link.btn-primary(href='javascript:void(0)')
+                                    i.fa.fa-eye-slash
+                .row
+
+  script.
+    $(document).ready(function() {
+      $('#basic-datatables').DataTable({
+        ordering: false
+      });
+    });

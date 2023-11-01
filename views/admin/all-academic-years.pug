@@ -1,0 +1,50 @@
+extends layout-admin
+
+block content
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        .page-inner.py-5
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold View All Academic Years
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              if h.checkPermission(session.user, permissionCacheData, "AcademicYearAdd") || checkSuperAdmin
+                a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/academic/year/add/') Add Academic Years
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard/') Dashboard
+      .page-inner
+        .row
+          .col-md-12
+            .card.card-with-nav
+              .card-body
+                //- pre= h.dump(courses)
+                .table-responsive
+                  .col-sm-12
+                    table#basic-datatables.display.table.table-striped.table-hover.dataTable(role='grid', aria-describedby='basic-datatables_info')
+                      thead
+                        tr(role='row')
+                          th Name
+                          th Start Date
+                          th End Date
+                          th Status
+                          th Action
+                      tbody
+                        each academicYear in academicYears
+                          a(href="#")
+                            tr.odd(role='row')
+                              td.sorting_1 #{academicYear.name}
+                              td #{moment(academicYear.start_date).format("MM/DD/YYYY")}
+                              td #{moment(academicYear.end_date).format("MM/DD/YYYY")}
+                              td #{academicYear.status == 'active' ? 'Active' : 'Inactive'}
+                              td
+                                if h.checkPermission(session.user, permissionCacheData, "AcademicYearEdit") || checkSuperAdmin
+                                  a.btn.btn-link.btn-primary(href=`/admin/academic/year/edit/${academicYear._id}`)
+                                    i.fa.fa-edit
+
+  script.
+    $(document).ready(function() {
+      $('#basic-datatables').DataTable({
+        ordering: false
+      });
+    });

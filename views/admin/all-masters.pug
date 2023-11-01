@@ -1,0 +1,123 @@
+extends layout-admin
+
+block content
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        .page-inner.py-5
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold Masters
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+      .page-inner
+        .row
+          if h.checkPermission(session.user, permissionCacheData, "AcademicYearViewMaster") || checkSuperAdmin
+            .col-md-4
+              a(href="/admin/academic/year/all")
+                .card.card-dark.bg-secondary-gradient
+                  .card-body.curves-shadow
+                    h1
+                      .icon-big
+                        i.fas.fa-calendar-alt
+                    h2.op-8 Academic Year Master
+                    .pull-right
+                      h1.fw-bold.op-8
+                        i.fas.fa-arrow-alt-circle-right
+          if checkSuperAdmin
+            .col-md-4
+              a(href="/admin/programcategory/all")
+                .card.card-dark.bg-secondary-gradient
+                  .card-body.skew-shadow
+                    h1
+                      .icon-big
+                        i.fas.fa-university
+                    h2.op-8 Program Category Setup
+                    .pull-right
+                      h1.fw-bold.op-8
+                        i.fas.fa-arrow-alt-circle-right
+          if checkSuperAdmin
+            .col-md-4
+              a(href="/admin/program/all")
+                .card.card-dark.bg-secondary-gradient
+                  .card-body.skew-shadow
+                    h1
+                      .icon-big
+                        i.fas.fa-university
+                    h2.op-8 Program Setup
+                    .pull-right
+                      h1.fw-bold.op-8
+                        i.fas.fa-arrow-alt-circle-right
+          if checkSuperAdmin
+            .col-md-4
+              a(href="/admin/country/all")
+                .card.card-dark.bg-secondary-gradient
+                  .card-body.skew-shadow
+                    h1
+                      .icon-big
+                        i.fas.fa-globe-americas
+                    h2.op-8 Country Setup
+                    .pull-right
+                      h1.fw-bold.op-8
+                        i.fas.fa-arrow-alt-circle-right
+          if checkSuperAdmin
+            .col-md-4
+              a(href="/admin/zone/all")
+                .card.card-dark.bg-secondary-gradient
+                  .card-body.bubble-shadow
+                    h1
+                      .icon-big
+                        i.fas.fa-archway
+                    h2.op-8 Zone Master
+                    .pull-right
+                      h1.fw-bold.op-8
+                        i.fas.fa-arrow-alt-circle-right
+          if checkSuperAdmin
+            .col-md-4
+              a(href="/admin/center/all")
+                .card.card-dark.bg-secondary-gradient
+                  .card-body.curves-shadow
+                    h1
+                      .icon-big
+                        i.fas.fa-school
+                    h2.op-8 Center Master
+                    .pull-right
+                      h1.fw-bold.op-8
+                        i.fas.fa-arrow-alt-circle-right
+          if h.checkPermission(session.user, permissionCacheData, "MessageViewMaster") || checkSuperAdmin
+            .col-md-4
+              a(href="/admin/message/all")
+                .card.card-dark.bg-secondary-gradient
+                  .card-body.curves-shadow
+                    h1
+                      .icon-big
+                        i.fas.fa-newspaper
+                    h2.op-8 Message Setup
+                    .pull-right
+                      h1.fw-bold.op-8
+                        i.fas.fa-arrow-alt-circle-right
+          if checkSuperAdmin
+            .col-md-4
+              a(href="/admin/uac/role/all")
+                .card.card-dark.bg-secondary-gradient
+                  .card-body.curves-shadow
+                    h1
+                      .icon-big
+                        i.fa.fa-user
+                    h2.op-8 UAC / Roles
+                    .pull-right
+                      h1.fw-bold.op-8
+                        i.fas.fa-arrow-alt-circle-right
+          if h.checkPermission(session.user, permissionCacheData, "UserViewMaster") || checkSuperAdmin
+            .col-md-4
+              a(href="/admin/employee/all")
+                .card.card-dark.bg-secondary-gradient
+                  .card-body.bubble-shadow
+                    h1
+                      .icon-big
+                        i.fas.fa-user-cog
+                    h2.op-8 User Master
+                    .pull-right
+                      h1.fw-bold.op-8
+                        i.fas.fa-arrow-alt-circle-right

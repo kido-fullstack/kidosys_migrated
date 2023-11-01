@@ -1,0 +1,400 @@
+extends layout-admin
+
+block content
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        div(style="padding:5px 20px 0px 40px;")
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold Dashboard
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            //- .ml-md-auto.py-2.py-md-0
+              a.btn.btn-white.btn-border.btn-round.mr-2.zero_qty_spares(href='javascript:void(0)') Download zero qty spares (Bhiwandi)
+              a.btn.btn-secondary.btn-round(href='/admin/stock/view/cart') View Cart
+      .page-inner
+        .row
+          .col-md-12
+            .card.card-with-nav.filter-div(style="margin-bottom: 0;")
+              .card-body(style="padding:0px 15px !important")
+                //- p= h.dump(acknowledgments)
+                .row
+                  - var showCountry = 1
+                  - var showZone = 1
+                  - var showCenter = 1
+                  if (session.user && session.user.main)
+                    - var showCountry = 1
+                    - var showZone = 1
+                    - var showCenter = 1
+                  else if (session.user.center_id.length == 1)
+                    - var showCountry = 0
+                    - var showZone = 0
+                    - var showCenter = 0
+                  else if (session.user.country_id.length == 1 && session.user.zone_id.length == 1 && session.user.center_id.length > 1)
+                    - var showCountry = 0
+                    - var showZone = 0
+                    - var showCenter = 1
+                  else if (session.user.zone_id.length > 1 && session.user.center_id.length > 1 && session.user.country_id.length == 1)
+                    - var showCountry = 0
+                    - var showZone = 1
+                    - var showCenter = 1
+                  else if (session.user.country_id.length > 1 && session.user.zone_id.length > 1 && session.user.center_id.length > 1)
+                    - var showCountry = 1
+                    - var showZone = 1
+                    - var showCenter = 1
+                  .col-md-3
+                    .form-group
+                      label(for='type' style="width: 100%;margin-bottom:0px;") Date Range
+                      input#date.form-control(type='text' name="date_range" value="" readonly style="height:40px !important")
+                      a#clr_date_range(href="javascript:void(0)" style="margin-top: 3px;float: right;text-decoration: none;z-index:9999")
+                        i.fa.fa-times(style="position: absolute;right: 35px;top: 42px;z-index: 99999;")
+                  if showCountry
+                    .col-md-2
+                      .form-group
+                        label(for='country',style="margin-bottom:-8px;") Country
+                        select#country(name='country[]' title="All" multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
+                          each country in data.countries
+                            option(value=country._id) #{country.country_name}
+                  if showZone
+                    .col-md-2
+                      .form-group
+                        label(for='source_category',style="margin-bottom:0px;") Zone
+                        select#zone(name='zone[]' title="All" multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
+                          each zone in data.zones
+                            option(value=zone._id) #{zone.name}
+                  if showCenter
+                    .col-md-2
+                      .form-group
+                        label(for='center',style="margin-bottom:0px;") Center
+                        select#center(name='center[]' title="All" multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
+                          each center in data.centers
+                            option(value=center._id) #{center.school_display_name}
+                  .col-md-2
+                    .form-group
+                      label(for='stage',style="margin-bottom:0px;") Source Category
+                      select#source_category(name='source_category' data-container="body" data-live-search="true" ).selectpicker
+                        option(value='') Select Source Category
+                        option(value="direct-walk-in") Direct Walk in
+                        option(value="digital-lead") Digital Lead
+                        option(value="database/events") Database/Events
+                  .col-md-1(style="text-align:inherit;margin-top: 25px;")
+                    .form-group
+                      label(for='stage',style="margin-bottom:0px;")
+                      button.btn.btn-icon.btn-primary.btn-round.btn-xs#clear_filter(type="button" style="width: -webkit-fill-available;")
+                        i.fas.fa-broom
+                      //- button.btn.btn-primary#clear_filter(type="button" style='margin-top:20px;')
+                      //-   | &nbsp;Clear Filter
+            .card-body(style="padding:0px 15px !important")
+              .row
+                .col-md-12
+                  .card-body
+                    ul#pills-tab-without-border.nav.nav-pills.nav-secondary.nav-pills-no-bd()
+                      li.nav-item.submenu
+                        a#pills-home-tab-nobd.nav-link.show(href='/admin/dashboard?rep=leads' onclick="sall('Please wait...', 12000)" class=(reportQuery == "leads" ? "active" : "")) Leads
+                      li.nav-item.submenu
+                        a#pills-profile-tab-nobd.nav-link(href='/admin/dashboard?rep=enrollment' onclick="sall('Please wait...', 12000)" class=(reportQuery == "enrollment" ? "active" : "")) Enrollment
+                      li.nav-item.submenu
+                        a#pills-contact-tab-nobd.nav-link(href='/admin/dashboard?rep=fees' onclick="sall('Please wait...', 12000)" class=(reportQuery == "fees" ? "active" : "")) Fees
+            .card-body
+              if reportQuery == "leads"
+                .row
+                  .col-sm-6.col-md-4
+                    .card.card-stats.card-primary.card-round(style="background:#00356b !important;")
+                      a.headerBox(href="/admin/lead/all" target="_blank")
+                        .card-body
+                          .row
+                            .col-5
+                              .icon-big.text-center
+                                i.flaticon-users
+                            .col-7.col-stats
+                              .numbers
+                                p.card-category Today's new leads
+                                h4.card-title.waiting1 Please wait...
+                                h4.card-title.done1(style="display:none;")
+                  .col-sm-6.col-md-4
+                    .card.card-stats.card-info.card-round(style="background:#bd5319 !important;")
+                      a.headerBox(href="/admin/lead/follow/all" target="_blank")
+                        .card-body
+                          .row
+                            .col-5
+                              .icon-big.text-center
+                                i.flaticon-next
+                            .col-7.col-stats
+                              .numbers
+                                p.card-category Today's followup due
+                                h4.card-title.waiting2 Please wait...
+                                h4.card-title.done2(style="display:none;")
+                  .col-sm-6.col-md-4
+                    .card.card-stats.card-success.card-round(style="background:#eb0000 !important;")
+                      a.headerBox(href="/admin/lead/follow/all" target="_blank")
+                        .card-body
+                          .row
+                            .col-5
+                              .icon-big.text-center
+                                i.flaticon-archive
+                            .col-7.col-stats
+                              .numbers
+                                p.card-category All overdue leads
+                                h4.card-title.waiting3 Please wait...
+                                h4.card-title.done3(style="display:none;")
+                .row.mt--2
+                  .col-md-6
+                    .card.full-height
+                      .card-body
+                        .waiting-loader-circle-1(style="font-size: 18px;") Please wait...
+                        .after-loading-circle-1(style="display:none;")
+                          .card-title Digital Lead Statistics
+                          //- .card-category Digital Lead > Post Tour > Enrollments (Nos in %age)
+                          .d-flex.flex-wrap.justify-content-around.pb-2.pt-4
+                            .px-2.pb-2.pb-md-0.text-center
+                              #circles-1
+                              h6.fw-bold.mt-3.mb-0 Lead
+                            .px-2.pb-2.pb-md-0.text-center
+                              #circles-2
+                              h6.fw-bold.mt-3.mb-0 Tour
+                            .px-2.pb-2.pb-md-0.text-center
+                              #circles-3
+                              h6.fw-bold.mt-3.mb-0 Won
+                          //- .card-category.circle_1(style="display:none;color: #2a3565;")
+                          .card-category.circle_1.d-inline-block(style="display:none;color: #2a3565;")
+                          .card-category.circle_11.d-inline-block(style="display:none;color: #2a3565;")
+                  .col-md-6
+                    .card.full-height
+                      .card-body
+                        .waiting-loader-barchart-1(style="font-size: 18px;") Please wait...
+                        .after-loading-barchart-1
+                          .card-title Digital Lead Flow of Last 7 Days
+                          .row.py-3
+                            .col-md-4.d-flex.flex-column.justify-content-around
+                              div
+                                h6.fw-bold.text-uppercase.op-8 Total Leads
+                                h3.fw-bold.tot-lead-count(style="margin-left: 40px;") 51
+                              //- div
+                                h6.fw-bold.text-uppercase.text-danger.op-8 Total Spend
+                                h3.fw-bold $1,248
+                            .col-md-8
+                              #chart-container
+                                canvas#totalIncomeChart
+                  .col-md-6
+                    .card.full-height
+                      .card-body
+                        .waiting-loader-circle-2(style="font-size: 18px;") Please wait...
+                        .after-loading-circle-2(style="display:none;")
+                          .card-title Direct Walk-in Statistics
+                          //- .card-category Daily information about statistics in system
+                          .d-flex.flex-wrap.justify-content-around.pb-2.pt-4
+                            .px-2.pb-2.pb-md-0.text-center
+                              #circles-4
+                              h6.fw-bold.mt-3.mb-0 Walk-ins
+                            .px-2.pb-2.pb-md-0.text-center
+                              #circles-5
+                              h6.fw-bold.mt-3.mb-0 Won
+                            //- .px-2.pb-2.pb-md-0.text-center
+                            //-   #circles-6
+                            //-   h6.fw-bold.mt-3.mb-0 Subscribers
+                          .card-category.circle_2(style="display:none;color: #2a3565;")
+                  .col-md-6
+                    .card.full-height
+                      .card-body
+                        .waiting-loader-barchart-2(style="font-size: 18px;") Please wait...
+                        .after-loading-barchart-2
+                          .card-title Direct Walk-ins Flow of Last 7 Days
+                          .row.py-3
+                            .col-md-4.d-flex.flex-column.justify-content-around
+                              div
+                                h6.fw-bold.text-uppercase.op-8 Total Walk-ins
+                                h3.fw-bold.tot-enq-count(style="margin-left: 40px;") 51
+                              //- div
+                              //-   h6.fw-bold.text-uppercase.text-danger.op-8 Total Spend
+                              //-   h3.fw-bold $1,248
+                            .col-md-8
+                              #chart-container
+                                canvas#totalIncomeChart1
+                  .col-md-6.pro_cat_div
+                    .card
+                      .card-header
+                        .card-title Enrollments by Program Category
+                      .card-body
+                        .waiting-loader-doughnut-1(style="font-size: 18px;") Please wait...
+                        .after-loading-doughnut-1(style="display:none;")
+                          .chart-container
+                            canvas#doughnutChart(style='width: 50%; height: 50%')
+                          .card-category.d11(style="display:none;color: #2a3565;") Pre School(20%) | DayCare(60%) | Social Science(20%)
+                          .card-category.d12(style="display:none;color: #2a3565;") Total - 5 leads
+                  .col-md-6.pro_div
+                    .card
+                      .card-header
+                        .card-title Enrollments by Program
+                      .card-body
+                        .waiting-loader-piechart-1(style="font-size: 18px;") Please wait...
+                        .after-loading-piechart-1(style="display:none;")
+                          .chart-container
+                            canvas#pieChart(style='width: 50%; height: 50%')
+                          .card-category.d21(style="display:none;color: #2a3565;") Pre School(20%) | DayCare(60%) | Social Science(20%)
+                          .card-category.d22(style="display:none;color: #2a3565;") Total - 5 leads
+                  .col-md-6.ld_cnt_status_og
+                    .card
+                      .card-header
+                        .card-title Lead count by Status
+                      .card-body
+                        .waiting-loader-hori-sta-2(style="font-size: 18px;") Please wait...
+                        .after-loading-hori-sta-2(style="display:none;")
+                          .chart-container(style="margin-bottom: 40px;")
+                            canvas#horizontalBarChart2(style='width: 50%; height: 50%')
+                          span.note-span  Note: 'Walked-in' status refers to - Counselling in Progress.
+                  .col-md-6.ld_stg_sc_og
+                    .card
+                      .card-header
+                        .card-title Lead stage by source category
+                      .card-body
+                        .waiting-loader-stage-srccat-2(style="font-size: 18px;") Please wait...
+                        .after-loading-stage-srccat-2(style="display:none;")
+                          .form-check(style="padding: 0 10px 0 10px;")
+                            label.form-radio-label
+                              input.form-radio-input(type='radio' name='src_cat' value='' checked='')
+                              span.form-radio-sign All
+                            label.form-radio-label.ml-3
+                              input.form-radio-input(type='radio' name='src_cat' value='direct-walk-in')
+                              span.form-radio-sign Direct Walk in
+                            label.form-radio-label.ml-3
+                              input.form-radio-input(type='radio' name='src_cat' value='digital-lead')
+                              span.form-radio-sign Digital Lead
+                            label.form-radio-label.ml-3
+                              input.form-radio-input(type='radio' name='src_cat' value='database/events')
+                              span.form-radio-sign Database/Events
+                          hr
+                          .chart-container
+                            canvas#horizontalBarChart3(style='width: 50%; height: 50%')
+                  .col-md-6.ld_cnt_status
+                    .card
+                      .card-header
+                        .card-title Lead count by Source
+                      .card-body
+                        .waiting-loader-piechart-2(style="font-size: 18px;") Please wait...
+                        .after-loading-piechart-2(style="display:none;")
+                          .chart-container(style='height:700px')
+                            canvas#horizontalBarChart(style='width: 50%; height:50%')
+                  .col-md-6
+                    .card.full-height
+                      .card-header
+                        .card-head-row
+                          .card-title Feed Activity (Last 10 messages sent)
+                          //- .card-tools
+                            ul#pills-tab.nav.nav-pills.nav-secondary.nav-pills-no-bd.nav-sm(role='tablist')
+                              li.nav-item
+                                a#pills-today.nav-link(data-toggle='pill' href='index.html#pills-today' role='tab' aria-selected='true') Today
+                              li.nav-item
+                                a#pills-week.nav-link.active(data-toggle='pill' href='index.html#pills-week' role='tab' aria-selected='false') Week
+                              li.nav-item
+                                a#pills-month.nav-link(data-toggle='pill' href='index.html#pills-month' role='tab' aria-selected='false') Month
+                      .card-body(style="max-height: 700px;overflow-y: scroll;")
+                        .waiting-loader-feed-1(style="font-size: 18px;") Please wait...
+                        .after-loading-feed-1(style="display:none;")
+                          - var colors = ["warning", "danger", "info", "secondary"]
+                          each msg in messages
+                            - const random = Math.floor(Math.random() * colors.length);
+                            - const rand = colors[random]
+                            .d-flex
+                              .avatar
+                                span.avatar-title.rounded-circle.border.border-white(class=`bg-${rand}`) #{msg.parent_name ? msg.parent_name.split(" ")[0].split("")[0] : "A"}
+                              .flex-1.ml-3.pt-1
+                                h6.text-uppercase.fw-bold.mb-1
+                                  | #{msg.parent_name ? msg.parent_name : "Not Provided"}
+                                  span.pl-3(class=`text-${rand}`) Sent By: #{msg.updatedBy_name}
+                                span.text-muted #{msg.msg.length > 80 ? msg.msg.slice(0, 80 - 1) + "…" : msg.msg}
+                              .float-right.pt-1
+                                small.text-muted #{msg.last_sent.last_date} / #{msg.last_sent.last_time}
+                            .separator-dashed
+                hr
+                .card.card-with-nav.filter-div
+                  .card-body(style="padding:0px 15px !important")
+                    .waiting-loader-monthrange(style="font-size: 18px;") Please wait...
+                    .row.after-loader-monthrange(style="display: none;")
+                      .col-md-3
+                        .form-group
+                          label(for='type' style="width: 100%;margin-bottom:0px;") From Date
+                          input#month.monthPicker-start.form-control(type='text' name="date_range" value="" readonly style="height:40px !important")
+                      .col-md-3
+                        .form-group
+                          label(for='type' style="width: 100%;margin-bottom:0px;") To Date
+                          input#month.monthPicker-end.form-control(type='text' name="date_range" value="" readonly style="height:40px !important")
+                      .col-md-3
+                        .form-group
+                          button.btn.btn-primary#clear_filter_months(type="button" style='margin-top:20px;')
+                            | &nbsp;Clear Filter
+                .row
+                  .col-md-3.country_box(style="display:none;")
+                    .form-group
+                      label.form-label Selected Country :
+                      br
+                      .selectgroup.selectgroup-pills.country_pills
+
+                  .col-md-3.zone_box(style="display:none;")
+                    .form-group
+                      label.form-label Selected Zone :
+                      br
+                      .selectgroup.selectgroup-pills.zone_pills
+
+                  .col-md-3.center_box(style="display:none;")
+                    .form-group
+                      label.form-label Selected Center :
+                      br
+                      .selectgroup.selectgroup-pills.center_pills
+
+                  .col-md-3.src_cat_box(style="display:none;")
+                    .form-group
+                      label.form-label Selected Source Category :
+                      br
+                      .selectgroup.selectgroup-pills.src_cat_pills
+
+
+                .card-body(style="padding: 0 !important;")
+                  .row
+                    .col-md-6
+                      .card
+                        .card-header
+                          .card-title Leads compared to previous time frames
+                        .card-body
+                          .waiting-loader-multiplelinechart-1(style="font-size: 18px;") Please wait...
+                          .after-loading-multiplelinechart-1(style="display:none;")
+                            .chart-container
+                              canvas#multipleLineChart
+                    .col-md-6
+                      .card
+                        .card-header
+                          .card-title Lead bifurcation by Stages
+                        .card-body
+                          .waiting-loader-multiplebarchart-1(style="font-size: 18px;") Please wait...
+                          .after-loading-multiplebarchart-1(style="display:none;")
+                            .chart-container
+                              canvas#multipleBarChart
+
+              if reportQuery == "enrollment"
+                h2 Data not found
+              if reportQuery == "fees"
+                h2 Data not found
+
+  //- style(type="text/css").
+  //-   .datepicker-months .prev ,.datepicker-months .next{
+  //-     display: none !important;
+  //-   }
+
+  block script
+    script(type='text/javascript' src='https://cdn.jsdelivr.net/momentjs/latest/moment.min.js')
+    script(type='text/javascript' src='https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js')
+    script(src='https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/js/bootstrap-datepicker.min.js')
+    script(type='text/javascript' src='https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js')
+    link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css")
+    //-- Chart JS
+    script(src='/admin/assets/js/plugin/chart.js/chart.min.js')
+    //-- jQuery Sparkline
+    script(src='/admin/assets/js/plugin/jquery.sparkline/jquery.sparkline.min.js')
+    //-- Chart Circle
+    script(src='/admin/assets/js/plugin/chart-circle/circles.min.js')
+    //- Lead js
+    script(src='/admin/assets/js/dashboard/lead.js')
+    //- plugin dependencies
+    script(src='/admin/assets/js/dashboard/dependency.js')
+
+  script.
+    var data = !{JSON.stringify(data)};

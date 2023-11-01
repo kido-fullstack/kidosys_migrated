@@ -1,0 +1,66 @@
+extends layout-admin
+
+block content
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        .page-inner.py-5
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold View All Zones
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/zone/add') Add Zone
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+      .page-inner
+        .row
+          .col-md-12
+            .card.card-with-nav
+              .card-body
+                //- pre= h.dump(courses)
+                .row
+                  .col-md-3
+                    .form-group
+                      label(for='exampleFormControlSelect') Select Status
+                      select#dropdown1.select2(name='status_dd')
+                        option(value='') Select Status
+                        option(value='enabled') Active
+                        option(value='disabled') In-active
+                .table-responsive
+                  .col-sm-12
+                    table#basic-datatables.display.table.table-striped.table-hover.dataTable(role='grid', aria-describedby='basic-datatables_info')
+                      thead
+                        tr(role='row')
+                          th Zone Name
+                          th Status
+                          th Action
+                          th(style="display:none") Status
+                      tbody
+                        each zone in zones
+                          a(href="#")
+                            tr.odd(role='row')
+                              td.sorting_1 #{zone.name}
+                              td #{zone.status == 'active' ? 'Active' : 'Inactive'}
+                              td
+                                a.btn.btn-link.btn-primary(href=`/admin/zone/edit/${zone._id}`)
+                                  i.fa.fa-edit
+                              td(style="display:none") #{zone.status == "active" ? "enabled" : "disabled"}
+
+  script.
+    $(document).ready(function() {
+      $("#dropdown1").select2();
+      var table = $('#basic-datatables').DataTable({
+        ordering: true,
+        columnDefs: [{
+          orderable: false,
+          targets: [2]
+        }]
+      });
+
+      $('#dropdown1').on('change', function () {
+        table
+          .columns(3)
+          .search(this.value)
+          .draw();
+      });
+    });

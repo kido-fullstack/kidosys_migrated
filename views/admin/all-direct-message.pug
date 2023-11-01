@@ -1,0 +1,234 @@
+extends layout-admin
+
+block content
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        .page-inner.py-5
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold All Message
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              button.btn.btn-white.btn-border.btn-round.mr-2(type="button" onclick="redirectToAddMessage()") Add Message
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+      .page-inner(style="margin-bottom: 50px;")
+        .d-flex.justify-content-between(style="margin-bottom: 20px;")
+          .d-md-inline-block
+        //-     .input-group
+        //-       .input-group-prepend
+        //-         span.input-group-text.bg-white
+        //-           i.fa.fa-search.search-icon
+        //-       input.form-control(type='text' aria-label='Text input with dropdown button')
+        //-       .input-group-append
+        //-         button.btn.btn-secondary.dropdown-toggle(type='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false') Filter
+        //-         .dropdown-menu
+        //-           a.dropdown-item(href='#') Action
+        //-           a.dropdown-item(href='#') Another action
+        //-           a.dropdown-item(href='#') Something else here
+        //-           .dropdown-divider(role='separator')
+        //-           a.dropdown-item(href='#') Separated link
+        //-   if h.checkPermission(session.user, permissionCacheData, "MessageAdd") || checkSuperAdmin
+        //-     a.btn.btn-success.d-none.d-sm-inline-block(href='/admin/message/add') New Message
+        .page-navs.bg-white
+          .nav-scroller
+            .nav.nav-tabs.nav-line.nav-color-secondary
+              a.nav-link.active.show(data-toggle='tab' href='#tab1')
+                | Messages
+                span.count.ml-1 (#{messages.length})
+
+              //- button.btn.btn-color.btm-block(type="button" onclick="redirectToAddMessage()") Add Message
+              //- a.nav-link(data-toggle='tab' href='#tab2') Files
+        //- pre= h.dump(messages)
+        //- each message in messages
+          .list-group.list-group-messages.list-group-flush
+            .list-group-item.unread
+              .list-group-item-figure
+                //-span.rating.rating-sm.mr-3
+                  input#star2(type='checkbox' value='1' checked='')
+                  label(for='star2')
+                    span.fa.fa-star
+                //- a.user-avatar(href='conversations.html')
+                  .avatar.avatar-offline
+                    img.avatar-img.rounded-circle(src='../assets/img/chadengle.jpg' alt='...')
+              .list-group-item-body.pl-3.pl-md-4
+                .row
+                  .col-12.col-lg-10
+                    h4.list-group-item-title
+                      a(href=`/admin/responses/send/${message._id}`) #{message.title}
+                      p.list-group-item-text.text-truncate.clamp-words #{message.msg}
+                    if message.total && message.total.last_sent_moment.last_date_time
+                      p.list-group-item-text.text-truncate Last sent on #{message.total ? message.total.last_sent_moment.last_date_time : "Not Yet Sent"}
+                    else
+                      p.list-group-item-text.text-truncate Not sent yet
+                  .col-12.col-lg-2.text-lg-right
+                    span.date.float-right
+                      if message.attachment
+                        i.fa.fa-paperclip.paperclip
+                      if message.total && message.total.sent_count
+                        | &nbsp;Sent #{message.total.sent_count} times
+
+                    //- p.list-group-item-text  20 minutes ago
+              //- .list-group-item-figure
+                .dropdown
+                  button.btn-dropdown(data-toggle='dropdown')
+                    i.icon-options-vertical
+                  .dropdown-arrow
+                  .dropdown-menu.dropdown-menu-right
+                    a.dropdown-item(href='#') Mark as read
+                    a.dropdown-item(href='#') Mark as unread
+                    a.dropdown-item(href='#') Toggle star
+                    a.dropdown-item(href='#') Trash
+        .row
+          .col-md-12
+            .card.card-with-nav
+              .card-body#truncate
+                //- pre= h.dump(courses)
+                .table-responsive
+                  table#basic-datatables.display.table.table-striped.table-hover.dataTable.quick-response-msg-table(role='grid', aria-describedby='basic-datatables_info' style="width: 100%;")
+                      thead
+                        tr(role='row')
+                          th Title
+                          th Created on
+                          th Created By
+                          //-if admin_check == "non_admin"
+                            th Sent
+                            th Last Sent
+                          th(data-orderable="false") Action
+                      tbody
+                        //- each message in messages
+                        //-   a(href="#")
+                        //-     tr.odd(role='row')
+
+                        //-       th #{message.title}
+                .row
+
+  block script
+    script(src='/admin/assets/js/common.js')
+
+  script.
+    var lead_id = !{JSON.stringify(lead_id)}
+    var check = !{JSON.stringify(check)}
+    var num_email = !{JSON.stringify(num_email)}
+    $(document).ready(function() {
+      $('#basic-datatables').DataTable({
+        bProcessing: true,
+        bServerSide: true,
+        //- searching: false,
+        language: {
+          searchPlaceholder: "Search by title.."
+        },
+        pagination: true,
+        ordering: true,
+        order: [[1, 'desc']],
+        sAjaxSource: "/admin/lead/messagedatatable",
+        fnServerParams: function ( data ) {
+          //- console.log("data", data);
+          //- data.push({ "name": "more_data", "value": "my_value" })
+          //- var startDatee;
+          //- var endDatee;
+          //- var dates = $('#fromTo span').html();
+          //- if (dates) {
+          //-   console.log('not empty');
+          //-   startDatee = moment(new Date(dates.split("-")[0])).format("DD/MM/YYYY");
+          //-   endDatee = moment(new Date(dates.split("-")[1])).format("DD/MM/YYYY");
+          //-   data.push( { "name": "start", "value": startDatee }, { "name": "end", "value": endDatee } );
+          //- } else {
+          //-   console.log('empty');
+          //- }
+        }
+      });
+
+
+    });
+    //- console.log(check,"check")
+    $('#truncate').css(
+        "white-space", "nowrap"
+      )
+    function redirectToresponse (message_id) {
+      console.log("clicked")
+      window.location.href = `/admin/lead/send/${message_id}|${lead_id}|${check}|${num_email}`;
+    }
+    $('#span_download').click((event) => {
+      console.log(event,"eve")
+    })
+
+    function redirectTodownload (filename) {
+      window.open(filename, '_blank');
+      return;
+      // below is the code for download a file.
+      //- console.log(filename,"downloaddclosaaj")
+      //- var fileName = filename.substring(filename.lastIndexOf('/')+1);
+      //- window.location.href = `/admin/responses/downloadfile/${fileName}`;
+    }
+
+    function viewMsg(id) {
+      //- console.log(id);
+      sall("Please wait...", 12000);
+      //- alert('hey');
+      $.ajax({
+        method: 'POST',
+        url: `/admin/responses/get/message`,
+        data: {
+          msg_id: id
+        },
+        dataType: 'json',
+        success: function (response) {
+          //- console.log("mmmm-----", response);
+          swal.close();
+          $.fancybox.open(`
+            <form method="POST" style="display: inline-block; width: 100%; max-width: 660px;" class="fancybox-content">
+              <h2 class="mb-3">View Message</strong></h2>
+              <p style="display: none">
+                <input type='hidden' name="employee_id" class="form-control"></input>
+              </p>
+              <input type='hidden' name="old_center_name" id="old_center_name" class="form-control" value=""></input>
+              <p>
+                <div class="col-md-12">
+                  <div class="form-group form-group-default">
+                    <label>Message:</label>
+                    <textarea class="form-control" id="comment" rows="10" disabled>${response.data.msg}</textarea>
+                  </div>
+                </div>
+              </p>
+            </form>
+          `)
+        }
+      });
+    }
+    function sall (msg, time) {
+      var SweetAlert2Demo = function () {
+        //== Demos
+        var initDemos = function () {
+          swal(msg, {
+            buttons: false,
+            timer: time,
+            backdrop:true,
+            closeOnClickOutside: false,
+            closeOnEsc: false
+          })
+        };
+
+        return {
+            //== Init
+            init: function () {
+              initDemos();
+            },
+          };
+        }();
+      jQuery(document).ready(function () {
+        SweetAlert2Demo.init();
+      });
+    };
+
+    function redirectToAddMessage () {
+      $.fancybox.open(`
+                <form action="/admin/lead/addmessage/${lead_id}|${check}" method="POST"  >
+                  <label class="col-lg-3 col-md-3 col-sm-4 mt-sm-2 text-right" for="name">Title</label>
+                    <input class="form-control" id="msg_title" type="text" name="msg_title" placeholder="Enter Message Title" required=""/>
+                  <label class="col-lg-3 col-md-3 col-sm-4 mt-sm-2 text-right" for="name">Message</label>
+                    <textarea class="form-control" rows="5" cols="5" id="msg_desc" name="msg_desc"></textarea>
+                  <button class="btn btn-color" type="submit">Add Message</button>
+                </form>
+          `);
+    }

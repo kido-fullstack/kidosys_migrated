@@ -1,0 +1,106 @@
+extends layout-admin
+
+block content
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        div(style="padding:5px 20px 0px 20px;")
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold View All Messages
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              if h.checkPermission(session.user, permissionCacheData, "MessageAdd") || checkSuperAdmin
+                a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/message/add') Add Message
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+      .page-inner
+        .row
+          .col-md-12
+            .card.card-with-nav
+              .card-body
+                div.col-12(style="margin-bottom:20px;")
+                  span.note-span  Note: Attachment will not be sent via Whatsapp.
+              .row
+                .col-md-3
+                  .form-group
+                    label(for='exampleFormControlSelect') Select Status
+                    select#dropdown1.select2(name='status_dd')
+                      option(value='') Select Status
+                      option(value='enabled') Active
+                      option(value='disabled') In-active
+                //- pre= h.dump(courses)
+                .table-responsive
+                  .col-sm-12
+                    table#basic-datatables.display.table.table-striped.table-hover.dataTable(role='grid', aria-describedby='basic-datatables_info')
+                      thead
+                        tr(role='row')
+                          th(style="display:none") Status
+                          th Title
+                          th Preview
+                          th Created on
+                          if session.user && session.user.main == "super_admin"
+                            th Created by
+                          th Status
+                          th Action
+                      tbody
+                        each message in messages
+                          a(href="#")
+                            tr.odd(role='row')
+                              td(style="display:none") #{message.status == "active" ? "enabled" : "disabled"}
+                              td.sorting_1 #{message.title}
+                                if message.attachment && message.attachment.length
+                                  span#view_attachment.badge.nowrap(onclick=`viewAttachment('${message._id}')`)
+                                    i.fa.fa-paperclip(style='float:right;')
+                              td
+                                a.btn.btn-link.btn-primary(onclick=`viewMsg(${JSON.stringify(message.msg)});`)
+                                  i.fa.fa-eye
+                              td #{moment(message.createdAt).format("MM/DD/YYYY")}
+                              if session.user && session.user.main == "super_admin"
+                                td #{message.createdBy && message.createdBy.first_name ? message.createdBy.first_name : "System"} #{message.createdBy && message.createdBy.last_name ? message.createdBy.last_name : "Admin"}
+                              td #{message.status == 'active' ? 'Active' : 'Inactive'}
+                              td
+                                if h.checkPermission(session.user, permissionCacheData, "MessageEdit") || checkSuperAdmin
+                                  a.btn.btn-link.btn-primary(href=`/admin/message/edit/${message._id}`)
+                                    i.fa.fa-edit
+  block script
+    script(src='/admin/assets/js/common.js')
+
+  script.
+    $(document).ready(function() {
+      $("#dropdown1").select2();
+      var table = $('#basic-datatables').DataTable({
+        ordering: true,
+        order: [[3, 'desc']],
+        //- columnDefs: [{
+        //-   orderable: false,
+        //-   targets: [5]
+        //- }]
+      });
+
+      $('#dropdown1').on('change', function () {
+        table
+          .columns(0)
+          .search(this.value)
+          .draw();
+      });
+    });
+    function viewMsg (msg) {
+      //- alert('hey');
+      $.fancybox.open(`
+        <form method="POST" style="display: inline-block; width: 100%; max-width: 660px;" class="fancybox-content">
+          <h2 class="mb-3">View Message</strong></h2>
+          <p style="display: none">
+            <input type='hidden' name="employee_id" class="form-control"></input>
+          </p>
+          <input type='hidden' name="old_center_name" id="old_center_name" class="form-control" value=""></input>
+          <p>
+            <div class="col-md-12">
+              <div class="form-group form-group-default">
+                <label>Message:</label>
+                <textarea class="form-control" id="comment" rows="10" disabled>${msg}</textarea>
+              </div>
+            </div>
+          </p>
+        </form>
+      `)
+    }

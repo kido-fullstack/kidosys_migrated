@@ -1,0 +1,17 @@
+extends email-layout
+
+block content
+  p Dear #{msg.lead_name},
+  p We appreciate your visit to our center. It was a pleasure to meet you and take you on a tour of our campus.
+  p We hope the tour gave you a clear picture of Kido's academic programs, extracurricular activities, & facilities. Our staff & faculty members were delighted to share their knowledge & expertise with you, and I hope that all your questions were satisfactorily answered.
+  p We value your feedback & would appreciate your sharing any thoughts or suggestions you may have regarding our school. Your input will help us improve our services & serve our students & parents better.
+  p If you were impressed by what you saw & would like to begin the admission process for your child, please let us know, & we will be more than happy to guide you through the application process.
+  p Thank you once again for considering Kido for your child's education.
+  p You can reach out to me by emailing at #{msg.email} or by calling at #{msg.contact} or by messaging at #{msg.whatsapp}.
+  p We look forward to welcoming you and your child to our Kido community.
+  p
+    | Best Regards,
+    br
+    | #{msg.sal} #{msg.spoc} - #{msg.designation}.
+    br
+    | #{msg.center_main_name}.

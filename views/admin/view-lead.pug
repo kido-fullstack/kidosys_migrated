@@ -1,0 +1,360 @@
+extends layout-admin
+
+block content
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        .page-inner.py-5
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold View Lead
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/lead/all') All Lead
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+      .page-inner
+        .row
+          //- pre= h.dump(lead)
+          form.col-md-12
+            .card
+              .card-header
+                .card-title Center Detail
+              .card-body
+                .row
+                  .col-md-12.col-lg-12
+                    .form-group
+                      label(for='exampleFormControlSelect1') Select Center
+                      select#center_name.form-control(name='center_id', required='' disabled)
+                        option #{lead.school_id.school_display_name}
+
+            .card
+              .card-header
+                .card-title Child Information
+              .card-body
+                .row
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='first_name') First Name
+                      input#first_name.form-control(type='text' name='child_first_name' placeholder='Enter First Name' value=(lead.child_first_name ? lead.child_first_name : " ") disabled)
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='last_name') Last Name
+                      input#last_name.form-control(type='text' name='child_last_name' placeholder='Enter Last Name' value=(lead.child_last_name ? lead.child_last_name : "") disabled)
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='exampleFormControlSelect1') Select Gender
+                      select#gender.form-control(name='child_gender' , required="" disabled)
+                        //- option(value="") selcect gender
+                        if lead.child_gender
+                          option #{lead.child_gender}
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='dob') Date of birth
+                      .input-group
+                        if lead.child_dob
+                          //- input#dob.form-control.custom-input.date(type='text' name='child_dob' required="" autocomplete="off" value=moment(lead.lead).format('L'))
+                          input#dob.form-control.custom-input.date(type='text' name='child_dob'  required="" autocomplete="off" value=moment(lead.child_dob).format('L') onkeydown="return false;" disabled)
+                        else
+                          input#dob.form-control.custom-input.date(type='text' name='child_dob' autocomplete="off" value="" disabled)
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='programcategory_id') Select Program Category
+                      select#programcategory.form-control(name='programcategory_id', required='' disabled)
+                        if lead.programcategory_id
+                          option #{lead.programcategory_id.title}
+                  .col-md-6.col-lg-4
+                    .form-group
+                        label(for='program_id') Select Program
+                        select#program.form-control(name='program_id', required='' disabled)
+                          if lead.program_id
+                            option #{lead.program_id.program_name}
+                  if lead.type === "enquiry"
+                      #child_attended.col-md-6.col-lg-12
+                        .form-group
+                          label.form-label(for='child_pre_school') Has Child attended preschool before?
+                          br
+                          if lead.child_pre_school == "yes"
+                            .selectgroup.w-25
+                              label.selectgroup-item
+                                input#yes.selectgroup-input(type='radio' name='child_pre_school' value='yes' checked='' disabled)
+                                span.selectgroup-button Yes
+                              label.selectgroup-item
+                                input#no.selectgroup-input(type='radio' name='child_pre_school' value='no' disabled)
+                                span.selectgroup-button No
+                          else if lead.child_pre_school == "no"
+                            .selectgroup.w-25
+                              label.selectgroup-item
+                                input#yes.selectgroup-input(type='radio' name='child_pre_school' value='yes' disabled)
+                                span.selectgroup-button Yes
+                              label.selectgroup-item
+                                input#no.selectgroup-input(type='radio' name='child_pre_school' value='no' checked='' disabled)
+                                span.selectgroup-button No
+                          else
+                            .selectgroup.w-25
+                              label.selectgroup-item
+                                input#yes.selectgroup-input(type='radio' name='child_pre_school' value='yes' disabled)
+                                span.selectgroup-button Yes
+                              label.selectgroup-item
+                                input#no.selectgroup-input(type='radio' name='child_pre_school' value='no' checked='' disabled)
+                                span.selectgroup-button No
+                  else
+                    #child_attended.col-md-6.col-lg-12
+                      .form-check
+                        label(for='child_pre_school') Has Child attended preschool before?
+                        br
+                        .selectgroup.w-25
+                          label.selectgroup-item
+                            input#yes.selectgroup-input(type='radio' name='child_pre_school' value='yes' disabled)
+                            span.selectgroup-button Yes
+                          label.selectgroup-item
+                            input#no.selectgroup-input(type='radio' name='child_pre_school' value='no' checked='' disabled)
+                            span.selectgroup-button No
+
+            .card
+              .card-header
+                .card-title Primary Parent Detail
+              .card-body
+                .row
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='exampleFormControlSelect1') Select Parent
+                        select#parent.form-control(name='primary_parent', required='' disabled)
+                          if lead.primary_parent
+                          option #{lead.primary_parent}
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='parent_name') Name
+                        input#parent_name.form-control(type='text' name='parent_name' placeholder='Enter Parent Name' required='' value=(lead.parent_name ? lead.parent_name : " ") disabled)
+
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='parent_first_contact') Contact 1
+                        input#parent_first_contact.form-control(type='text' name='parent_first_contact' placeholder='Enter Contact 1' value=lead.parent_first_contact disabled)
+                        .form-check
+                          label.form-check-label
+                            input.form-check-input(type='checkbox' name='whatsapp_first' id="checkItem1" checked=(lead.parent_first_whatsapp == '1' ? 'checked' : unchecked) disabled)
+                            span.form-check-sign Whatsapp
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='parent_second_contact') Contact 2
+                        input#parent_second_contact.form-control(type='text' name='parent_second_contact' placeholder='Enter Contact 2' value=(lead.parent_second_contact ? lead.parent_second_contact : " ") disabled)
+                        .form-check
+                          label.form-check-label
+                            input.form-check-input(type='checkbox' name='whatsapp_second' id="checkItem2" checked=(lead.parent_second_whatsapp == '1' ? 'checked' : unchecked) disabled)
+                            span.form-check-sign Whatsapp
+                    //- col-md-6.col-lg-1
+                    //-   //- .form-group
+                    //-   //-   label(for='whatsapp_second') whatsapp
+                    //-   //-   input(type="checkbox" name='whatsapp_second' checked=(lead.parent_second_whatsapp == '1' ? 'checked' : unchecked))
+                    //-   .form-check
+                    //-     label.form-check-label
+                    //-       input.form-check-input(type='checkbox' name='whatsapp_second'  id="checkItem" checked=(lead.parent_second_whatsapp == '1' ? 'checked' : unchecked))
+                    //-       span.form-check-sign whatsapp
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='parent_email') Email Id
+                        input#parent_email.form-control(type='text' name='parent_email' placeholder='Enter Email' value=lead.parent_email required='' disabled)
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='parent_education') Education
+                        input#parent_education.form-control(type='text' name='parent_education' placeholder='Enter Parent education' value=(lead.parent_education ? lead.parent_education : "") disabled)
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='parent_profession') Profession
+                        input#parent_profession.form-control(type='text' name='parent_profession' placeholder='Enter Parent Profession' value=(lead.parent_profession ? lead.parent_profession :"") disabled)
+                    #cor_parent.col-md-3.col-lg-3
+                      .form-group
+                        label.form-label(for='lead_type') Lead type:
+                        br
+                        if lead.cor_parent == "partner_corporate"
+                          .selectgroup.w-25
+                            label.selectgroup-item
+                              input#partner_corporate.selectgroup-input(type='radio' name='cor_parent' value='partner_corporate' checked='' disabled)
+                              span.selectgroup-button Partner Corporate
+                            label.selectgroup-item
+                              input#others.selectgroup-input(type='radio' name='cor_parent' value='others' disabled)
+                              span.selectgroup-button Others
+                        else
+                          .selectgroup.w-25
+                            label.selectgroup-item
+                              input#partner_corporate.selectgroup-input(type='radio' name='cor_parent' value='partner_corporate' disabled)
+                              span.selectgroup-button Partner Corporate
+                            label.selectgroup-item
+                              input#others.selectgroup-input(type='radio' name='cor_parent' value='others' checked='' disabled)
+                              span.selectgroup-button Others
+                    if lead.cor_parent == "partner_corporate"
+                      #comp_name_div.col-md-9.col-lg-9
+                        .form-group
+                          label(for='company_name_parent') Company Name
+                          input#company_name_parent.form-control(type='text' name='company_name_parent' value=lead.company_name_parent ? lead.company_name_parent : "" disabled)
+            if lead.type === "enquiry"
+              #secondary_detail.card
+                .card-header
+                  .card-title Secondary Parent Detail
+                .card-body
+                  .row
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='exampleFormControlSelect1') Select Parent
+                        select#secondary_parent.form-control(name='secondary_parent_type', required="" disabled)
+                          if lead.primary_parent
+                          option #{lead.secondary_parent_type}
+                          //- option(value='Mother' selected=(lead.secondary_parent_type == 'Mother' ? 'selected' : null)) Mother
+                          //- option(value='Father' selected=(lead.secondary_parent_type == 'Father' ? 'selected' : null)) Father
+                          //- option(value='Guradian' selected=(lead.secondary_parent_type == 'Guradian' ? 'selected' : null)) Guradian
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='secondary_parent_name') Name
+                        input#secondary_parent_name.form-control(type='text' name='secondary_parent_name' placeholder='Enter Parent Name' required="" value=(lead.secondary_parent_name ? lead.secondary_parent_name : "") disabled)
+
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='secondary_first_contact') Contact 1
+                        input#secondary_first_contact.form-control(type='text' name='secondary_first_contact' placeholder='Enter Contact 1' value=(lead.secondary_first_contact ? lead.secondary_first_contact : "")  disabled)
+                        .form-check
+                          label.form-check-label
+                            input.form-check-input(type='checkbox' name='secondary_first_whatsapp' id="checkItemSec1" checked=(lead.secondary_first_whatsapp == '1' ? 'checked' : unchecked) disabled)
+                            span.form-check-sign Whatsapp
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='secondary_Second_contact') Contact 2
+                        input#secondary_Second_contact.form-control(type='text' name='secondary_Second_contact' placeholder='Enter Contact 2' value=(lead.secondary_Second_contact ? lead.secondary_Second_contact : "") disabled)
+                        .form-check
+                          label.form-check-label
+                            input.form-check-input(type='checkbox' name='secondary_second_whatsapp'  id="checkItemSec2" checked=(lead.secondary_second_whatsapp == '1' ? 'checked' : unchecked) disabled)
+                            span.form-check-sign Whatsapp
+
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='secondary_email') Email Id
+                        input#secondary_email.form-control(type='text' required="" name='secondary_email' placeholder='Enter Email' value=(lead.secondary_email ? lead.secondary_email : "") disabled)
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='secondary_education') Education
+                        input#secondary_education.form-control(type='text'  name='secondary_education' placeholder='Enter Parent education' value=(lead.secondary_education ? lead.secondary_education : "") disabled)
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='secondary_profession') Profession
+                        input#secondary_profession.form-control(type='text' name='secondary_profession' placeholder='Enter Parent Profession' value=(lead.secondary_profession ? lead.secondary_profession : "") disabled)
+
+            .card
+              .card-header
+                .card-title Primary Parent Address
+              .card-body
+                .row
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='parent_country') Country
+                      select#country.form-control(name='parent_country', disabled)
+                        if lead.parent_country
+                          option #{lead.parent_country.country_name}
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='parent_state') State
+                      select#state.form-control(name='parent_state', disabled)
+                        if lead.parent_state
+                          option #{lead.parent_state.state_name}
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='parent_city') City
+                      select#city.form-control(name='parent_city', disabled)
+                        if lead.parent_city
+                          option #{lead.parent_city.city_name}
+                        //- each city in citys
+                        //-   //- option(value=programcategory._id) #{programcategory.title}
+                        //-   if (lead.parent_city.toString() == city._id.toString())
+                        //-     option(value=`${city.id}|${city._id}` selected=(city._id.toString() == lead.parent_city.toString())) #{city.city_name}
+
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='parent_area') Area
+                      input#parent_area.form-control(type='text' name='parent_area' placeholder='Enter Parent Area' value=(lead.parent_area ? lead.parent_area: "") disabled)
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='parent_pincode') Pincode
+                      input#parent_pincode.form-control(type='text' name='parent_pincode'  placeholder='Enter Parent Pincode' value=(lead.parent_pincode ? lead.parent_pincode : "") disabled)
+                  .col-md-6.col-lg-4
+                      .form-group
+                        label(for='exampleFormControlSelect1') How did you come to Know about us
+                        span.required-label *
+                        select#know_us.form-control(name='parent_know_aboutus' , multiple='multiple' ,disabled)
+                          //- option(value='') How did you come to Know about us*
+                          if lead.parent_know_aboutus
+                           option #{lead.parent_know_aboutus}
+                          //-   option(value=`${knowus.name}` selected=(lead.parent_know_aboutus.includes(knowus.name) == true ? 'selected' : null)) #{knowus.name}
+                  if lead.type === "enquiry"
+                    #landmark.col-md-6.col-lg-3
+                      .form-group
+                        label(for='parent_landmark') Landmark
+                        input#parent_landmark.form-control(type='text' name='parent_landmark' required="" placeholder='Enter Parent Landmark' value=(lead.parent_landmark ? lead.parent_landmark : "" ) disabled)
+                    #house.col-md-6.col-lg-3
+                      .form-group
+                        label(for='parent_house') House
+                        input#parent_house.form-control(type='text' name='parent_house' required="" placeholder='Enter Parent House' value=(lead.parent_house ? lead.parent_house : "") disabled)
+                    #street.col-md-6.col-lg-3
+                      .form-group
+                        label(for='parent_street') Street
+                        input#parent_street.form-control(type='text'  required="" name='parent_street' placeholder='Enter Parent Street' value=(lead.parent_street ? lead.parent_street : "") disabled)
+                    #address_s.col-md-6.col-lg-3
+                      .form-group
+                        label(for='parent_address') Address
+                        input#parent_address.form-control(type='text' name='parent_address' placeholder='Enter Parent Address' value=(lead.parent_address ? lead.parent_address : "") disabled)
+
+            .card
+              .card-header
+                .card-title Source Category
+              .card-body
+                .row
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='source_category') Source Category
+                      select#source.form-control(name='source_category' , disabled)
+                        //- if lead.source_category
+                        //-   option #{lead.source_category}
+                        option(value='direct-walk-in' selected=(lead.source_category == 'direct-walk-in' ? 'selected' : null)) Direct Walk in
+                        option(value='digital-lead' selected=(lead.source_category == 'digital-lead' ? 'selected' : null)) Digital Lead
+                        option(value='database/events' selected=(lead.source_category == 'database/events' ? 'selected' : null)) Database/Events
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='status_id') Select Status
+                      select#status.form-control(name='status_id', required=''  disabled)
+                        if lead.status_id
+                          option #{lead.status_id.name}
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='substatus_id') Select Sub Status
+                      select#substatus.form-control(name='substatus_id', required=''  disabled)
+                        if lead.substatus_id
+                          option #{lead.substatus_id.name}
+                  .col-md-6.col-lg-12
+                    .form-group
+                      //- label(for='stage') Stage
+                      input#stage.form-control(type='hidden' name='stage' placeholder='Enter stage')
+                      input#lead_type.form-control(type='hidden' name='lead_type' placeholder='Enter type')
+                  .col-md-6.col-lg-12
+                    .form-group
+                      label(for='action_taken') Action Planned / Taken
+                      //- span.required-label *
+                      select#action_planned.form-control(name='action_taken[]',multiple='multiple' disabled)
+                        if lead.action_taken
+                          option #{lead.action_taken}
+                  .col-md-6.col-lg-12
+                    .form-group
+                      label(for='remark') Remark
+                      //- input#remark.form-control(type='text' name='remark' placeholder='Enter remark' value=lead.remark)
+                      if lead && lead.remark && lead.remark.includes("{")
+                        textarea.form-control(rows='5', cols='5', id="remark", name="remark" disabled)
+                      else
+                        textarea.form-control(rows='5', cols='5', id="remark", name="remark" disabled) #{lead.remark}
+            if h.checkPermission(session.user, permissionCacheData, "LeadEdit") || checkSuperAdmin
+              button.btn.btn-color.btm-block(type="button" onclick="redirectToedit()") Edit lead
+  block script
+    script(src="/admin/assets/js/plugin/moment/moment.min.js")
+    script(type='text/javascript' src='/admin/assets/js/plugin/datepicker/bootstrap-datetimepicker.min.js')
+
+  script.
+    var lead = !{JSON.stringify(lead)}
+    function redirectToedit () {
+      console.log(lead._id,"lokoko")
+      window.location.href = `/admin/lead/edit/${lead._id}`;
+    }

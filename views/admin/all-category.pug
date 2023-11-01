@@ -1,0 +1,63 @@
+extends layout-admin
+
+block content
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        .page-inner.py-5
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold View All Category
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/category/add') Add Category
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+      .page-inner
+        .row
+          .col-md-12
+            .card.card-with-nav
+              .card-body
+                //- pre= h.dump(categories)
+                .table-responsive
+                  .col-sm-12
+                    table#basic-datatables.display.table.table-striped.table-hover.dataTable(role='grid', aria-describedby='basic-datatables_info')
+                      thead
+                        tr(role='row')
+                          th Name
+                          th Description
+                          th Image
+                          th Status
+                          th Action
+                      tbody
+                        each category in categories
+                          a(href="#")
+                            tr.odd(role='row')
+                              td.sorting_1 #{category.category_name}
+                              td
+                                a(href="javascript:void(0);", onclick=`viewDetailCategory('${category.category_desc}')`) View Description
+                              td
+                                a(href="javascript:void(0);", onclick=`viewImageCategory('${category.category_img}')`) View Category Image
+                              td #{category.status == 'active' ? 'Active' : 'Inactive'}
+                              td
+                                //- a.btn.btn-link.btn-primary(href=`/admin/category/view/detail/${category._id}`)
+                                  i.fa.fa-eye
+                                a.btn.btn-link.btn-primary(href=`/admin/category/edit/${category._id}`)
+                                  i.fa.fa-edit
+                .row
+
+  script.
+    $(document).ready(function() {
+      $('#basic-datatables').DataTable({
+        ordering: false
+      });
+    });
+
+    function viewDetailCategory(desc) {
+      $.fancybox.open(desc);
+    }
+
+    function viewImageCategory(img) {
+      $.fancybox.open(`
+        <img src=${img}>
+      `);
+    }

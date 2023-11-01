@@ -1,0 +1,63 @@
+extends layout-admin
+
+block content
+  #cover-spin
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        .page-inner.py-5
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold View All Users
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              - var hasPermission = h.checkPermission(session.user, permissionCacheData, "UserViewListing");
+              if hasPermission || checkSuperAdmin
+                a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/employee/all') All User
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+      .page-inner
+        .row
+          .col-md-12
+            .card.card-with-nav
+              .card-body
+                //- pre= h.dump(session.productIDs)
+                .table-responsive
+                  .col-sm-12
+                    table#multi-filter-select.display.table.table-striped.table-hover.dataTable(role='grid', aria-describedby='basic-datatables_info')
+                      thead
+                        tr(role='row')
+                          th Name
+                          th Email
+                          th Mobile
+                          //- th Created Date
+                          th Status
+                          th Approval
+                          th Action
+                      tbody
+                        each user in employees
+                          a(href="#")
+                            tr.odd(role='row')
+                              td.sorting_1 #{user.name}
+                              td #{user.email}
+                              td #{user.mobile}
+                              //- td #{user.createdAt.toString().split(" ").slice(0, 4).join(" ")}
+                              td #{user.status == 'active' ? 'Active' : 'Inactive'}
+                              td
+                                input.userr(type='checkbox', checked=(user.admin_approval !== 0 ? true : false), data-toggle='toggle', data-onstyle='info', onchange=`userApproveStatus("${user._id}", "${user.admin_approval}")`, data-style='btn-round', id=user._id value=user.admin_approval)
+                              td
+                                if h.checkPermission(session.user, permissionCacheData, "UserEditUser") || checkSuperAdmin
+                                  a.btn.btn-link.btn-primary(href=`/admin/employee/edit/${user._id}` title="Edit User")
+                                    i.fa.fa-edit
+                                if h.checkPermission(session.user, permissionCacheData, "UserViewPassword") || checkSuperAdmin
+                                  a.btn.btn-link.btn-primary(href="javascript:void(0);" title="View Password" onclick=`viewPassword("${user._id}");`)
+                                    i.fas.fa-eye
+                                if h.checkPermission(session.user, permissionCacheData, "UserSendMail") || checkSuperAdmin
+                                  a.btn.btn-link.btn-primary(href="javascript:void(0);" title="Send Mail" onclick=`sendMail("${user._id}");`)
+                                    i.fas.fa-paper-plane
+                                if h.checkPermission(session.user, permissionCacheData, "UserResetPassword") || checkSuperAdmin
+                                  a.btn.btn-link.btn-primary(href="javascript:void(0);" title="Reset Password" onclick=`resetPassword("${user._id}");`)
+                                    i.fas.fa-key
+
+                .row
+  block script
+    script(src="/admin/custom/all-pending-employees.js")

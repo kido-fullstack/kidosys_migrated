@@ -1,0 +1,102 @@
+extends layout-admin
+
+block content
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        .page-inner.py-5
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold Add Category
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/category/all') All Category
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+      .page-inner
+        .row
+          .col-md-12
+            .card
+              form(action="/admin/category/add", method="POST", enctype="multipart/form-data")
+                .card-body
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='name')
+                      | Category Name
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#name.form-control(type='text', name='category_name', placeholder='Enter Center Name', required='')
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='name')
+                      | Category Image
+                      span.required-label
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#name.form-control(type='file', name='category_img', placeholder='Enter Printing Name', accept="image/x-png,image/jpeg")
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='name')
+                      | Center Description
+                      span.required-label
+                    .col-lg-7.col-md-9.col-sm-8
+                      textarea.form-control(rows='5', cols='5', id="category_desc", name="category_desc")
+                  //- .form-group.row
+                  //-   label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='name')
+                  //-     | Price
+                  //-     span.required-label *
+                  //-   .col-lg-7.col-md-9.col-sm-8
+                  //-     input#qty_text.form-control(type='text', name='price', placeholder='Enter Price', onkeyup="checkNumberPrice();" required='', value=1)
+                  //-     p(id="demo" style="color: #FF0000")
+                  .form-group.form-show-validation.row
+                      label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='prod')
+                        | Status
+                      .col-lg-7.col-md-9.col-sm-8
+                        .select2-input
+                          select.form-control(name='status', required='')
+                            option(value='active') Active
+                            option(value='inactive') Inactive
+                .card-action
+                  .row
+                    .col-md-12
+                      button.btn.btn-color(type="submit") Add Category
+
+  block script
+    script(src="https://cdn.ckeditor.com/4.11.4/basic/ckeditor.js")
+
+  script.
+    CKEDITOR.replace('category_desc');
+    //- CKEDITOR.instances['category_desc'].setData("<ul>\r\n\t<li>Passenger is requested to check-in 2hrs prior to scheduled depature (flights departing from international terminal check-in 3 hrs. prior to scheduled departure).</li>\r\n\t<li>All Passengers including children and infants, must present valid identity proof ( Passport / Pan Card / election card or any photo identity proof ) at check-in. It is your responsibility to ensure you have the appropriate travel documents at all times.</li>\r\n\t<li>Changes/Cancellations to booking must be made at least 5 hours prior to scheduled departure time or else should be cancelled directly from the respective airlines.</li>\r\n\t<li>If any flight is cancelled or rescheduled by the airline authority, passenger is requested to get a stamped/endorsed copy of the ticket to process the refund.</li>\r\n\t<li>Passenger travelling on Air India Express from Delhi and Mumbai, will have to check-in at International Airport.</li>\r\n\t<li>As per Government guidelines, check-in counters at all Airports will now close 45 minutes before departure withimmediate effect. Passengers are informed to plan their Airport arrival accordingly.At IGI airport, New Delhi all international flights, arrivals and departures, operate from Terminal 3. Full-service domesticairlines - Air India, Air India Express, Jet Airways, Jet Konnect, Jetlite, Kingfisher Airlines, Kingfisher Red will operatefrom T3. Airline Carriers such as IndiGo Airlines, SpiceJet, Go Air shall depart from Terminal 1D and will arrive atTerminal 1C. (The above-said is for informational purpose only, we strongly recommend you to check with respectiveairline for updated flight and terminal information details.)</li>\r\n</ul>\r\n");
+    CKEDITOR.editorConfig = function(config) {
+      config.removeButtons = 'Underline,Subscript,Superscript,Bold,link';
+    }
+    //- var warehouseObj = !{JSON.stringify(warehouses)};
+
+    //- function checkNumberPrice() {
+    //-   var x = document.getElementById("qty_text").value;
+
+    //-   // If x is Not a Number or less than one or greater than 10
+    //-   if (isNaN(x)) {
+    //-     console.log(document.getElementById("submit-btn"));
+    //-     text = "Your price is not a number.";
+    //-     document.getElementById("submit-btn").disabled = true;
+    //-   } else if (x.includes('.') || x.includes('-') || x.includes('+')) {
+    //-     text = "This is not a valid number. Please check!";
+    //-     document.getElementById("submit-btn").disabled = true;
+    //-   } else {
+    //-     text = "";
+    //-     document.getElementById("submit-btn").disabled = false;
+    //-   }
+    //-   document.getElementById("demo").innerHTML = text;
+    //- }
+
+    //- function checkNumberThreshold () {
+    //-   var y = document.getElementById("threshold_qty").value;
+
+    //-   if (isNaN(y)) {
+    //-     text = "Your threshold is not a number.";
+    //-     document.getElementById("submit-btn").disabled = true;
+    //-   } else if (y.includes('.') || y.includes('-') || y.includes('+')) {
+    //-     text = "This is not a valid number. Please check!";
+    //-     document.getElementById("submit-btn").disabled = true;
+    //-   } else {
+    //-     text = "";
+    //-     document.getElementById("submit-btn").disabled = false;
+    //-   }
+    //-   document.getElementById("demo_threshold").innerHTML = text;
+    //- }

@@ -1,0 +1,1661 @@
+extends layout-admin
+
+block content
+  #cover-spin
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        div(style="padding:5px 20px 0px 20px;")
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold Add Sibling Details
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/lead/all') All Leads
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+      .page-inner
+        .row
+          form#add_lead.col-md-12(action="/admin/lead/addsibling", method="POST")
+            if type == "super_admin"
+              .card
+                .card-header
+                  .card-title School Title
+                .card-body
+                  .row
+                    .col-md-6.col-lg-12
+                      .form-group
+                        label(for='school_id') Select School
+                        span.required-label *
+                        select#school.form-control(name='school_id', required='')
+                          option(value='') Select School
+                          each center in centers
+                            option(value=center._id selected=(center._id.toString() == lead.school_id.toString()) ) #{center.school_display_name}
+            else
+              .card
+                .card-header
+                  .card-title School Title
+                .card-body
+                  .row
+                    .col-md-6.col-lg-12
+                      .form-group
+                        label(for='school_id') Select School
+                        span.required-label *
+                        select#school.form-control(name='school_id', required='')
+                          option(value='') Select School
+                          each center in centers
+                            option(value=center._id selected=(center._id.toString() == lead.school_id.toString()) ) #{center.school_display_name}
+
+            .card
+              .card-header
+                .card-title Child Information
+              .card-body
+                .row
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='child_first_name') First Name
+                      span.enquiry-mark.required-label *
+                      input#child_first_name.form-control(type='text' name='child_first_name' placeholder='Enter First Name' value=oldLead.child_first_name)
+                      input.form-control(type='hidden' name='sibling_id' value=oldLead._id)
+
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='child_last_name') Last Name
+                      span.enquiry-mark.required-label *
+                      input#child_last_name.form-control(type='text' name='child_last_name' placeholder='Enter Last Name' value=oldLead.child_last_name)
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='exampleFormControlSelect1') Select Gender
+                      span.enquiry-mark.required-label *
+                      select#gender.form-control(name='child_gender')
+                        option(value='') Select Gender
+                        option(value="Male" selected=(oldLead.child_gender == 'Male' ? 'selected' : null)) Male
+                        option(value="Female" selected=(oldLead.child_gender == 'Female' ? 'selected' : null)) Female
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='dob') Date of birth
+                      span.enquiry-mark.required-label *
+                      .input-group
+                        if oldLead.child_dob
+                          //- input#dob.form-control.custom-input.date(type='text' name='child_dob' required="" autocomplete="off" value=moment(lead.lead).format('L'))
+                          input#dob.form-control.custom-input.date(type='text' name='child_dob'  required="" autocomplete="off" value=moment(oldLead.child_dob).format('L') onkeydown="return false;")
+                        //- input#dob.form-control(type='text' name='child_dob' required='')
+                        else
+                          input#dob.form-control.custom-input.date(type='text' name='child_dob' autocomplete="off" value="")
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='programcategory_id') Program Category
+                      span.required-label *
+                      select#programcategory.form-control(name='programcategory_id', required='')
+                        option(value='') Select ProgramCategory
+                        //- each programcategory in programcategorys
+                        //-   option(value=programcategory._id) #{programcategory.title}
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='program_id') Program
+                      span.enquiry-mark.required-label *
+                      select#program.form-control(name='program_id')
+                        option(value='') Select Program
+                        //- option(value='') Select Program
+                        //- each program in programs
+                        //-   option(value=program._id) #{program.program_name}
+                  if lead.type == "enquiry"
+                    #child_attended.col-md-6.col-lg-12
+                      .form-group
+                        label.form-label(for='child_pre_school') Has Child attended preschool before?
+                        span.enquiry-mark.required-label *
+                        br
+                        if lead.child_pre_school == "yes"
+                          .selectgroup.w-25
+                            label.selectgroup-item
+                              input#yes.selectgroup-input(type='radio' name='child_pre_school' value='yes' checked='')
+                              span.selectgroup-button Yes
+                            label.selectgroup-item
+                              input#no.selectgroup-input(type='radio' name='child_pre_school' value='no')
+                              span.selectgroup-button No
+                        else if lead.child_pre_school == "no"
+                          .selectgroup.w-25
+                            label.selectgroup-item
+                              input#yes.selectgroup-input(type='radio' name='child_pre_school' value='yes')
+                              span.selectgroup-button Yes
+                            label.selectgroup-item
+                              input#no.selectgroup-input(type='radio' name='child_pre_school' value='no' checked='')
+                              span.selectgroup-button No
+                        else
+                          .selectgroup.w-25
+                            label.selectgroup-item
+                              input#yes.selectgroup-input(type='radio' name='child_pre_school' value='yes')
+                              span.selectgroup-button Yes
+                            label.selectgroup-item
+                              input#no.selectgroup-input(type='radio' name='child_pre_school' value='no' checked='')
+                              span.selectgroup-button No
+                  else
+                    #child_attended.col-md-6.col-lg-12
+                      .form-check
+                        label(for='child_pre_school') Has Child attended preschool before?
+                        span.enquiry-mark.required-label *
+                        br
+                        .selectgroup.w-25
+                          label.selectgroup-item
+                            input#yes.selectgroup-input(type='radio' name='child_pre_school' value='yes')
+                            span.selectgroup-button Yes
+                          label.selectgroup-item
+                            input#no.selectgroup-input(type='radio' name='child_pre_school' value='no' checked='')
+                            span.selectgroup-button No
+            //- .card
+            //-   .card-header
+            //-     .card-title School Title
+            //-   .card-body
+            //-     .row
+            //-       .col-md-6.col-lg-12
+            //-         .form-group
+            //-           label(for='school_id') Select School
+            //-           select#school.form-control(name='school_id', required='')
+            //-             option(value='') Select School
+            //-             each center in centers
+            //-               option(value=center._id selected=(center._id.toString() == lead.school_id.toString())) #{center.school_name}
+            .card
+              .card-header
+                .card-title Primary Parent Detail
+              .card-body
+                .row
+                  .col-md-6.col-lg-6
+                    .form-group
+                      label(for='exampleFormControlSelect1') Select Mother/Father/Guradian
+                      span.required-label *
+                      select#exampleFormControlSelect1.form-control(name='primary_parent', required='')
+                          option(value='Mother' selected=(lead.primary_parent == 'Mother' ? 'selected' : null)) Mother
+                          option(value='Father' selected=(lead.primary_parent == 'Father' ? 'selected' : null)) Father
+                          option(value='Guradian' selected=(lead.primary_parent == 'Guradian' ? 'selected' : null)) Guradian
+                  .col-md-6.col-lg-6
+                    .form-group
+                      label(for='parent_name') Name
+                      span.required-label *
+                      input#parent_name.form-control(type='text' required='' name='parent_name' placeholder='Enter Parent Name' value=lead.parent_name)
+
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='parent_first_contact') Contact 1
+                      span.required-label *
+                      input#parent_first_contact.form-control(type='text' required='' name='parent_first_contact' placeholder='Enter Contact 1' value=lead.parent_first_contact)
+                      .form-check
+                        label.form-check-label
+                          input.form-check-input(type='checkbox' name='whatsapp_first'  id="checkItem1" checked=(lead.parent_first_whatsapp == '1' ? 'checked' : unchecked))
+                          span.form-check-sign Whatsapp
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='parent_second_contact') Contact 2
+                      input#parent_second_contact.form-control(type='text' name='parent_second_contact' placeholder='Enter contact 2' value=lead.parent_second_contact)
+                      .form-check
+                        label.form-check-label
+                          input.form-check-input(type='checkbox' name='whatsapp_second' id="checkItem2" checked=(lead.parent_second_whatsapp == '1' ? 'checked' : unchecked))
+                          span.form-check-sign Whatsapp
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='parent_email') Email Id
+                      span.required-label *
+                      input#parent_email.form-control(type='text' required='' name='parent_email' placeholder='Enter Email' value=lead.parent_email)
+                  .col-md-6.col-lg-6
+                    .form-group
+                      label(for='parent_education') Education
+                      //- span.enquiry-mark.required-label *
+                      input#parent_education.form-control(type='text' name='parent_education'  placeholder='Enter Parent education' value=lead.parent_education)
+                  .col-md-6.col-lg-6
+                    .form-group
+                      label(for='parent_profession') Profession
+                      //- span.enquiry-mark.required-label *
+                      input#parent_profession.form-control(type='text' name='parent_profession'  placeholder='Enter Parent Profession' value=lead.parent_profession)
+                  #cor_parent.col-md-3.col-lg-3
+                    .form-group
+                      label.form-label(for='lead_type') Lead type:
+                      br
+                      if oldLead.cor_parent == "partner_corporate"
+                        .selectgroup.w-25
+                          label.selectgroup-item
+                            input#partner_corporate.selectgroup-input(type='radio' name='cor_parent' value='partner_corporate' checked='')
+                            span.selectgroup-button Partner Corporate
+                          label.selectgroup-item
+                            input#others.selectgroup-input(type='radio' name='cor_parent' value='others')
+                            span.selectgroup-button Others
+                      else
+                        .selectgroup.w-25
+                          label.selectgroup-item
+                            input#partner_corporate.selectgroup-input(type='radio' name='cor_parent' value='partner_corporate')
+                            span.selectgroup-button Partner Corporate
+                          label.selectgroup-item
+                            input#others.selectgroup-input(type='radio' name='cor_parent' value='others' checked='')
+                            span.selectgroup-button Others
+                  if oldLead.cor_parent == "partner_corporate"
+                    #comp_name_div.col-md-9.col-lg-9
+                      .form-group
+                        label(for='company_name_parent') Company Name
+                        input#company_name_parent.form-control(type='text' name='company_name_parent' placeholder='Enter Parent Company Name' value=oldLead.company_name_parent)
+                  else
+                    #comp_name_div.col-md-9.col-lg-9
+                      .form-group
+                        label(for='company_name_parent') Company Name
+                        input#company_name_parent.form-control(type='text' name='company_name_parent' placeholder='Enter Parent Company Name')
+                  //- .col-md-6.col-lg-6
+                  //-   .form-group
+                  //-     label(for='parent_education') Education
+                  //-     input#parent_education.form-control(type='text' name='parent_education' placeholder='Enter Parent education')
+                  //- .col-md-6.col-lg-6
+                  //-   .form-group
+                  //-     label(for='parent_profession') Profession
+                  //-     input#parent_profession.form-control(type='text' name='primary_parentparent_profession_name' placeholder='Enter Parent Profession')
+            //- .card
+            //-   .card-header
+            //-     .card-title Secondary Parent Detail
+            //-   .card-body
+            //-     .row
+            //-       .col-md-6.col-lg-6
+            //-         .form-group
+            //-           label(for='exampleFormControlSelect1') Select Parent
+            //-           select#exampleFormControlSelect1.form-control(name='secondary_parent_type', required='')
+            //-             option(value="Mother ") Mother
+            //-             option(value="Father") Father
+            //-             option(value="Guradian") Guradian
+            //-       .col-md-6.col-lg-6
+            //-         .form-group
+            //-           label(for='secondary_parent_name') Name
+            //-           input#secondary_parent_name.form-control(type='text' name='secondary_parent_name' placeholder='Enter Parent Name')
+            //-       col-md-6.col-lg-3
+            //-         .form-group
+            //-           label(for='secondary_first_contact') Contact 1
+            //-           input#secondary_first_contact.form-control(type='text' name='secondary_first_contact' placeholder='Enter Contact 1')
+            //-       col-md-6.col-lg-1
+            //-         .form-group
+            //-           label(for='secondary_whatsapp') whatsapp
+            //-           input(type="checkbox" name='secondary_whatsapp')
+            //-       col-md-6.col-lg-3
+            //-         .form-group
+            //-           label(for='secondary_Second_contact') Contact 2
+            //-           input#secondary_Second_contact.form-control(type='text' name='secondary_Second_contact' placeholder='Enter contact 2')
+            //-       col-md-6.col-lg-1
+            //-         .form-group
+            //-           label(for='secondary_whatsapp') whatsapp
+            //-           input(type="checkbox" name='secondary_whatsapp')
+            //-       col-md-6.col-lg-4
+            //-         .form-group
+            //-           label(for='secondary_email') Email Id
+            //-           input#secondary_email.form-control(type='text' name='secondary_email' placeholder='Enter Email')
+            //-       //- .col-md-6.col-lg-6
+            //-       //-   .form-group
+            //-       //-     label(for='secondary_education') Education
+            //-       //-     input#secondary_education.form-control(type='text' name='secondary_education' placeholder='Enter Parent education')
+            //-       //- .col-md-6.col-lg-6
+            //-       //-   .form-group
+            //-       //-     label(for='secondary_profession') Profession
+            //-       //-     input#secondary_profession.form-control(type='text' name='secondary_profession' placeholder='Enter Parent Profession')
+            .card
+              .card-header
+                .card-title Primary Parent Address
+              .card-body
+                .row
+                  .col-md-6.col-lg-4
+                      .form-group
+                        label(for='parent_country') Country
+                        span.enquiry-mark.required-label *
+                        select#country.form-control(name='parent_country')
+                          option(value='') Select Country
+                          each employee in employees
+                            if lead.parent_country
+                              option(value=`${employee.country_id}|${employee._id}` selected=(employee._id.toString() == lead.parent_country.toString())) #{employee.country_name}
+                            else
+                              option(value=`${employee.country_id}|${employee._id}`) #{employee.country_name}
+                  .col-md-6.col-lg-4
+                      .form-group
+                        label(for='parent_state') State
+                        span.enquiry-mark.required-label *
+                        select#state.form-control(name='parent_state')
+                          option(value='') Select State
+                          each state in states
+                            //- option(value=programcategory._id) #{programcategory.title}
+                            if lead.parent_state
+                              option(value=`${state.id}|${state._id}` selected=(state._id.toString() == lead.parent_state.toString())) #{state.state_name}
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='parent_city') City
+                      span.enquiry-mark.required-label *
+                      select#city.form-control(name='parent_city')
+                        option(value='') Select city
+                        //- each city in citys
+                        //-   //- option(value=programcategory._id) #{programcategory.title}
+                        //-   if (lead.parent_city.toString() == city._id.toString())
+                        //-     option(value=`${city.id}|${city._id}` selected=(city._id.toString() == lead.parent_city.toString())) #{city.city_name}
+                        each state in states
+                          each city in citys
+                            if lead.parent_city
+                              if (state._id.toString() == lead.parent_state.toString())
+                                if(state.id == city.state_id)
+                                  option(value=`${city.id}|${city._id}` selected=(city._id.toString() == lead.parent_city.toString())) #{city.city_name}
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='parent_area') Area/Locality/Sector
+                      span.enquiry-mark.required-label *
+                      input#parent_area.form-control(type='text' name='parent_area' placeholder='Enter Parent Area' value=lead.parent_area)
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='parent_pincode') Pincode
+                      span.enquiry-mark.required-label *
+                      input#parent_pincode.form-control(type='text'  name='parent_pincode' placeholder='Enter Parent Pincode' value=lead.parent_pincode)
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='exampleFormControlSelect1') How did you come to Know about us
+                      span.required-label *
+                      select#know_us.form-control(name='parent_know_aboutus' , multiple='multiple' required="")
+                        option(value='') How did you come to Know about us*
+                        each knowus in knowuss
+                          option(value=`${knowus.name}` selected=(lead.parent_know_aboutus.includes(knowus.name) == true ? 'selected' : null)) #{knowus.name}
+                  if lead.type === "enquiry"
+                    #landmark.col-md-6.col-lg-3
+                      .form-group
+                        label(for='parent_landmark') Landmark
+                        //- span.enquiry-mark.required-label *
+                        input#parent_landmark.form-control(type='text' name='parent_landmark' placeholder='Enter Parent Landmark' value=lead.parent_landmark)
+                    #house.col-md-6.col-lg-3
+                      .form-group
+                        label(for='parent_house') House/Bldg/Apt
+                        //- span.enquiry-mark.required-label *
+                        input#parent_house.form-control(type='text' name='parent_house' placeholder='Enter Parent House' value=lead.parent_house)
+                    #street.col-md-6.col-lg-3
+                      .form-group
+                        label(for='parent_street') Street/Road/Lane
+                        //- span.enquiry-mark.required-label *
+                        input#parent_street.form-control(type='text' name='parent_street' placeholder='Enter Parent Street' value=lead.parent_street)
+                    #address_s.col-md-6.col-lg-3
+                      .form-group
+                        label(for='parent_address') Address
+                        //- span.enquiry-mark.required-label *
+                        input#parent_address.form-control(type='text' name='parent_address' placeholder='Enter Parent Address' value=lead.parent_address)
+                  else
+                    #landmark.col-md-6.col-lg-3
+                      .form-group
+                        label(for='parent_landmark') Landmark
+                        //- span.enquiry-mark.required-label *
+                        input#parent_landmark.form-control(type='text' name='parent_landmark' placeholder='Enter Parent Landmark')
+                    #house.col-md-6.col-lg-3
+                      .form-group
+                        label(for='parent_house') House/Bldg/Apt
+                        //- span.enquiry-mark.required-label *
+                        input#parent_house.form-control(type='text' name='parent_house' placeholder='Enter Parent House')
+                    #street.col-md-6.col-lg-3
+                      .form-group
+                        label(for='parent_street') Street/Road/Lane
+                        //- span.enquiry-mark.required-label *
+                        input#parent_street.form-control(type='text' name='parent_street' placeholder='Enter Parent Street')
+                    #address_s.col-md-6.col-lg-3
+                      .form-group
+                        label(for='parent_address') Address
+                        //- .span.enquiry-mark.required-label *
+                        input#parent_address.form-control(type='text' name='parent_address' placeholder='Enter Parent Address')
+                  //- .col-md-6.col-lg-3
+                  //-   .form-group
+                  //-     label(for='parent_landmark') Landmark
+                  //-     input#parent_landmark.form-control(type='text' name='parent_landmark' placeholder='Enter Parent Landmark')
+                  //- .col-md-6.col-lg-3
+                  //-   .form-group
+                  //-     label(for='parent_house') House
+                  //-     input#parent_house.form-control(type='text' name='parent_house' placeholder='Enter Parent House')
+                  //- .col-md-6.col-lg-3
+                  //-   .form-group
+                  //-     label(for='parent_street') Street
+                  //-     input#parent_street.form-control(type='text' name='parent_street' placeholder='Enter Parent Street')
+                  //- .col-md-6.col-lg-3
+                  //-   .form-group
+                  //-     label(for='parent_address') Address
+                  //-     input#parent_address.form-control(type='text' name='parent_address' placeholder='Enter Parent Address')
+            if lead.type === "enquiry"
+              .card
+                .card-header
+                  .card-title Secondary Parent Detail
+                .card-body
+                  .row
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='exampleFormControlSelect1') Select Parent
+                        span.required-label *
+                        select#secondary_parent.form-control(name='secondary_parent_type', required="")
+                          option(value=" ") Select Parent
+                          //- option(value="Father") Father
+                          //- option(value="Guradian") Guradian
+                          option(value='Mother' selected=(lead.secondary_parent_type == 'Mother' ? 'selected' : null)) Mother
+                          option(value='Father' selected=(lead.secondary_parent_type == 'Father' ? 'selected' : null)) Father
+                          option(value='Guradian' selected=(lead.secondary_parent_type == 'Guradian' ? 'selected' : null)) Guradian
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='secondary_parent_name') Name
+                        span.required-label *
+                        input#secondary_parent_name.form-control(type='text' name='secondary_parent_name' placeholder='Enter Parent Name' required="" value=lead.secondary_parent_name)
+                    .col-md-6.col-lg-3
+                      .form-group
+                        label(for='secondary_first_contact') Contact 1
+                        span.enquiry-mark.required-label *
+                        input#secondary_first_contact.form-control(type='text' name='secondary_first_contact' placeholder='Enter Contact 1' required="" value=lead.secondary_first_contact)
+                    .col-md-6.col-lg-1
+                      //- .form-group
+                      //-   label(for='secondary_first_whatsapp') whatsapp
+                      //-   input(type="checkbox" name='secondary_first_whatsapp' checked=(lead.secondary_first_whatsapp == '1' ? 'checked' : unchecked))
+                      .form-check
+                        label.form-check-label
+                          input.form-check-input(type='checkbox' name='secondary_first_whatsapp'  id="checkItemSec1" checked=(lead.secondary_first_whatsapp == '1' ? 'checked' : unchecked))
+                          span.form-check-sign whatsapp
+                    .col-md-6.col-lg-3
+                      .form-group
+                        label(for='secondary_Second_contact') Contact 2
+                        input#secondary_Second_contact.form-control(type='text' name='secondary_Second_contact' placeholder='Enter contact 2' value=lead.secondary_Second_contact)
+                    .col-md-6.col-lg-1
+                      //- .form-group
+                      //-   label(for='secondary_second_whatsapp') whatsapp
+                      //-   input(type="checkbox" name='secondary_second_whatsapp' checked=(lead.secondary_second_whatsapp == 1 ? 'selected' : null))
+                      .form-check
+                        label.form-check-label
+                          input.form-check-input(type='checkbox' name='secondary_second_whatsapp'  id="checkItemSec2" checked=(lead.secondary_second_whatsapp == '1' ? 'checked' : unchecked))
+                          span.form-check-sign whatsapp
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='secondary_email') Email Id
+                        span.enquiry-mark.required-label *
+                        input#secondary_email.form-control(type='text' required="" name='secondary_email' placeholder='Enter Email' value=lead.secondary_email)
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='secondary_education') Education
+                        //- span.enquiry-mark.required-label *
+                        input#secondary_education.form-control(type='text' name='secondary_education' placeholder='Enter Parent education' value=lead.secondary_education)
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='secondary_profession') Profession
+                        //- span.enquiry-mark.required-label *
+                        input#secondary_profession.form-control(type='text' name='secondary_profession' placeholder='Enter Parent Profession' value=lead.secondary_profession)
+            else
+              #secondary_detail.card
+                .card-header
+                  .card-title Secondary Parent Detail
+                .card-body
+                  .row
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='exampleFormControlSelect1') Select Parent
+                        span.required-label *
+                        select#secondary_parent.form-control(name='secondary_parent_type', required="")
+                          option(value="") Select Parent
+                          option(value='Mother') Mother
+                          option(value='Father') Father
+                          option(value='Guradian') Guradian
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='secondary_parent_name') Name
+                        span.required-label *
+                        input#secondary_parent_name.form-control(type='text' name='secondary_parent_name' placeholder='Enter Parent Name' required="")
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='secondary_first_contact') Contact 1
+                        span.enquiry-mark.required-label *
+                        input#secondary_first_contact.form-control(type='text' name='secondary_first_contact' placeholder='Enter Contact 1')
+                        .form-check
+                          label.form-check-label
+                            input.form-check-input(type='checkbox' name='secondary_first_whatsapp'  id="checkItemSec1")
+                            span.form-check-sign Whatsapp
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='secondary_Second_contact') Contact 2
+                        input#secondary_Second_contact.form-control(type='text' name='secondary_Second_contact' placeholder='Enter Contact 2')
+                        .form-check
+                          label.form-check-label
+                            input.form-check-input(type='checkbox' name='secondary_second_whatsapp'  id="checkItemSec2")
+                            span.form-check-sign Whatsapp
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='secondary_email') Email Id
+                        span.enquiry-mark.required-label *
+                        input#secondary_email.form-control(type='text' required="" name='secondary_email' placeholder='Enter Email')
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='secondary_education') Education
+                        //- span.enquiry-mark.required-label *
+                        input#secondary_education.form-control(type='text' name='secondary_education' placeholder='Enter Parent education')
+                    .col-md-6.col-lg-6
+                      .form-group
+                        label(for='secondary_profession') Profession
+                        //- span.enquiry-mark.required-label *
+                        input#secondary_profession.form-control(type='text' name='secondary_profession' placeholder='Enter Parent Profession')
+            .card
+              .card-header
+                .card-title Lead Status Detail
+              .card-body
+                .row
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='source_category') Source Category
+                      span.required-label *
+                      select#source.form-control(name='source_category' required="")
+                       option(value='') Select Source Category
+                        option(value='direct-walk-in' selected=(lead.source_category == 'direct-walk-in' ? 'selected' : null)) Direct-Walk-in
+                        option(value='digital-lead' selected=(lead.source_category == 'digital-lead' ? 'selected' : null)) Digital Lead
+                        option(value='database/events' selected=(lead.source_category == 'database/events' ? 'selected' : null)) Database/Even
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='status_id') Select Status
+                      span.required-label *
+                      select#status.form-control(name='status_id', required='')
+                        option(value='') Select Status
+                        if lead.type == "lead"
+                          each statuse in statuses
+                            if statuse.name !== "Booked a tour" && statuse.name !== "Walked in - Need to follow up" && statuse.name !== "Walked in, will not enroll" && statuse.name !== "Walked in - Lost to Competitor" && statuse.name !== "Enrolled"
+                              option(value=statuse._id data-type=statuse.type data-stage=statuse.stage selected=(statuse._id.toString() == lead.status_id.toString())) #{statuse.name}
+                        else
+                          each statuse in statuses
+                            option(value=statuse._id data-type=statuse.type data-stage=statuse.stage selected=(statuse._id.toString() == oldLead.status_id.toString())) #{statuse.name}
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='substatus_id') Select Sub Status
+                      span.required-label *
+                      select#substatus.form-control(name='substatus_id', required='')
+                        //- option(value='') Select Sub Status
+                        //- each statuse in statuses
+                        //-   option(value=statuse._id) #{statuse.name}
+                  .col-md-6.col-lg-12
+                    .form-group
+                      //- label(for='stage') Stage
+                      input#stage.form-control(type='hidden' name='stage' placeholder='Enter stage' value=lead.stage)
+                      input#lead_type.form-control(type='hidden' name='lead_type' placeholder='Enter stage' value=lead.type)
+                  .col-md-6.col-lg-12
+                    .form-group
+                      //- .form-check
+                        label.form-check-label
+                          input.form-check-input(type='checkbox' name='sel_action_check' id="sel_action_check" checked=(lead.action_taken.length == actions.length  ? 'checked' : unchecked))
+                          span.form-check-sign Select All
+                      label(for='action_taken') Action Planned / Taken
+                      span.enquiry-mark.required-label *
+                      select#action_planned.form-control(name='action_taken[]',multiple='multiple' )
+                        each action in actions
+                          option(value=action.name selected=(lead.action_taken.includes(action.name) == true ? 'selected' : null)) #{action.name}
+                  .col-md-6.col-lg-12
+                    .form-group
+                      label(for='remark') Remark
+                      //- input#remark.form-control(type='text' name='remark' placeholder='Enter Remark' value=lead.remark)
+                      textarea.form-control(rows='5', cols='5', id="remark", name="remark") #{lead.remark}
+
+            .card-action
+              .row
+                .col-md-12
+                  button.btn.btn-color.btm-block.sub_form(type="submit") Add Sibling
+
+  block script
+    script(type='text/javascript' src='https://cdn.jsdelivr.net/momentjs/latest/moment.min.js')
+    script(type='text/javascript' src='https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js')
+
+  script.
+    var lead = !{JSON.stringify(lead)}
+    var substatuses = !{JSON.stringify(substatuses)}
+    var states = !{JSON.stringify(states)}
+    var programs = !{JSON.stringify(programs)}
+    var citys = !{JSON.stringify(citys)}
+    var type = !{JSON.stringify(type)}
+
+    var checkInq
+    $("#school_input").hide();
+    $(document).ready(function () {
+      $(".enquiry-mark").hide();
+      //- console.log(type,"checktype---->>")
+      $("#add_lead").submit(function () {
+        $(".sub_form").attr("disabled", true);
+        $('#cover-spin').show(0);
+        return true;
+      });
+
+      if (lead.cor_parent == "partner_corporate") {
+        $("#comp_name_div").show();
+      } else {
+        $("#comp_name_div").hide();
+      }
+      let checkboxpart = document.getElementById("partner_corporate");
+      let checkbox1oth = document.getElementById("others");
+      checkboxpart.addEventListener("change", () => {
+         if (checkboxpart.checked) {
+          $("#comp_name_div").show();
+          $("#company_name_parent").prop("required", true);
+         } else {
+          $("#comp_name_div").hide();
+          $("#company_name_parent").prop("required", false);
+         }
+      });
+      checkbox1oth.addEventListener("change", () => {
+         if (checkbox1oth.checked) {
+          $("#comp_name_div").hide();
+          $("#company_name_parent").prop("required", false);
+         } else {
+          $("#comp_name_div").show();
+          $("#company_name_parent").prop("required", true);
+         }
+      });
+    });
+    //- if(lead.action_taken.length > 0){
+    //-     $("#action_planned > option").prop("selected","selected");
+    //-   }
+    $(document).ready(function () {
+
+      let checkbox = document.getElementById("checkItem1");
+      checkbox.addEventListener( "change", () => {
+         if (checkbox.checked) {
+          $("#parent_first_contact").prop("required", true);
+          $("#parent_second_contact").prop("required", false);
+          $("#checkItem2").prop('checked', false);
+         } else {
+          alert('parent_first_contact-false');
+          $("#checkItem2").prop('checked', true);
+          $("#parent_first_contact").prop("required", false);
+         }
+      });
+
+      let checkbox2 = document.getElementById("checkItem2");
+      checkbox2.addEventListener( "change", () => {
+         if (checkbox2.checked) {
+          $("#parent_second_contact").prop("required", true);
+          $("#parent_first_contact").prop("required", false);
+          $("#checkItem1").prop('checked', false);
+         } else {
+          alert('parent_second_contact-false');
+          $("#checkItem2").prop('checked', true);
+          $("#parent_second_contact").prop("required", false);
+         }
+      });
+
+      var startdate = new Date();
+      startdate.setFullYear(startdate.getFullYear() - 10);
+      $(`#dob`).daterangepicker({
+        autoUpdateInput: false,
+        singleDatePicker: true,
+        maxDate: new Date(),
+        minDate: startdate,
+        //- minYear: parseInt(moment().format('YYYY'),10),
+        showDropdowns: true,
+        autoApply: true
+      }, function (start, end, label) {
+        $("#dob").val(start.format('YYYY/MM/DD'))
+      });
+      $('#dob').on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('MM/DD/YYYY'));
+      });
+      $('#stage').hide()
+      $('#know_us').select2({
+        placeholder: "Select Known us",
+        theme: "bootstrap"
+      });
+      $("#sel_know_check").click(function(){
+        if($("#sel_know_check").is(':checked') ){
+          $("#know_us > option").prop("selected","selected");
+          $("#know_us").trigger("change");
+        }else{
+          $("#know_us > option").removeAttr("selected");
+          $("#know_us").trigger("change");
+        }
+      });
+      $('#country').select2({
+        placeholder: "Select country ",
+        theme: "bootstrap"
+      });
+      $('#state').select2({
+        placeholder: "Select state ",
+        theme: "bootstrap"
+      });
+      $('#city').select2({
+        placeholder: "Select city ",
+        theme: "bootstrap"
+      });
+      $('#programcategory').select2({
+        placeholder: "Select ProgramCtegory",
+        theme: "bootstrap"
+      });
+      if(type == "super_admin"){
+        $('#school').select2({
+          placeholder: "Select Center",
+          theme: "bootstrap"
+        });
+      }else{
+        $('#school').select2({
+          placeholder: "Select Center",
+          theme: "bootstrap",
+          //- disabled: true
+        });
+      }
+      $('#source').select2({
+        placeholder: "Select source",
+        theme: "bootstrap"
+      });
+      $('#parent').select2({
+        placeholder: "Select parent",
+        theme: "bootstrap"
+      });
+      $('#gender').select2({
+        placeholder: "Select gender",
+        theme: "bootstrap"
+      });
+      $('#action_planned').select2({
+        placeholder: "Select Action",
+        theme: "bootstrap"
+      });
+      $("#sel_action_check").click(function(){
+        if($("#sel_action_check").is(':checked') ){
+          $("#action_planned > option").prop("selected","selected");
+          $("#action_planned").trigger("change");
+        }else{
+          $("#action_planned > option").removeAttr("selected");
+          $("#action_planned").trigger("change");
+        }
+      });
+      $('#program').select2({
+        placeholder: "Select program",
+        theme: "bootstrap"
+      });
+      $('#status').select2({
+        placeholder: "Select status",
+        theme: "bootstrap"
+      });
+      $('#substatus').select2({
+        placeholder: "Select substatus",
+        theme: "bootstrap"
+      });
+      $(document).on('change', '#action_planned', function () {
+        let actionsList = $("#action_planned option").length;
+        var valueLength = $(this).val() ? $(this).val().length : 0;
+          if (actionsList == valueLength) {
+            $('#sel_action_check').prop('checked',true);
+          } else {
+            $('#sel_action_check').prop('checked',false);
+          }
+      })
+      $(document).on('change', '#know_us', function () {
+        let knowusList = $("#know_us option").length;
+        var valueLength = $(this).val() ? $(this).val().length : 0;
+          if (knowusList == valueLength) {
+            $('#sel_know_check').prop('checked',true);
+          } else {
+            $('#sel_know_check').prop('checked',false);
+          }
+      })
+      for (var i = 0; i < programs.length; i++) {
+        var id = programs[i]['_id'];
+        var name = programs[i]['program_name'];
+        var programcategory = programs[i]['programcategory_id']
+
+        //- console.log(programs[i])
+        if(lead.program_id){
+          console.log("done")
+          if (lead.program_id.includes(id)) {
+            $("#program").append(`<option value='${id}' selected=(${lead.program_id.includes(id) == true ? 'selected' : null})>${name}</option>`);
+          }
+        }else if (programcategory.toString() ==  lead.programcategory_id.toString()){
+          //- console.log(lead.programcategory_id,"lead.programcategory_id")
+          //- console.log(programcategory,"programcategory")
+          //- //- console.log("not done")
+          //- //- console.log(name,"name")
+          $("#program").append(`<option value='${id}'>${name}</option>`);
+        }
+      }
+      //- for (var i = 0; i < states.length; i++) {
+      //-   var id = states[i]['_id'];
+      //-   var name = states[i]['state_name'];
+      //-   var state_id = states[i]['id']
+
+      //-   // console.log(page.testimonials.includes(id));
+
+      //-   if (lead.parent_state.includes(id)) {
+      //-     $("#state").append(`<option value='${state_id}|${id}' selected=(${lead.parent_state.includes(id) == true ? 'selected' : null})>${name}</option>`);
+      //-   }
+      //- }
+      //- for (var i = 0; i < citys.length; i++) {
+      //-   var id = citys[i]['_id'];
+      //-   var name = citys[i]['city_name'];
+      //-   var city_id = citys[i]['id']
+
+      //-   // console.log(page.testimonials.includes(id));
+
+      //-   if (lead.parent_city.includes(id)) {
+      //-     $("#city").append(`<option value='${city_id}|${id}' selected=(${lead.parent_city.includes(id) == true ? 'selected' : null})>${name}</option>`);
+      //-   }
+      //- }
+
+
+      //- $('#select2-country-container').on('click',function () {
+      //-   //- var countryId = $(this).children('span');
+      //-   var countryId = $("#country option:selected").val();
+      //-   var id = countryId.split("|")[0];
+      //-   console.log(id,"couidd")
+
+      //-   $.ajax({
+      //-     method: 'POST',
+      //-     url: `/admin/lead/state`,
+      //-     data: {
+      //-       type: id
+      //-     },
+      //-     dataType: 'json',
+      //-     success: function (response) {
+      //-       //- console.log(response,"response")
+
+      //-       $("#state").empty();
+      //-       $("#state").append(`<option value=''>Select state</option>`);
+
+      //-       var len = response.data.length;
+      //-       for (var i = 0; i < len; i++) {
+      //-         var id = response.data[i]['_id'];
+      //-         var state_name = response.data[i]['state_name'];
+      //-         var state_id = response.data[i]['id']
+
+      //-         console.log(response,"responssse")
+      //-         console.log(id,"id")
+      //-         console.log(state_name,"ststae_name")
+      //-         console.log(state_id,"state_id")
+
+
+
+      //-       //-   // $(".testi_class").append("<option value='" + id + "'>" + name + "</option>");
+
+      //-         $("#state").append(`<option value='${state_id}|${id}'>${state_name}</option>`);
+
+      //-       }
+      //-       // $(".testi_class").select2("refresh");
+      //-     }
+      //-   });
+      //- });
+      //- for (var i = 0; i < programs.length; i++) {
+      //-   var id = programs[i]['_id'];
+      //-   var name = programs[i]['program_name'];
+      //-   var programcategory = programs[i]['programcategory_id']
+
+      //-   //- console.log(programs[i])
+
+      //-   if (lead.program_id.includes(id)) {
+      //-     $("#program").append(`<option value='${id}' selected=(${lead.program_id.includes(id) == true ? 'selected' : null})>${name}</option>`);
+      //-   }else if (lead.programcategory_id.includes(programcategory)){
+      //-     $("#program").append(`<option value='${id}'>${name}</option>`);
+      //-   }
+      //- }
+      $(document).on('change', '#country', function () {
+        var countryId = $(this).val();
+        var id = countryId.split("|")[0];
+        //- console.log(id,"couidd")
+
+        $.ajax({
+          method: 'POST',
+          url: `/admin/lead/state`,
+          data: {
+            type: id
+          },
+          dataType: 'json',
+          success: function (response) {
+            //- console.log(response,"response")
+
+            $("#state").empty();
+            $("#state").append(`<option value=''>Select state</option>`);
+
+            var len = response.data.length;
+            for (var i = 0; i < len; i++) {
+              var id = response.data[i]['_id'];
+              var state_name = response.data[i]['state_name'];
+              var state_id = response.data[i]['id']
+
+              //- console.log(response,"responssse")
+              //- console.log(id,"id")
+              //- console.log(state_name,"ststae_name")
+              //- console.log(state_id,"state_id")
+
+
+
+            //-   // $(".testi_class").append("<option value='" + id + "'>" + name + "</option>");
+
+              $("#state").append(`<option value='${state_id}|${id}'>${state_name}</option>`);
+
+            }
+            // $(".testi_class").select2("refresh");
+          }
+        });
+      });
+      $(document).on('change', '#state', function () {
+        var stateId = $(this).val();
+        var id = stateId.split("|")[0];
+        //- console.log(id,"city")
+
+        $.ajax({
+          method: 'POST',
+          url: `/admin/lead/city`,
+          data: {
+            type: id
+          },
+          dataType: 'json',
+          success: function (response) {
+            //- console.log(response,"response")
+
+            $("#city").empty();
+            $("#city").append(`<option value=''>Select city</option>`);
+
+            var len = response.data.length;
+            for (var i = 0; i < len; i++) {
+              var id = response.data[i]['_id'];
+              var city_name = response.data[i]['city_name'];
+              var city_id = response.data[i]['id']
+
+              //- console.log(response,"responssse")
+              //- console.log(id,"id")
+              //- console.log(city_name,"ststae_name")
+              //- console.log(city_id,"state_id")
+
+
+
+            //-   // $(".testi_class").append("<option value='" + id + "'>" + name + "</option>");
+              if(lead.parent_country){
+
+                if (lead.parent_city.includes(id)) {
+                  $("#city").append(`<option value='${city_id}|${id}' selected=(${lead.parent_city.includes(id) == true ? 'selected' : null}>${city_name}</option>`);
+                }
+              }else{
+                $("#city").append(`<option value='${city_id}|${id}'>${city_name}</option>`);
+              }
+
+              //- $("#city").append(`<option value='${city_id}|${id}'>${city_name}</option>`);
+
+            }
+            // $(".testi_class").select2("refresh");
+          }
+        });
+      });
+      $.ajax({
+          method: 'POST',
+          url: `/admin/lead/center`,
+          data: {
+            type: lead.school_id
+          },
+          dataType: 'json',
+          success: function (response) {
+            //- console.log(response,"response")
+
+            $("#programcategory").empty();
+            $("#programcategory").append(`<option value=''>Select programcategory</option>`);
+
+            var len = response.data.length;
+            for (var i = 0; i < len; i++) {
+              var id = response.data[i]['_id'];
+              var title = response.data[i]['title'];
+
+
+              //- console.log(response,"responssse")
+              //- console.log(id,"id")
+              //- console.log(title,"title")
+
+
+
+
+            //-   // $(".testi_class").append("<option value='" + id + "'>" + name + "</option>");
+            if (lead.programcategory_id.includes(id)) {
+              $("#programcategory").append(`<option value='${id}' selected=(${lead.programcategory_id.includes(id) == true ? 'selected' : null})>${title}</option>`);
+            }else{
+
+              $("#programcategory").append(`<option value='${id}'>${title}</option>`);
+            }
+
+
+            }
+            // $(".testi_class").select2("refresh");
+          }
+        });
+      $(document).on('change', '#programcategory', function () {
+      var id = $(this).val();
+      //- console.log(id)
+
+      $.ajax({
+        method: 'POST',
+        url: `/admin/lead/dropdown`,
+        data: {
+          type: id
+        },
+        dataType: 'json',
+        success: function (response) {
+          //- console.log(response,"response")
+
+          $("#program").empty();
+          $("#program").append(`<option value=''>Select Program</option>`);
+
+          var len = response.data.length;
+          for (var i = 0; i < len; i++) {
+            var id = response.data[i]['_id'];
+            var program_name = response.data[i]['program_name'];
+
+            //- console.log(response,"responssse")
+            //- console.log(id,"id")
+
+
+
+          //-   // $(".testi_class").append("<option value='" + id + "'>" + name + "</option>");
+
+            $("#program").append(`<option value='${id}'>${program_name}</option>`);
+
+          }
+          // $(".testi_class").select2("refresh");
+        }
+      });
+    });
+    for (var i = 0; i < substatuses.length; i++) {
+        var id = substatuses[i]['_id'];
+        var name = substatuses[i]['name'];
+        //- console.log(name,"name")
+        //- console.log(lead.substatus_id,"subid")
+
+        // console.log(page.testimonials.includes(id));
+
+        if (lead.substatus_id.includes(id)) {
+          $("#substatus").append(`<option value='${id}' selected=(${lead.substatus_id.includes(id) == true ? 'selected' : null})>${name}</option>`);
+        }
+      }
+      $(document).on('change', '#school', function () {
+      var id = $(this).val();
+      //- console.log(id,"school")
+
+
+      $.ajax({
+        method: 'POST',
+        url: `/admin/lead/center`,
+        data: {
+          type: id
+        },
+        dataType: 'json',
+        success: function (response) {
+          //- console.log(response,"response")
+
+          $("#programcategory").empty();
+          $("#programcategory").append(`<option value=''>Select programcategory</option>`);
+          $("#program").empty();
+          $("#program").append(`<option value=''>Select program</option>`);
+
+          var len = response.data.length;
+          for (var i = 0; i < len; i++) {
+            var programcat_id = response.data[i]['_id'];
+            var title = response.data[i]['title'];
+
+
+            //- console.log(response,"responssse")
+            //- console.log(id,"id")
+            //- console.log(title,"title")
+
+
+
+
+          //-   // $(".testi_class").append("<option value='" + id + "'>" + name + "</option>");
+          if(lead.programcategory_id.toString() == programcat_id.toString()){
+            console.log("title",title)
+            $("#programcategory").append(`<option value='${programcat_id}' selected>${title}</option>`);
+            for (var i = 0; i < programs.length; i++) {
+              var id = programs[i]['_id'];
+              var name = programs[i]['program_name'];
+              var programcategory = programs[i]['programcategory_id']
+
+              //- console.log(programs[i])
+              if(lead.program_id){
+                console.log("done")
+                if (lead.program_id.includes(id)) {
+                  $("#program").append(`<option value='${id}' selected=(${lead.program_id.includes(id) == true ? 'selected' : null})>${name}</option>`);
+                }
+              }else if (programcategory.toString() ==  lead.programcategory_id.toString()){
+                //- console.log(lead.programcategory_id,"lead.programcategory_id")
+                //- console.log(programcategory,"programcategory")
+                //- //- console.log("not done")
+                //- //- console.log(name,"name")
+                $("#program").append(`<option value='${id}'>${name}</option>`);
+              }
+            }
+          }else{
+            $("#programcategory").append(`<option value='${programcat_id}'>${title}</option>`);
+          }
+
+            //- $("#programcategory").append(`<option value='${programcat_id}'>${title}</option>`);
+
+          }
+          // $(".testi_class").select2("refresh");
+        }
+      });
+    });
+
+      if (lead.type == "lead") {
+        $("#child_attended").hide();
+        $("#landmark").hide();
+        $("#secondary_detail").hide();
+        $("#house").hide();
+        $("#street").hide();
+        $("#address_s").hide();
+
+        $("#parent_area").prop("required", false);
+        $("#dob").prop("required", false);
+        $("#action_planned").prop("required", false);
+        $("#parent_landmark").prop("required", false);
+        $("#parent_house").prop("required", false);
+        $("#parent_street").prop("required", false);
+        $("#parent_address").prop("required", false);
+        $("#secondary_parent").prop("required", false);
+        $("#secondary_parent_name").prop("required", false);
+        $("#secondary_email").prop("required", false);
+        $("#parent_education").prop("required", false);
+        $("#parent_profession").prop("required", false);
+        $("#parent_pincode").prop("required", false);
+        $("#country").prop("required", false);
+        $("#state").prop("required", false);
+        $("#city").prop("required", false);
+
+        $("#child_first_name").prop("required", false);
+        $("#child_last_name").prop("required", false);
+        $("#gender").prop("required", false);
+        $("#program").prop("required", false);
+
+        $("#secondary_first_contact").prop("required", false);
+        $("#secondary_Second_contact").prop("required", false);
+        $("#checkItemSec1").prop("checked", false);
+        $("#checkItemSec2").prop("checked", false);
+
+        checkInq = 0;
+      } else {
+        $(".enquiry-mark").show();
+        $("#child_attended").show();
+        $("#landmark").show();
+        $("#secondary_detail").show();
+        $("#house").show();
+        $("#street").show();
+        $("#address_s").show();
+
+        $("#action_planned").prop("required", false);
+        //- $("#parent_landmark").prop("required", true);
+        //- $("#parent_house").prop("required", true);
+        //- $("#parent_street").prop("required", true);
+        //- $("#parent_address").prop("required", true);
+        $("#parent_area").prop("required", true);
+        $("#secondary_parent").prop("required", true);
+        $("#secondary_parent_name").prop("required", true);
+        $("#secondary_email").prop("required", true);
+        //- $("#parent_education").prop("required", true);
+        //- $("#parent_profession").prop("required", true);
+        $("#parent_pincode").prop("required", true);
+        $("#country").prop("required", true);
+        $("#state").prop("required", true);
+        $("#city").prop("required", true);
+
+        $("#child_first_name").prop("required", true);
+        $("#child_last_name").prop("required", true);
+        $("#gender").prop("required", true);
+        $("#program").prop("required", true);
+
+        $("#secondary_first_contact").prop("required", true);
+        $("#checkItemSec1").prop("checked", true);
+        $("#dob").prop("required", true);
+        checkInq = 1;
+      }
+
+      $(document).on('change', '#status', function () {
+      var id = $(this).val();
+      //- console.log(id,"id")
+      var type = $(this).find(':selected').attr('data-type');
+      var stage= $(this).find(':selected').attr('data-stage');
+
+      $("#lead_type").val(type);
+      $("#stage").val(stage);
+
+      if (stage == "Post Tour" || stage == "Closed-Enquiry Lost" || stage == "Closed-Won") {
+          //- console.log('show popup');
+          $(".enquiry-mark").show();
+          $("#child_attended").show();
+          $("#landmark").show();
+          $("#secondary_detail").show();
+          $("#house").show();
+          $("#street").show();
+          $("#address_s").show();
+
+          //- $("#parent_landmark").prop("required", true);
+          //- $("#parent_house").prop("required", true);
+          //- $("#parent_street").prop("required", true);
+          //- $("#parent_address").prop("required", true);
+          $("#parent_area").prop("required", true);
+          $("#secondary_parent").prop("required", true);
+          $("#secondary_parent_name").prop("required", true);
+          $("#secondary_email").prop("required", true);
+          //- $("#parent_education").prop("required", true);
+          //- $("#parent_profession").prop("required", true);
+          $("#parent_pincode").prop("required", true);
+
+          $("#country").prop("required", true);
+          $("#state").prop("required", true);
+          $("#city").prop("required", true);
+
+          $("#child_first_name").prop("required", true);
+          $("#child_last_name").prop("required", true);
+          $("#gender").prop("required", true);
+          $("#program").prop("required", true);
+
+          $("#secondary_first_contact").prop("required", true);
+          $("#checkItemSec1").prop("checked", true);
+          $("#dob").prop("required", true);
+          checkInq = 1;
+
+        } else {
+
+          //- console.log('hide popup');
+          $(".enquiry-mark").hide();
+          $("#child_attended").hide();
+          $("#landmark").hide();
+          $("#secondary_detail").hide();
+          $("#house").hide();
+          $("#street").hide();
+          $("#address_s").hide();
+
+          $("#parent_landmark").prop("required", false);
+          $("#parent_area").prop("required", false);
+          $("#parent_house").prop("required", false);
+          $("#parent_street").prop("required", false);
+          $("#parent_address").prop("required", false);
+          $("#secondary_parent").prop("required", false);
+          $("#secondary_parent_name").prop("required", false);
+          $("#secondary_email").prop("required", false);
+          $("#parent_education").prop("required", false);
+          $("#parent_profession").prop("required", false);
+          $("#parent_pincode").prop("required", false);
+
+          $("#country").prop("required", false);
+          $("#state").prop("required", false);
+          $("#city").prop("required", false);
+
+          $("#child_first_name").prop("required", false);
+          $("#child_last_name").prop("required", false);
+          $("#gender").prop("required", false);
+          $("#program").prop("required", false);
+
+          $("#secondary_first_contact").prop("required", false);
+          $("#secondary_Second_contact").prop("required", false);
+          $("#checkItemSec1").prop("checked", false);
+          $("#checkItemSec2").prop("checked", false);
+          $("#dob").prop("required", false);
+
+          checkInq = 0;
+        }
+
+      if (checkInq) {
+        let checkbox = document.getElementById("checkItemSec1");
+        checkbox.addEventListener( "change", () => {
+          if (checkbox.checked) {
+            $("#secondary_first_contact").prop("required", true);
+            $("#secondary_Second_contact").prop("required", false);
+            $("#checkItemSec2").prop('checked', false);
+          } else {
+            $("#checkItemSec2").prop('checked', true);
+            $("#secondary_first_contact").prop("required", false);
+          }
+        });
+
+        let checkbox2 = document.getElementById("checkItemSec2");
+        checkbox2.addEventListener( "change", () => {
+          if (checkbox2.checked) {
+            $("#secondary_Second_contact").prop("required", true);
+            $("#secondary_first_contact").prop("required", false);
+            $("#checkItemSec1").prop('checked', false);
+          } else {
+            alert('parent_second_contact-false');
+            $("#checkItemSec2").prop('checked', true);
+            $("#secondary_Second_contact").prop("required", false);
+          }
+        });
+      }
+
+      $.ajax({
+        method: 'POST',
+        url: `/admin/lead/status`,
+        data: {
+          type: id
+        },
+        dataType: 'json',
+        success: function (response) {
+          //- console.log(response,"response")
+
+          $("#substatus").empty();
+
+          var len = response.data.length;
+          if(len == 1){
+            for (var i = 0; i < len; i++) {
+            //- console.log(response.data[i]);
+            var id = response.data[i]['_id'];
+            var program_name = response.data[i]['name'];
+            var stage = response.data[i]['stage']
+
+            //- console.log(response,"responssse")
+            //- console.log(id,"id")
+            //- console.log(stage,"stage")
+
+
+          //-   // $(".testi_class").append("<option value='" + id + "'>" + name + "</option>");
+
+              $("#substatus").append(`<option value='${id}' selected>${program_name}</option>`);
+            }
+          }else{
+
+            for (var i = 0; i < len; i++) {
+              //- console.log(response.data[i]);
+              var id = response.data[i]['_id'];
+              var program_name = response.data[i]['name'];
+              var stage = response.data[i]['stage']
+
+              //- console.log(response,"responssse")
+              //- console.log(id,"id")
+              //- console.log(stage,"stage")
+
+
+            //-   // $(".testi_class").append("<option value='" + id + "'>" + name + "</option>");
+
+              $("#substatus").append(`<option value='${id}'>${program_name}</option>`);
+            }
+          }
+          //- for (var i = 0; i < len; i++) {
+          //-   var id = response.data[i]['_id'];
+          //-   var program_name = response.data[i]['name'];
+          //-   var stage = response.data[i]['stage']
+
+          //-   //- console.log(response,"responssse")
+          //-   //- console.log(id,"id")
+          //-   //- console.log(stage,"stage")
+
+
+          //- //-   // $(".testi_class").append("<option value='" + id + "'>" + name + "</option>");
+
+          //-   $("#substatus").append(`<option value='${id}'>${program_name}</option>`);
+          //-   //- $("#stage").val(stage);
+          //- }
+          // $(".testi_class").select2("refresh");
+        }
+      });
+    });
+    })
+
+
+
+
+
+
+
+//- extends layout-admin
+
+//- block content
+//-   .main-panel
+//-     .container
+//-       .panel-header.bg-primary-gradient
+//-         .page-inner.py-5
+//-           .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+//-             div
+//-               h2.text-white.pb-2.fw-bold Add Lead
+//-               h5.text-white.op-7.mb-2 Welcome to Admin Panel
+//-             .ml-md-auto.py-2.py-md-0
+//-               a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/lead/all') All Lead
+//-               a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+//-       .page-inner
+//-         .row
+//-           form.col-md-12(action="/admin/lead/add", method="POST")
+//-             .card
+//-               .card-header
+//-                 .card-title Center Detail
+//-               .card-body
+//-                 .row
+//-                   .col-md-12.col-lg-12
+//-                     .form-group
+//-                       label(for='exampleFormControlSelect1') Select Center
+//-                       select#center_name.form-control(name='center_id', required='')
+//-                         option(value='') Select Center
+//-                         each center in centers
+//-                           option(value=center._id) #{center.center_name}
+
+//-             .card
+//-               .card-header
+//-                 .card-title Child Information
+//-               .card-body
+//-                 .row
+//-                   .col-md-6.col-lg-4
+//-                     .form-group
+//-                       label(for='first_name') First Name
+//-                       input#first_name.form-control(type='text' name='child_first_name' placeholder='Enter First Name')
+//-                     .form-group
+//-                       label(for='dob') Date of birth
+//-                       .input-group
+//-                         input#birth.form-control(type='text' name='child_dob' required='')
+//-                   .col-md-6.col-lg-4
+//-                     .form-group
+//-                       label(for='last_name') Last Name
+//-                       input#last_name.form-control(type='text' name='child_last_name' placeholder='Enter Last Name')
+//-                     .form-group
+//-                       label(for='exampleFormControlSelect1') Course Interested In
+//-                       select#course_int.form-control(name='child_course_id', required='')
+//-                         option(value='') Select Course
+//-                         each course in courses
+//-                           option(value=course._id) #{course.course_name}
+//-                   .col-md-6.col-lg-4
+//-                     .form-group
+//-                       label(for='exampleFormControlSelect1') Select Gender
+//-                       select#exampleFormControlSelect1.form-control(name='child_gender', required='')
+//-                         option(value="Male") Male
+//-                         option(value="Female") Female
+
+//-             .card
+//-               .card-header
+//-                 .card-title Family Information
+//-               .card-body
+//-                 .row
+//-                   .col-md-6.col-lg-4
+//-                     .form-group
+//-                       label(for='parent_name')
+//-                       | Parent Name
+//-                       span.required-label *
+//-                       input#parent_name.form-control(type='text' name="parent_name" placeholder='Enter Parent Name' required='')
+//-                     .form-group
+//-                       label(for='parent_email')
+//-                       | Parent Email ID
+//-                       span.required-label *
+//-                       input#parent_email.form-control(type='text' name="parent_email" placeholder='Enter Parent Email ID' required='')
+//-                     .form-group
+//-                       label(for='area_locality')
+//-                       | Area Locality Sector
+//-                       span.required-label *
+//-                       input#area_locality.form-control(type='text' name="area_locality" placeholder='Enter Area Locality Sector' required='')
+//-                     .form-group
+//-                       label(for='exampleFormControlSelect1') How did you come to Know about us
+//-                       span.required-label *
+//-                       select#know_us.form-control(name='know_about_us', required='', multiple='multiple')
+//-                         each knowus in knowuss
+//-                           option(value=knowus.name) #{knowus.name}
+//-                   .col-md-6.col-lg-4
+//-                     .form-group
+//-                       label(for='parent_contact_no')
+//-                       | Parent Contact No.
+//-                       span.required-label *
+//-                       input#parent_contact_no.form-control(type='text' name="parent_contact_no" placeholder='Enter Parent Contact No.' required='')
+//-                     .form-group
+//-                       label(for='exampleFormControlSelect1') Select State
+//-                       span.required-label *
+//-                       select#state-id.form-control(name='state', required='')
+//-                         option(value='') Select State
+//-                         each state in states
+//-                           option(value=`${state.id}|${state.state_name}`) #{state.state_name}
+//-                     .form-group
+//-                       label(for='pincode')
+//-                       | Pincode
+//-                       span.required-label *
+//-                       input#pincode.form-control(type='text' name="pincode" placeholder='Enter Pincode' required='')
+//-                   .col-md-6.col-lg-4
+//-                     .form-group
+//-                       label(for='parent_contact_no_another')
+//-                       | Parent Contact No. 2
+//-                       span.required-label
+//-                       input#parent_contact_no_another.form-control(type='text' name="parent_contact_no_another" placeholder='Enter Parent Contact No. 2')
+//-                     .form-group
+//-                       label(for='exampleFormControlSelect1') Select City
+//-                       span.required-label *
+//-                       select#city-id.form-control(name='city', required='')
+//-                         option(value='') -- Select --
+//-                     .form-group
+//-                       label(for='lead_cat') Lead Category
+//-                       span.required-label *
+//-                       select#lead_cat.form-control(name='lead_category', required='')
+//-                         option(value='') Select Lead Category
+//-                         each leadCategory in leadCategories
+//-                           option(value=leadCategory.name) #{leadCategory.name}
+//-             .card
+//-               .card-header
+//-                 .card-title Follow-Ups
+//-               .card-body
+//-                 .row
+//-                   .col-md-6.col-lg-4
+//-                     .form-group
+//-                       label(for='exampleFormControlSelect1') Select Status
+//-                       span.required-label *
+//-                       select#status-id.form-control(name='follow_status', required='')
+//-                         option(value='') Select Status
+//-                         each status in statuses
+//-                           option(value=`${status._id}|${status.name}`) #{status.name}
+//-                     .form-group
+//-                       label(for='exampleFormControlSelect1') Select Lead / Enquiry Stage
+//-                       span.required-label *
+//-                       select#exampleFormControlSelect1.form-control(name="enq_stage", required='')
+//-                         option(value='') Select Status
+//-                         option(value='Hot') Hot
+//-                         option(value='Cold') Cold
+//-                         option(value='Enrolled') Enrolled
+//-                     .form-group
+//-                       label(for='updated_by')
+//-                       | Updated By
+//-                       span.required-label
+//-                       input#updated_by.form-control(type='text' value=currentUser.name disabled)
+//-                       input.form-control(type='hidden' name="updated_by" value=currentUser._id.toString() disabled hidden)
+//-                   .col-md-6.col-lg-4
+//-                     .form-group
+//-                       label(for='exampleFormControlSelect1') Select Sub Status
+//-                       span.required-label *
+//-                       select#substatus-id.form-control(name='follow_sub_status', required='')
+//-                         option(value='') -- Select --
+//-                     .form-group
+//-                       label(for='dob') Follow-Up Date
+//-                       span.required-label *
+//-                       .input-group
+//-                         input#follow_date.form-control(type='text' name='follow_up_date' required='')
+//-                     .form-group
+//-                       label(for='notes') Notes
+//-                       textarea#notes.form-control(rows='5' name="notes")
+//-                   .col-md-6.col-lg-4
+//-                     .form-group
+//-                       label(for='exampleFormControlSelect1') Action Planned / Taken
+//-                       span.required-label *
+//-                       select#action_planned.form-control(name='action_taken', required='')
+//-                         option(value='') Select Status
+//-                         each actionTaken in actionTakens
+//-                           option(value=actionTaken.name) #{actionTaken.name}
+//-                     .form-group
+//-                       label Select Time
+//-                       span.required-label *
+//-                       .input-group
+//-                         input#follow_up_time.form-control(type='text' name='follow_up_time' required="")
+//-                         .input-group-append
+//-                           span.input-group-text
+//-                             i.fa.fa-clock
+//-                     .form-group
+//-                       label(for='notes') Remarks (For Office Use Only)
+//-                       textarea#notes.form-control(rows='5' name="remark")
+
+//-             .card-action
+//-               .row
+//-                 .col-md-12
+//-                   button.btn.btn-color.btm-block(type="submit") Add Lead with follow-Up
+
+//-   block script
+//-     script(src="/admin/assets/js/plugin/moment/moment.min.js")
+//-     script(type='text/javascript' src='/admin/assets/js/plugin/datepicker/bootstrap-datetimepicker.min.js')
+
+//-   script.
+//-     $(document).ready(function () {
+//-       $('#birth').datetimepicker({
+//-         format: 'YYYY/MM/DD'
+//-       });
+
+//-       $('#follow_date').datetimepicker({
+//-         format: 'YYYY/MM/DD'
+//-       });
+
+//-       $('#follow_up_time').datetimepicker({
+//-         format: 'h:mm A',
+//-       });
+
+//-       $('#course_int').select2({
+//-         theme: "bootstrap"
+//-       });
+
+//-       $('#center_name').select2({
+//-         theme: "bootstrap"
+//-       });
+
+//-       $('#lead_cat').select2({
+//-         theme: "bootstrap"
+//-       });
+
+//-       $('#know_us').select2({
+//-         theme: "bootstrap"
+//-       });
+
+//-       $("#status-id").select2({
+//-         theme: "bootstrap"
+//-       });
+
+//-       $("#substatus-id").select2({
+//-         theme: "bootstrap"
+//-       });
+
+//-       $("#action_planned").select2({
+//-         theme: "bootstrap"
+//-       });
+
+//-       $(document).on('change', '#state-id', function () {
+//-         // alert('hey');
+//-         var stateId = $(this).val();
+//-         var onlyStateId = stateId.split("|")[0];
+//-         $("#city-id").empty().trigger("change");
+//-         $("#city-id").attr("required", "")
+
+//-         $.ajax({
+//-           url: `/admin/client/select/state/${onlyStateId}`,
+//-           type: 'get',
+//-           dataType: 'json',
+//-           success: function (response) {
+//-             console.log(response);
+//-             var len = response.data.length;
+//-             for (var i = 0; i < len; i++) {
+//-               var id = response.data[i]['id'];
+//-               var name = response.data[i]['city_name'];
+
+//-               $("#city-id").append("<option value='" + name + "'>" + name + "</option>");
+//-             }
+//-             $("#city-id").select2("refresh");
+//-           }
+//-         });
+//-       })
+
+//-       $(document).on('change', '#status-id', function () {
+//-         // alert('hey');
+//-         var statusId = $(this).val();
+//-         var onlyStatusId = statusId.split("|")[0];
+//-         console.log(onlyStatusId)
+//-         //- var onlyStateId = stateId.split("|")[0];
+//-         $("#substatus-id").empty().trigger("change");
+//-         $("#substatus-id").attr("required", "")
+
+//-         $.ajax({
+//-           url: `/admin/client/select/substatus/${onlyStatusId}`,
+//-           type: 'get',
+//-           dataType: 'json',
+//-           success: function (response) {
+//-             console.log(response);
+//-             var len = response.data.length;
+//-             for (var i = 0; i < len; i++) {
+//-               var id = response.data[i]['_id'];
+//-               var name = response.data[i]['name'];
+
+//-               $("#substatus-id").append("<option value='" + name + "'>" + name + "</option>");
+//-             }
+//-             $("#substatus-id").select2("refresh");
+//-           }
+//-         });
+//-       })
+//-     })

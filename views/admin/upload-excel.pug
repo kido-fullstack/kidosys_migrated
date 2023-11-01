@@ -1,0 +1,60 @@
+extends layout-admin
+
+block content
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        .page-inner.py-5
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold Upload Excel
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/lead/all') All Lead
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+      .page-inner
+        .row
+          h1 Upload Excel
+          form(id="excel" action='/admin/lead/upload', method='POST', enctype='multipart/form-data')
+            input(type='file', name='file')
+            button() Upload
+          div.progresss
+            div.progress-bar(id='progresss-bar', role='progressbar', ariaValuenow='0', ariaValuemin='0', ariaValuemax='100')
+
+  script.
+    console.log('jdjdjdjdjd');
+    var socket = io();
+    socket.on('message', function(data) {
+      console.log("data-->", data);
+    });
+
+    socket.on('progress', function(percentComplete) {
+      console.log("percentComplete-->", percentComplete);
+      document.getElementById('progresss-bar').style.width = percentComplete + '%';
+      document.getElementById('progresss-bar').innerHTML = percentComplete + '%';
+    });
+
+    $(document).ready(function() {
+      $("form#excel").submit(function(e) {
+        e.preventDefault();
+        var formData = new FormData(this);
+        $.ajax({
+          url:'/admin/lead/upload',
+          type:'POST',
+          data: formData,
+          success:function (json) {
+            console.log(json);
+          },
+          cache: false,
+          contentType: false,
+          processData: false
+        });
+      })
+    })
+
+
+    socket.on('progress', function(percentComplete) {
+      console.log("percentComplete-->", percentComplete);
+      document.getElementById('progresss-bar').style.width = percentComplete + '%';
+      document.getElementById('progresss-bar').innerHTML = percentComplete + '%';
+    });

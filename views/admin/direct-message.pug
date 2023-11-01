@@ -1,0 +1,223 @@
+extends layout-admin
+
+block content
+  #cover-spin
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        div(style="padding:5px 20px 0px 20px;")
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold Send Response
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              //- a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/program/add') Add Program
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+      .page-inner(style="margin-bottom: 50px;")
+        .d-flex.justify-content-between(style="margin-bottom: 20px;")
+          .list-group.list-group-messages.list-group-flush
+            .list-group-item.unread
+              .list-group-item-figure
+                //-span.rating.rating-sm.mr-3
+                  input#star2(type='checkbox' value='1' checked='')
+                  label(for='star2')
+                    span.fa.fa-star
+                //- a.user-avatar(href='conversations.html')
+                  .avatar.avatar-offline
+                    img.avatar-img.rounded-circle(src='../assets/img/chadengle.jpg' alt='...')
+              .list-group-item-body
+                .row
+                  .col-12.col-lg-40
+                    h4.list-group-item-title
+                    a.quick-response-lead-name(style="margin-top:15px;") #{message.title}
+                    if message.attachment && message.attachment.length
+                      button.btn.pull-right.btn-color.btm-block(type="button" onclick=`viewAttachment('${message._id}')` ,style="margin-bottom:20px;") View Attachment(s)
+                    textarea.form-control.quick-response-lead-message-box(rows='15', cols='400', id="msg", name="msg", required) #{message.msg}
+                    p(style="float: right;margin-top: 5px;cursor:pointer;" onclick=`editMessageAdd(${JSON.stringify(message.msg)});`) Edit Message Template
+                    .bg-white(style="margin-bottom: 21px;")#super_admin
+                      .nav-scroller
+                        .nav.nav-tabs.nav-line.nav-color-secondary
+                          input#name.form-control(type='text', name='name', placeholder='Enter Name', required='' value=lead.parent_name, disabled)
+                    if check == "whatsapp"
+                      if message.attachment
+                        div(style="margin-bottom:14px;margin-top:10px;") Note: Attachment will not be sent via Whatsapp.
+                    .bg-white#export_button
+                      button.btn.btn-color.btm-block(type="button" onclick="redirectTosend()" ) Send
+
+  block script
+    script(src="https://cdn.ckeditor.com/4.11.4/basic/ckeditor.js")
+    script(src='/admin/assets/js/common.js')
+
+  script.
+    var message = !{JSON.stringify(message)}
+    var lead = !{JSON.stringify(lead)}
+    var check = !{JSON.stringify(check)}
+    var num_email = !{JSON.stringify(num_email)}
+    function redirectTodownload () {
+      var filename = message.attachment;
+      window.open(filename, '_blank');
+      return;
+      // below is the code for download a file.
+      //- console.log(filename,"downloaddclosaaj")
+      //- var fileName = filename.substring(filename.lastIndexOf('/')+1);
+      //- window.location.href = `/admin/responses/downloadfile/${fileName}`;
+    }
+    function editMessageAdd(msg) {
+      //- alert('hey');
+      //- console.log(msg);
+      $.fancybox.open(`
+        <form method="POST" style="display: inline-block; width: 100%; max-width: 660px;" class="fancybox-content">
+          <h2 class="mb-3">Edit Message Template</strong></h2>
+          <p style="display: none">
+            <input type='hidden' name="employee_id" class="form-control"></input>
+          </p>
+          <input type='hidden' name="old_center_name" id="old_center_name" class="form-control" value=""></input>
+          <p>
+            <div class="col-md-12">
+              <div class="form-group form-group-default">
+                <label>Title:</label>
+                <input type='text' name="msg_title" id="msg_title" class="form-control" value=""></input>
+              </div>
+            </div>
+            <div class="col-md-12">
+              <div class="form-group form-group-default">
+                <label>New Message:</label>
+                <textarea class="form-control" id="comment" rows="7">${msg}</textarea>
+              </div>
+            </div>
+          </p>
+          <p class="mb-0">
+            <button class="btn btn-primary btn-block password_btn" id="submit-btn" onclick="saveMessage();" type="button" disabled=true>Submit</button>
+          </p>
+        </form>
+      `);
+      $("#msg_title").keyup(function(){
+        let msgCom = $("#comment").val();
+        if (msgCom) {
+            $('#submit-btn').prop('disabled', false);
+          }
+        $("#comment").keyup(function(){
+          if (msgCom) {
+            $('#submit-btn').prop('disabled', false);
+          }
+        })
+      });
+    }
+    function saveMessage() {
+      $.fancybox.close();
+      sall ("Please wait...", 12000);
+      const msgTit = $("#msg_title").val();
+      const msgComm = $("#comment").val();
+      //- console.log("msgTit------", msgTit);
+      //- console.log("msgComm------", msgComm);
+      //- return;
+      $.ajax({
+        method: 'POST',
+        url: `/admin/message/add/from/direct/lead/msg`,
+        data: {
+          msg_title: msgTit,
+          msg_desc: msgComm,
+          pdf_file: message.attachment,
+          status: message.status
+        },
+        dataType: 'json',
+        success: function (response) {
+          //- console.log(response,"-----response");
+          //- swal.close();
+          window.location.href = `/admin/lead/send/${response.data._id}|${lead._id}|${check}|${num_email}`;
+        }
+      });
+    }
+    function sall (msg, time) {
+      var SweetAlert2Demo = function () {
+        //== Demos
+        var initDemos = function () {
+          swal(msg, {
+            buttons: false,
+            timer: time,
+            backdrop:true,
+            closeOnClickOutside: false,
+            closeOnEsc: false
+          })
+        };
+
+        return {
+            //== Init
+            init: function () {
+              initDemos();
+            },
+          };
+        }();
+      jQuery(document).ready(function () {
+        SweetAlert2Demo.init();
+      });
+    };
+    $(document).ready(function () {
+      //- $('#other_client_data').css('display', 'none')
+
+    })
+    let newMessage;
+    $('#msg').keypress(function(){
+      //- console.log($(this).val(),"change")
+      //- window.onbeforeunload = function() {
+      //-   return '';
+      //- };
+      newMessage = $(this).val()
+
+    })
+    //- console.log(check,"chekc bro check")
+    function redirectTosend () {
+      var data = $('#msg').text();
+      console.log($('#msg').val(),"valueeee")
+      //- console.log($(".quick-response-lead-name").text());
+      let subj = $(".quick-response-lead-name").text();
+      let msg = $('#msg').val()
+      let attachment = (message.attachment && message.attachment.length) ? message.attachment : []
+      let messageData = {"msg" : msg, "attachment" :attachment, "subject": subj}
+      //- console.log(messageData,"dataa")
+      //- console.log(num_email,"num_email")
+      $('#cover-spin').show(0);
+      //- console.log(data,"meet");
+      //- console.log("clickedddddd")
+      //- console.log(lead._id,"////")
+      //- console.log(message._id,"/message///")
+      //- window.location.href = `/admin/responses/whatsapp/${lead._id}|${message._id}|${check}`;
+      $.ajax({
+          method: 'POST',
+          url: `/admin/responses/whatsapp/${lead._id}|${message._id}|${check}|${num_email}`,
+          data: {
+            type: messageData
+          },
+          dataType: 'json',
+          success: function (response) {
+            //- console.log(response, "---------------response");
+            if(response.msg === "email"){
+              $('#cover-spin').hide(0);
+              $("#contact-alert-overlay").show();
+              $("#contact-alert").show();
+              swal("Mail Sent!", {
+                buttons: false,
+                timer: 2000,
+                backdrop:true,
+                closeOnClickOutside: false,
+                closeOnEsc: false
+              });
+              //- window.open(`mailto:${response.email}?subject=Kido!&body=${response.newmsg}`, null, "width=600, height=400, location=0, menubar=0, resizeable=0, scrollbars=0, status=0, titlebar=0, toolbar=0");
+              window.location.href = `/admin/lead/add/followup/${lead._id}`;
+              return;
+            } else {
+            //- console.log(response.data,"respponse")
+              $('#cover-spin').hide(0);
+              window.open(response.data, '_blank')
+              window.location.href = `/admin/lead/add/followup/${lead._id}`;
+              return;
+            }
+            return
+            //- console.log(response.data,"respponse")
+            //- window.open(response.data, '_blank');
+            //- return
+          }
+      })
+    }
+
+

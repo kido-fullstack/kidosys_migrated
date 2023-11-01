@@ -1,0 +1,107 @@
+extends layout-admin
+
+block content
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        .page-inner.py-5
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold Edit Role
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/uac/role/all') All Role(s)
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+      .page-inner
+        .row
+          .col-md-12
+            .card
+              form(action=`/admin/uac/role/edit/${role._id}`, method="POST")
+                .card-body
+                  //- pre= h.dump(permGroup)
+                  .row(style="width:100%;margin:0px auto;")
+                    .col-md-12.col-lg-12(style="padding: 0px 30px;")
+                      .form-group
+                        label.text-left(for='name')
+                          | Role Name
+                          span.required-label *
+                        input#role.form-control(type='text', name='name', placeholder='Enter Role Name', required='',style="width:100%", value=role.name )
+                    .col-md-12.col-lg-12(style="padding:20px 40px;")
+                      div#fieldUserRoles
+                        label.selectgroup-item
+                          input.selectgroup-input(type='checkbox' name='value' value='' id="checkAll")
+                          span.selectgroup-button Check All
+                      br
+                      each permissionObj,key in permGroup
+                        .card
+                          .card-header
+                            .form-check(style="padding:0px;")
+                              label.form-check-label
+                                input.groupcheck-cls(type='checkbox' name='' value="" tabindex=i id="")
+                                span.form-check-sign #{key.toUpperCase()}
+                          .card-body
+                            each permission,i in permissionObj
+                              .col-md-3.col-lg-3(style="float:left")
+                                .form-check
+                                  label.form-check-label
+                                    input.form-check-input.permission-check-cls(type='checkbox' name='permissions[]' value=permission._id tabindex=i id="checkItem" checked=(role.permissions.includes(permission._id) ? true : null))
+                                    span.form-check-sign #{permission.name}
+                              if permissionObj.length == (i+1)
+                                div(style="clear:both")
+
+                .card-action
+                  .row
+                    .col-md-12(style="padding-left:50px")
+                      button.btn.btn-color(type="submit") Save Changes
+  script.
+      $(document).ready(function(){
+        //- default deafault all selected
+        var total_checkbox_count = $(".permission-check-cls").length;
+        var total_checkbox_checked_count = $(".permission-check-cls:checked").length;
+        if(total_checkbox_count == total_checkbox_checked_count){
+          $(".groupcheck-cls").prop('checked', true);
+          $("#checkAll").prop('checked', true);
+        }else{
+          $("#checkAll").prop('checked', false);
+        }
+        $(".groupcheck-cls").each(function(){
+          var this_group_checkbox_count = $(this).closest(".card").find(".permission-check-cls").length;
+          var this_group_checkbox_checked_count = $(this).closest(".card").find(".permission-check-cls:checked").length;
+          if(this_group_checkbox_count == this_group_checkbox_checked_count){
+            $(this).closest(".card").find(".groupcheck-cls").prop('checked',true);
+          }else{
+            $(this).closest(".card").find(".groupcheck-cls").prop('checked',false);
+          }
+        });
+        $('#category').select2({
+          placeholder: "Select Category",
+          theme: "bootstrap"
+        });
+        $("#checkAll").click(function () {
+          $('input:checkbox').not(this).prop('checked', this.checked);
+        });
+        $(".groupcheck-cls").on("click",function(){
+          if(!this.checked){
+            $("#checkAll").prop('checked', this.checked);
+          }
+          $(this).closest(".card").find(".card-body").find("input:checkbox").prop('checked', this.checked)
+        })
+        $(".permission-check-cls,.groupcheck-cls").on("click",function(){
+          if(!this.checked){
+            $("#checkAll").prop('checked', this.checked);
+            $(this).closest(".card").find(".groupcheck-cls").prop('checked', this.checked)
+          }else{
+            var total_checkbox_count = $(".permission-check-cls").length;
+            var total_checkbox_checked_count = $(".permission-check-cls:checked").length;
+            if(total_checkbox_count == total_checkbox_checked_count){
+              $(".groupcheck-cls").prop('checked', this.checked);
+              $("#checkAll").prop('checked', this.checked);
+            }
+            var this_group_checkbox_count = $(this).closest(".card").find(".permission-check-cls").length;
+            var this_group_checkbox_checked_count = $(this).closest(".card").find(".permission-check-cls:checked").length;
+            if(this_group_checkbox_count == this_group_checkbox_checked_count){
+              $(this).closest(".card").find(".groupcheck-cls").prop('checked', this.checked);
+            }
+          }
+        });
+      })

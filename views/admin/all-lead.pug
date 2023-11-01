@@ -1,0 +1,1751 @@
+extends layout-admin
+
+block content
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        div(style="padding:5px 20px 0px 20px;")
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              //- pre= h.dump(centersObj)
+              h2.text-white.fw-bold View All Leads
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              .lead-flex-container
+                div.form-group.export-btn-wrapper
+                div.form-group
+                  .dropdown
+                    if !checkSuperAdmin && h.checkPermission(session.user, permissionCacheData, "LeadAdd") && (centersObj.length == 1)
+                      a.btn.btn-white.btn-border.btn-round.mr-2(href='javascript:void(0);' onclick='generateQR();') Generate QR
+                    if h.checkPermission(session.user, permissionCacheData, "LeadImport") || checkSuperAdmin
+                      a#importexcel.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/lead/upload/file',style="height: 45px;margin-top: 0px;" target="_blank") Import Excel
+                    button#dropdownMenuButton.btn.btn-white.btn-border.btn-round.mr-2.dropdown-toggle(type='button', data-mdb-toggle='dropdown', aria-expanded='false')
+                      | Columns
+                    ul.dropdown-menu.hide(aria-labelledby='dropdownMenuButton',style="height: 300px;overflow-y: auto;")
+                      li
+                        a.dropdown-item(href="javascript:void(0)")
+                          .form-check
+                            label.form-check-label(for='Checkme0')
+                              input#Checkme0.form-check-input(type='checkbox', value='', checked,data-common="comm" data-column="0" name="Checkme0")
+                              span.form-check-sign Lead Id
+                      li
+                        a.dropdown-item(href="javascript:void(0)")
+                          .form-check
+                            label.form-check-label(for='Checkme1')
+                              input#Checkme1.form-check-input(type='checkbox', value='', checked,data-common="comm" data-column="1")
+                              span.form-check-sign Date
+                      li
+                        a.dropdown-item(href="javascript:void(0)")
+                          .form-check
+                            label.form-check-label(for='Checkme2')
+                              input#Checkme2.form-check-input(type='checkbox', value='', checked,data-common="comm" data-column="2")
+                              span.form-check-sign Last Updated
+                      li
+                        a.dropdown-item(href="javascript:void(0)")
+                          .form-check
+                            label.form-check-label(for='Checkme3')
+                              input#Checkme3.form-check-input(type='checkbox', value='', checked,data-common="comm" data-column="3")
+                              span.form-check-sign Lead Name
+                      li
+                        a.dropdown-item(href="javascript:void(0)")
+                          .form-check
+                            label.form-check-label(for='Checkme4')
+                              input#Checkme4.form-check-input(type='checkbox', value='',data-common="comm" data-column="4")
+                              span.form-check-sign First Name
+                      li
+                        a.dropdown-item(href="javascript:void(0)")
+                          .form-check
+                            label.form-check-label(for='Checkme5')
+                              input#Checkme5.form-check-input(type='checkbox', value='',data-common="comm" data-column="5")
+                              span.form-check-sign Last Name
+                      li
+                        a.dropdown-item(href="javascript:void(0)")
+                          .form-check
+                            label.form-check-label(for='Checkme6')
+                              input#Checkme6.form-check-input(type='checkbox', value='', checked,data-common="comm" data-column="6")
+                              span.form-check-sign Stage
+                      li
+                        a.dropdown-item(href="javascript:void(0)")
+                          .form-check
+                            label.form-check-label(for='Checkme7')
+                              input#Checkme7.form-check-input(type='checkbox', value='',data-common="comm" data-column="7")
+                              span.form-check-sign Type
+                      li
+                        if user_type
+                          a.dropdown-item(href="javascript:void(0)")
+                            .form-check
+                              label.form-check-label(for='Checkme8')
+                                input#Checkme8.form-check-input(type='checkbox', value='', checked,data-common="comm" data-column="8")
+                                span.form-check-sign School Name
+                        else
+                          a.dropdown-item(href="javascript:void(0)")
+                            .form-check
+                              label.form-check-label(for='Checkme8')
+                                input#Checkme8.form-check-input(type='checkbox', value='',data-common="comm" data-column="8")
+                                span.form-check-sign Child Name
+                      li
+                        a.dropdown-item(href="javascript:void(0)")
+                          .form-check
+                            label.form-check-label(for='Checkme9')
+                              input#Checkme9.form-check-input(type='checkbox', value='',data-common="comm" data-column="9")
+                              span.form-check-sign Source Category
+                      li
+                        a.dropdown-item(href="javascript:void(0)")
+                          .form-check
+                            label.form-check-label(for='Checkme10')
+                              input#Checkme10.form-check-input(type='checkbox', value='', checked,data-common="comm" data-column="10")
+                              span.form-check-sign Source
+                      li
+                        a.dropdown-item(href="javascript:void(0)")
+                          .form-check
+                            label.form-check-label(for='Checkme11')
+                              input#Checkme11.form-check-input(type='checkbox', value='',data-common="comm" data-column="11")
+                              span.form-check-sign Program Category
+                      li
+                        a.dropdown-item(href="javascript:void(0)")
+                          .form-check
+                            label.form-check-label(for='Checkme12')
+                              input#Checkme12.form-check-input(type='checkbox', value='', checked,data-common="comm" data-column="12")
+                              span.form-check-sign Program
+                      li
+                        a.dropdown-item(href="javascript:void(0)")
+                          .form-check
+                            label.form-check-label(for='Checkme13')
+                              input#Checkme13.form-check-input(type='checkbox', value='', checked,data-common="comm" data-column="13")
+                              span.form-check-sign Status
+                    if h.checkPermission(session.user, permissionCacheData, "LeadExport") || checkSuperAdmin
+                      a#ExportReporttoExcel.btn.btn-white.btn-border.btn-round.mr-2(href='javascript:void(0)',style="height: 45px;margin-top: 0px;") Export to Excel
+                    if h.checkPermission(session.user, permissionCacheData, "LeadAdd") || checkSuperAdmin
+                      a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/lead/add',style="height: 45px;margin-top: 0px;") Add Lead
+      .page-inner
+        .row
+          .col-md-12
+            .card.card-with-nav.filter-div
+              .card-body(style="padding:0px 15px !important")
+                .row
+                  .col-md-3
+                    .form-group
+                      label(for='type',style="margin-bottom:0px;") Search
+                      input.form-control#searchbox(type='text' placeholder='By ID, Name, Number, Email..' name='search' style='height: 38px;')
+                      a#clr_search(href="javascript:void(0)" style="margin-top: 3px;float: right;text-decoration: none;z-index:9999")
+                        i.fa.fa-times(style="position: absolute;right: 35px;top: 45px;z-index: 99999;")
+                  .col-md-3
+                    .form-group
+                      label(for='type' style="width: 100%;margin-bottom:0px;") Date Range
+                      input#date.form-control(type='text' name="date_range" value="" readonly style="height:40px !important")
+                      a#clr_date_range(href="javascript:void(0)" style="margin-top: 3px;float: right;text-decoration: none;z-index:9999")
+                        i.fa.fa-times(style="position: absolute;right: 35px;top: 42px;z-index: 99999;")
+                  .col-md-3
+                    .form-group
+                      label(for='stage',style="margin-bottom:0px;") Lead Stage
+                      select#stage(name='stage' data-container="body" data-live-search="true" ).selectpicker
+                        option(value='') Select Stage
+                        option(value="New Lead") 1. New Lead
+                        option(value="Enquiry Received") 2. Enquiry Received
+                        option(value="Tour Booked") 3. Tour Booked
+                        option(value="Closed-Lead Lost") 4. Closed-Lead Lost
+                        option(value="Post Tour") 5. Post Tour
+                        option(value="Closed-Enquiry Lost") 6. Closed-Enquiry Lost
+                        option(value="Closed - Won") 7. Closed - Won
+                  .col-md-3
+                    .form-group.lead-flex-container
+                      button.btn.btn-primary#show_filter(type="button" style='margin-top:20px;margin-left:-40px;')
+                        i.fa.fa-filter
+                        |  Additional Filter
+                      button.btn.btn-primary#clear_filter(type="button" style='margin-top:20px;')
+                        //- i.fa.fa-times
+                        | &nbsp;Clear Filter
+                        //- | Additional Filter
+                .row.filter
+                  - var showCountry = 1
+                  - var showZone = 1
+                  - var showCenter = 1
+                  if (session.user && session.user.main)
+                    - var showCountry = 1
+                    - var showZone = 1
+                    - var showCenter = 1
+                  else if (session.user.center_id.length == 1)
+                    - var showCountry = 0
+                    - var showZone = 0
+                    - var showCenter = 0
+                  else if (session.user.country_id.length == 1 && session.user.zone_id.length == 1 && session.user.center_id.length > 1)
+                    - var showCountry = 0
+                    - var showZone = 0
+                    - var showCenter = 1
+                  else if (session.user.zone_id.length > 1 && session.user.center_id.length > 1 && session.user.country_id.length == 1)
+                    - var showCountry = 0
+                    - var showZone = 1
+                    - var showCenter = 1
+                  else if (session.user.country_id.length > 1 && session.user.zone_id.length > 1 && session.user.center_id.length > 1)
+                    - var showCountry = 1
+                    - var showZone = 1
+                    - var showCenter = 1
+                  if showCountry
+                    .col-md-3(style="margin-top: -10px;")
+                      .form-group
+                        label(for='country',style="margin-bottom:-8px;") Country
+                        select#country(name='country[]' multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
+                          each country in data.countries
+                            option(value=country._id) #{country.country_name}
+                  if showZone
+                    .col-md-3(style="margin-top: -10px;")
+                      .form-group
+                        label(for='source_category',style="margin-bottom:0px;") Zone
+                        br
+                        select#zone(name='zone[]' multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
+                          each zone in data.zones
+                            option(value=zone._id) #{zone.name}
+                  if showCenter
+                    .col-md-3(style="margin-top: -10px;")
+                      .form-group
+                        label(for='center',style="margin-bottom:0px;") Center
+                        select#center(name='center[]' multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
+                          each center in data.centers
+                            option(value=center._id) #{center.school_display_name}
+                  .col-md-3(style="margin-top: -10px;")
+                    .form-group
+                      label(for='program',style="margin-bottom:0px;") Program
+                      select#program(name='program[]' multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
+                        each program in programs
+                          option(value=program._id) #{program.program_name}
+                  .col-md-3(style="margin-top: -10px;")
+                    .form-group
+                      label(for='source_category',style="margin-bottom:0px;") Source Category
+                      select#source_category(name='source_category' data-container="body" data-live-search="true" ).selectpicker
+                        option(value='') Select Source Category
+                        option(value="direct-walk-in") Direct Walk in
+                        option(value="digital-lead") Digital Lead
+                        option(value="database/events") Database/Events
+                  .col-md-3(style="margin-top: -10px;")
+                    .form-group
+                      label(for='know_us',style="margin-bottom:0px;") Lead Source
+                      select#know_us(name='know_us[]' multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
+                        each knowus in knowuss
+                          option(value=knowus.name) #{knowus.name}
+                  .col-md-3(style="margin-top: -10px;")
+                    .form-group
+                      label(for='status',style="margin-bottom:0px;") Status
+                      select#status(name='status[]' multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
+                        each statuses in statusess
+                          option(value=statuses._id) #{statuses.name}
+                  .col-md-3
+                    .form-group
+                      .form-check
+                        label.form-check-label
+                          input.form-check-input.searchInput(type='checkbox' name='dup_leads' id="dup_lead_1" )
+                          span.form-check-sign Show Duplicate Leads
+                  .col-md-3(style="margin-top:25px;")
+                    button.excelexport.btn-primary-wrapper(type="button" style="float: left;")
+                hr
+                .table-responsive
+                  .col-sm-12
+                    table#all_lead.display.table.table-striped.table-hover.dataTable(role='grid', aria-describedby='basic-datatables_info')
+                      thead
+                        tr(role='row')
+                          th(data-bSortable="false") Lead ID
+                          th Date
+                          th Updated
+                          th Lead Name
+                          th First Name
+                          th Last Name
+                          th(style='width: 40%;') Stage
+                          th Type
+                          if user_type || showCenter
+                            th School
+                          th Src Cat
+                          th Source
+                          //- th Src Cat
+                          th Pro Cat
+                          th Program
+                          th Status
+                          th(data-orderable="false") Actions
+                      tbody
+                .row
+
+  block script
+    script(type='text/javascript' src='https://cdn.jsdelivr.net/momentjs/latest/moment.min.js')
+    script(type='text/javascript' src='https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js')
+
+    script(type='text/javascript' src='https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js')
+    link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css")
+
+  script.
+    var data = !{JSON.stringify(data)};
+    var table;
+    var col = [];
+    var colDT = [];
+    $('.filter').css('display', 'none');
+    var currentUser = !{JSON.stringify(session.user)};
+    var onlyUserEntry = !{JSON.stringify(user_type)};
+    var permissionEdit = !{JSON.stringify(permissionEditLead)};
+    var permissionAddFollow = !{JSON.stringify(permissionAddFollowUp)};
+    var permissionTransfer = !{JSON.stringify(permissionTransferLead)};
+    var showCenterObj = !{JSON.stringify(showCenter)};
+    //- console.log(permissionEdit);
+    //- console.log(permissionAddFollow);
+    //- console.log(onlyUserEntry);
+    //- console.log(currentUser.main,"currentUser")
+    var excelName
+    const timeElapsed = Date.now();
+    const today = new Date(timeElapsed);
+    //- console.log(data.centers,"datas");
+    if(currentUser.main == "super_admin"){
+      //- console.log("ifif")
+      excelName = `all-leads_${moment(today).format("DD-MM-YYYY")}`
+    } else {
+      data.centers.forEach((element, index, array) => {
+        excelName = element.school_display_name.split(' ').join('-')
+          //- console.log(element.school_display_name); // 100, 200, 300
+          //- console.log(index); // 0, 1, 2
+          //- console.log(array); // same myArray object 3 times
+      });
+      excelName = `${excelName}_${moment(today).format("DD-MM-YYYY")}`
+    }
+    //- console.log(data.centers,"datas");
+
+    $(document).ready(function() {
+      if (window.location.search == "?ref=import") {
+        $.notify({
+          message: "Import Completed."
+        },{
+          type: 'error',
+          showProgressbar: false
+        },
+        {
+          offset: 20,
+          spacing: 10,
+          z_index: 1031,
+          delay: 5000,
+          timer: 1200
+        });
+      }
+      //- $('.filter').hide()
+      let dupLeads = document.getElementById("dup_lead_1");
+      dupLeads.addEventListener( "change", () => {
+        if (dupLeads.checked) {
+          //- alert('checked dupLeads.');
+          table
+            .columns(15)
+            .search(dupLeads.checked.toString())
+            .draw();
+        } else {
+          table
+            .columns(15)
+            .search("")
+            .draw();
+        }
+      });
+
+      if (onlyUserEntry) {
+        // admin
+        colDT = [
+            {
+              data: 'lead_no',
+              //- bSortable: false,
+              render: function (data, type, row) {
+                return `${onlyUserEntry || permissionEdit ? `<a href="/admin/lead/view/${row._id}">${data}</a>` : data}`
+              },
+            },
+            {
+              data: 'lead_date',
+              render: function (data, type, row) {
+                return `${data ? moment(data).format("MM/DD/YYYY") : 'Not Provided'}`
+              }
+            },
+            {
+              data: 'updatedAt',
+              render: function (data, type, row) {
+                return `${data ? moment(data).format("MM/DD/YYYY") : 'Not Provided'}`
+              }
+            },
+            {
+              data: 'parent_name',
+              render: function (data, type, row) {
+                return `${data ? data : 'Not Provided'}`
+              }
+            },
+            {
+              data: 'child_first_name',
+              render: function (data, type, row) {
+                return `${data ? data : 'Not Provided'}`
+              }
+            },
+            {
+              data: 'child_last_name',
+              render: function (data, type, row) {
+                return `${data ? data : 'Not Provided'}`
+              }
+            },
+            {
+              data: 'stage',
+              width: "200",
+              render: function (data, type, row) {
+                if (data == "New Lead") {
+                  return `
+                   1. New Lead
+                  `;
+                } else if (data == "Enquiry Received") {
+                  return `
+                   2. Enquiry Received
+                  `;
+                } else if (data == "Tour Booked") {
+                  return `
+                    3. Tour Booked
+                  `;
+                } else if (data == "Closed-Lead Lost") {
+                  return `
+                    4. Closed-Lead Lost
+                  `;
+                } else if (data == "Post Tour") {
+                  return `
+                    5. Post Tour
+                  `;
+                } else if (data == "Closed-Enquiry Lost") {
+                  return `
+                    6. Closed-Enquiry Lost
+                  `;
+                } else if (data == "Closed - Won") {
+                  return `
+                    7. Closed - Won
+                  `;
+                } else {
+                  return data;
+                }
+              }
+            },
+            {
+              data: 'type',
+              render: function (data, type, row) {
+                return `${data ? `${data.toUpperCase()}` : 'Not Provided'}`
+              }
+            },
+            {
+              data: 'school_id.school_display_name',
+              render: function (data, type, row) {
+                return `${data ? data : 'Not Provided'}`
+              }
+            },
+            {
+              data: 'source_category',
+              render: function (data, type, row) {
+                if (data == "direct-walk-in") {
+                  return "Direct Walk in";
+                } else if (data == "database/events") {
+                  return "Database/Events";
+                } else if (data == "digital-lead") {
+                  return "Digital Lead";
+                } else {
+                  return "Not Provided"
+                }
+              }
+            },
+            {
+              data: 'parent_know_aboutus',
+              render: function (data, type, row) {
+                return `${data && data.length ? data : 'Not Provided'}`
+              }
+            },
+            //- {
+            //-   data: 'source_category',
+            //-   render: function (data, type, row) {
+            //-     return `${data ? data : 'Not Provided'}`
+            //-   }
+            //- },
+            {
+              data: 'programcategory_id.title',
+              render: function (data, type, row) {
+                return `${data ? data : 'Not Provided'}`
+              }
+            },
+            {
+              data: 'program_id.program_name',
+              render: function (data, type, row) {
+                return `${data ? data : 'Not Provided'}`
+              }
+            },
+            {
+              data: 'status_id.name',
+              render: function (data, type, row) {
+                return `${data ? data : 'Not Provided'}`
+              }
+            },
+            {
+              data: `_id`,
+              render: function (data, type, row) {
+                return `${onlyUserEntry || permissionAddFollow ? `<a class="btn btn-link btn-primary tbl-action-btn" data-toggle="tooltip" title="Add Follow Up" data-original-title="Add Follow Up" href="/admin/lead/add/followup/${data}"><i class="fa fa-plus" style="font-size: 17px;"></i></a>` : ''} ${onlyUserEntry || permissionTransfer ? `<button type="button" class="btn btn-link btn-primary tbl-action-btn" data-toggle="tooltip" title="Transfer Lead" data-original-title="Transfer Lead" onclick="openTransferLeadPopup('${data}', '${row.school_id._id}', '${row.school_id.school_display_name}', '${row.lead_no}')"><i class="fas fa-sign-in-alt" style="font-size: 17px;"></i></button>` : ''}`
+              }
+            }
+        ];
+      } else if (showCenterObj) {
+        // non-admin with multiple centers assigned
+        colDT = [
+            {
+              data: 'lead_no',
+              //- bSortable: false,
+              render: function (data, type, row) {
+                return `${onlyUserEntry || permissionEdit ? `<a href="/admin/lead/view/${row._id}">${data}</a>` : data}`
+              },
+            },
+            {
+              data: 'lead_date',
+              render: function (data, type, row) {
+                return `${data ? moment(data).format("MM/DD/YYYY") : 'Not Provided'}`
+              }
+            },
+            {
+              data: 'updatedAt',
+              render: function (data, type, row) {
+                return `${data ? moment(data).format("MM/DD/YYYY") : 'Not Provided'}`
+              }
+            },
+            {
+              data: 'parent_name',
+              render: function (data, type, row) {
+                return `${data ? data : 'Not Provided'}`
+              }
+            },
+            {
+              data: 'child_first_name',
+              render: function (data, type, row) {
+                return `${data ? data : 'Not Provided'}`
+              }
+            },
+            {
+              data: 'child_last_name',
+              render: function (data, type, row) {
+                return `${data ? data : 'Not Provided'}`
+              }
+            },
+            {
+              data: 'stage',
+              width: "200",
+              render: function (data, type, row) {
+                if (data == "New Lead") {
+                  return `
+                   1. New Lead
+                  `;
+                } else if (data == "Enquiry Received") {
+                  return `
+                   2. Enquiry Received
+                  `;
+                } else if (data == "Tour Booked") {
+                  return `
+                    3. Tour Booked
+                  `;
+                } else if (data == "Closed-Lead Lost") {
+                  return `
+                    4. Closed-Lead Lost
+                  `;
+                } else if (data == "Post Tour") {
+                  return `
+                    5. Post Tour
+                  `;
+                } else if (data == "Closed-Enquiry Lost") {
+                  return `
+                    6. Closed-Enquiry Lost
+                  `;
+                } else if (data == "Closed - Won") {
+                  return `
+                    7. Closed - Won
+                  `;
+                } else {
+                  return data;
+                }
+              }
+            },
+            {
+              data: 'type',
+              render: function (data, type, row) {
+                return `${data ? `${data.toUpperCase()}` : 'Not Provided'}`
+              }
+            },
+            {
+              data: 'school_id.school_display_name',
+              render: function (data, type, row) {
+                return `${data ? data : 'Not Provided'}`
+              }
+            },
+            {
+              data: 'source_category',
+              render: function (data, type, row) {
+                if (data == "direct-walk-in") {
+                  return "Direct Walk in";
+                } else if (data == "database/events") {
+                  return "Database/Events";
+                } else if (data == "digital-lead") {
+                  return "Digital Lead";
+                } else {
+                  return "Not Provided"
+                }
+              }
+            },
+            {
+              data: 'parent_know_aboutus',
+              render: function (data, type, row) {
+                return `${data && data.length ? data : 'Not Provided'}`
+              }
+            },
+            //- {
+            //-   data: 'source_category',
+            //-   render: function (data, type, row) {
+            //-     return `${data ? data : 'Not Provided'}`
+            //-   }
+            //- },
+            {
+              data: 'programcategory_id.title',
+              render: function (data, type, row) {
+                return `${data ? data : 'Not Provided'}`
+              }
+            },
+            {
+              data: 'program_id.program_name',
+              render: function (data, type, row) {
+                return `${data ? data : 'Not Provided'}`
+              }
+            },
+            {
+              data: 'status_id.name',
+              render: function (data, type, row) {
+                return `${data ? data : 'Not Provided'}`
+              }
+            },
+            {
+              data: `_id`,
+              render: function (data, type, row) {
+                return `${onlyUserEntry || permissionAddFollow ? `<a class="btn btn-link btn-primary tbl-action-btn" data-toggle="tooltip" title="Add Follow Up" data-original-title="Add Follow Up" href="/admin/lead/add/followup/${data}"><i class="fa fa-plus" style="font-size: 17px;"></i></a>` : ''} ${onlyUserEntry || permissionTransfer ? `<button type="button" class="btn btn-link btn-primary tbl-action-btn" data-toggle="tooltip" title="Transfer Lead" data-original-title="Transfer Lead" onclick="openTransferLeadPopup('${data}', '${row.school_id._id}', '${row.school_id.school_display_name}', '${row.lead_no}')"><i class="fas fa-sign-in-alt" style="font-size: 17px;"></i></button>` : ''}`
+              }
+            }
+        ];
+      } else {
+        // with single center
+        colDT = [
+            {
+              data: 'lead_no',
+              //- bSortable: false,
+              render: function (data, type, row) {
+                return `${onlyUserEntry || permissionEdit ? `<a href="/admin/lead/view/${row._id}">${data}</a>` : data}`
+              },
+            },
+            {
+              data: 'lead_date',
+              render: function (data, type, row) {
+                return `${data ? moment(data).format("MM/DD/YYYY") : 'Not Provided'}`
+              }
+            },
+            {
+              data: 'updatedAt',
+              render: function (data, type, row) {
+                return `${data ? moment(data).format("MM/DD/YYYY") : 'Not Provided'}`
+              }
+            },
+            {
+              data: 'parent_name',
+              render: function (data, type, row) {
+                return `${data ? data : 'Not Provided'}`
+              }
+            },
+            {
+              data: 'child_first_name',
+              render: function (data, type, row) {
+                return `${data ? data : 'Not Provided'}`
+              }
+            },
+            {
+              data: 'child_last_name',
+              render: function (data, type, row) {
+                return `${data ? data : 'Not Provided'}`
+              }
+            },
+            {
+              data: 'stage',
+              width: "200",
+              render: function (data, type, row) {
+                if (data == "New Lead") {
+                  return `
+                   1. New Lead
+                  `;
+                } else if (data == "Enquiry Received") {
+                  return `
+                   2. Enquiry Received
+                  `;
+                } else if (data == "Tour Booked") {
+                  return `
+                    3. Tour Booked
+                  `;
+                } else if (data == "Closed-Lead Lost") {
+                  return `
+                    4. Closed-Lead Lost
+                  `;
+                } else if (data == "Post Tour") {
+                  return `
+                    5. Post Tour
+                  `;
+                } else if (data == "Closed-Enquiry Lost") {
+                  return `
+                    6. Closed-Enquiry Lost
+                  `;
+                } else if (data == "Closed - Won") {
+                  return `
+                    7. Closed - Won
+                  `;
+                } else {
+                  return data;
+                }
+              }
+            },
+            {
+              data: 'type',
+              render: function (data, type, row) {
+                return `${data ? `${data.toUpperCase()}` : 'Not Provided'}`
+              }
+            },
+            {
+              data: 'source_category',
+              render: function (data, type, row) {
+                if (data == "direct-walk-in") {
+                  return "Direct Walk in";
+                } else if (data == "database/events") {
+                  return "Database/Events";
+                } else if (data == "digital-lead") {
+                  return "Digital Lead";
+                } else {
+                  return "Not Provided"
+                }
+              }
+            },
+            {
+              data: 'parent_know_aboutus',
+              render: function (data, type, row) {
+                return `${data && data.length ? data : 'Not Provided'}`
+              }
+            },
+            //- {
+            //-   data: 'source_category',
+            //-   render: function (data, type, row) {
+            //-     return `${data ? data : 'Not Provided'}`
+            //-   }
+            //- },
+            {
+              data: 'programcategory_id.title',
+              render: function (data, type, row) {
+                return `${data ? data : 'Not Provided'}`
+              }
+            },
+            {
+              data: 'program_id.program_name',
+              render: function (data, type, row) {
+                return `${data ? data : 'Not Provided'}`
+              }
+            },
+            {
+              data: 'status_id.name',
+              render: function (data, type, row) {
+                return `${data ? data : 'Not Provided'}`
+              }
+            },
+            {
+              data: `_id`,
+              render: function (data, type, row) {
+                return `${onlyUserEntry || permissionAddFollow ? `<a class="btn btn-link btn-primary tbl-action-btn" data-toggle="tooltip" title="Add Follow Up" data-original-title="Add Follow Up" href="/admin/lead/add/followup/${data}"><i class="fa fa-plus" style="font-size: 17px;"></i></a>` : ''} ${onlyUserEntry || permissionTransfer ? `<button type="button" class="btn btn-link btn-primary tbl-action-btn" data-toggle="tooltip" title="Transfer Lead" data-original-title="Transfer Lead" onclick="openTransferLeadPopup('${data}', '${row.school_id._id}', '${row.school_id.school_display_name}', '${row.lead_no}')"><i class="fas fa-sign-in-alt" style="font-size: 17px;"></i></button>` : ''}`
+              }
+            }
+        ];
+      }
+
+      var total_records = 0;
+      table = $('#all_lead').DataTable({
+        bProcessing: true,
+        bServerSide: true,
+        pagination: true,
+        ordering: true,
+        autoWidth: true,
+        //- dom: 'Bfrtip',
+        order: [[1, 'desc']],
+        buttons: [{
+            extend: 'excel',
+            text: 'Export to excel',
+            className: 'btn btn-primary exp_btn',
+            title: excelName,
+            exportOptions: {
+              columns: [0, 1, 2, 3, 4, 5, 6, 7, 8],
+              modifier : {
+                order : 'index',
+                page: 'all'
+              }
+            }
+          }
+        ],
+        sAjaxSource: "/admin/lead/datatable",
+        "rowCallback": function(row, data, index) {
+          //- console.log(data);
+          if (data.is_external === 2) {
+            $(row).addClass('new-mail-leads-dup');
+          } else if (data.is_external === 1) {
+            $(row).addClass('new-mail-leads');
+          }
+
+          // duplicate lead
+          if (data.is_dup == 1) {
+            if (data.dup_no == 1) {
+              $(row).addClass('dup-leads-1');
+            } else if (data.dup_no == 2) {
+              $(row).addClass('dup-leads-2');
+            } else if (data.dup_no == 3) {
+              $(row).addClass('dup-leads-3');
+            } else if (data.dup_no == 4) {
+              $(row).addClass('dup-leads-4');
+            } else if (data.dup_no == 5) {
+              $(row).addClass('dup-leads-5');
+            } else if (data.dup_no == 6) {
+              $(row).addClass('dup-leads-6');
+            } else if (data.dup_no == 7) {
+              $(row).addClass('dup-leads-7');
+            } else if (data.dup_no == 8) {
+              $(row).addClass('dup-leads-8');
+            } else if (data.dup_no == 9) {
+              $(row).addClass('dup-leads-9');
+            } else if (data.dup_no == 10) {
+              $(row).addClass('dup-leads-10');
+            } else if (data.dup_no == 11) {
+              $(row).addClass('dup-leads-11');
+            } else if (data.dup_no == 12) {
+              $(row).addClass('dup-leads-12');
+            } else if (data.dup_no == 13) {
+              $(row).addClass('dup-leads-13');
+            } else if (data.dup_no == 14) {
+              $(row).addClass('dup-leads-14');
+            } else if (data.dup_no == 15) {
+              $(row).addClass('dup-leads-15');
+            } else {
+              $(row).addClass('dup-leads-15');
+            }
+          }
+        },
+        "drawCallback": function( settings, start, end, max, total, pre ) {
+            total_records = this.fnSettings().fnRecordsTotal();
+        },
+        columns: colDT,
+        fnServerParams: function (data, osettings) {
+            data.push({
+                "name": "country",
+                "value": $('#country').val()
+            });
+            data.push({
+                "name": "zone",
+                "value": $('#zone').val()
+            });
+            data.push({
+                "name": "center",
+                "value": $('#center').val()
+            });
+            data.push({
+                "name": "program",
+                "value": $('#program').val()
+            });
+            data.push({
+                "name": "know_us",
+                "value": $('#know_us').val()
+            });
+            data.push({
+                "name": "status",
+                "value": $('#status').val()
+            });
+            //- data.push({
+            //-     "name": "stage",
+            //-     "value": $('#stage').val()
+            //- });
+            data.push({
+                "name": "dup_leads",
+                "value": $('#dup_lead_1').prop("checked")
+            });
+        }
+      });
+
+      $("#ExportReporttoExcel").on("click", function() {
+        //- table.button('.buttons-excel').trigger();
+        if(total_records > 0) {
+          //- table.button('.buttons-excel').trigger();
+          var search_key = $("#searchbox").val();
+          var stardate = "";
+          var enddate = "";
+          if($("#date").val() != ""){
+            stardate  = ($("#date").val().split("-"))[0];
+            enddate  = ($("#date").val().split("-"))[1];
+          }
+          var stage = $("#stage").val();
+          var center = $("#center").val();
+          var country = $("#country").val();
+          var source_category = $("#source_category").val();
+          var zone = $("#zone").val();
+          var program = $("#program").val();
+          var knowUs = $("#know_us").val();
+          var status = $("#status").val();
+          var dupLeads = $("#dup_lead_1").prop("checked");
+          //- window.open("/admin/reports/export?search_key="+search_key+"&stardate="+stardate+"&enddate="+enddate+"&stage="+stage);
+          //- console.log(JSON.stringify(country), "-----country");
+          let exportApi = `/admin/reports/export?search_key=${search_key}&stardate=${stardate}&enddate=${enddate}&stage=${stage}&country=${country ? JSON.stringify(country) : ""}&zone=${zone ? JSON.stringify(zone) : ""}&center=${center ? JSON.stringify(center) : ""}&program=${program ? JSON.stringify(program) : ""}&source_category=${source_category}&know_us=${knowUs ? JSON.stringify(knowUs) : ""}&status=${status ? JSON.stringify(status) : ""}&dup_leads=${dupLeads}`;
+          //- return;
+          //- console.log(exportApi);
+          window.open(exportApi);
+          return false;
+        } else {
+          sall("No data found!", 2500);
+          return;
+        }
+      });
+
+      //- selectpicker assignment
+      $("#country").selectpicker();
+      $("#zone").selectpicker();
+      $("#center").selectpicker();
+      $("#source_category").selectpicker();
+      $("#stage").selectpicker();
+      $("#program").selectpicker();
+      $("#know_us").selectpicker();
+      $("#status").selectpicker();
+      $("#source").select2({
+        placeholder: "Select Source",
+        theme: "bootstrap"
+      });
+
+      if (currentUser.main == "super_admin") {
+        console.log('Super Admin');
+        let countriesList = $("#country option").length;
+        let zonesList = $("#zone option").length;
+        let centersList = $("#center option").length;
+
+        $(document).on('change', '#country', function () {
+          var id = $(this).val();
+          var valueLength = $(this).val() ? $(this).val().length : 0;
+          if (countriesList == valueLength) {
+            $('#sel_country_check').prop('checked',true);
+          } else {
+            $('#sel_country_check').prop('checked',false);
+          }
+          $('#sel_zone_check').prop('checked',false);
+          $('#sel_center_check').prop('checked',false);
+          $("#clr_zone").css('visibility', 'hidden');
+          $("#clr_center").css('visibility', 'hidden');
+          if(id){
+            $("#zone").val("");
+            $("#center").val("");
+            $.ajax({
+              method: 'POST',
+              url: `/admin/lead/zonefilter`,
+              data: {
+                type: id
+              },
+              dataType: 'json',
+              success: function (response) {
+                console.log(response,"response")
+
+                $("#zone").val("");
+                $("#zone option").remove();
+                $("#center").val("");
+                $("#center option").remove();
+                $("#center").selectpicker("refresh");
+                //- $("#program").append(`<option value=''>Select Program</option>`);
+
+                var len = response.data.length;
+                for (var i = 0; i < len; i++) {
+                  console.log(i);
+                  var id = response.data[i]['_id'];
+                  var zone_name = response.data[i]['name'];
+                  $("#zone").append(`<option value='${id}'>${zone_name}</option>`);
+                  $("#zone").selectpicker("refresh");
+                }
+                if (response.centers && response.centers.length > 0) {
+                  for (var i = 0; i < response.centers.length; i++) {
+                    console.log(i, "--centers");
+                    var id = response.centers[i]['_id'];
+                    var school_name = response.centers[i]['school_display_name'];
+                    $("#center").append(`<option value='${id}'>${school_name}</option>`);
+
+                  }
+                }
+                $("#center").selectpicker("refresh");
+                // $(".testi_class").select2("refresh");
+              }
+            });
+          }else{
+            console.log('yaha aaya kya ?');
+            $("#zone").val("");
+            $("#zone option").remove();
+            $("#zone").selectpicker("refresh");
+            $("#center").val("");
+            $("#center option").remove();
+            $("#center").selectpicker("refresh");
+            $("#clr_zone").css('visibility', 'hidden');
+            $("#clr_center").css('visibility', 'hidden');
+            $("#clr_country").css('visibility', 'hidden');
+            for (var i = 0; i < data.zones.length; i++) {
+              //- console.log(data.zones[i])
+              var id = data.zones[i]['_id'];
+              var zone_name = data.zones[i]['name'];
+              //- console.log(id,"id")
+              //- console.log(zone_name,"zone_name")
+              $("#zone").append(`<option value='${id}'>${zone_name}</option>`);
+              $("#zone").selectpicker("refresh");
+            }
+            for (var i = 0; i < data.centers.length; i++) {
+              //- console.log(data.centers[i])
+              var id = data.centers[i]['_id'];
+              var center_name = data.centers[i]['school_display_name'];
+              //- console.log(id,"id")
+              //- console.log(zone_name,"zone_name")
+              $("#center").append(`<option value='${id}'>${center_name}</option>`);
+              $("#center").selectpicker("refresh");
+            }
+          }
+        });
+        $('#clr_country').click(function(e) {
+          $("#zone").val("");
+          $("#center").val("");
+          $('#sel_country_check').prop('checked',false);
+          $('#sel_zone_check').prop('checked',false);
+          $('#sel_center_check').prop('checked',false);
+          $("#clr_zone").css('visibility', 'hidden');
+          $("#clr_center").css('visibility', 'hidden');
+          for (var i = 0; i < data.zones.length; i++) {
+            var id = data.zones[i]['_id'];
+            var zone_name = data.zones[i]['name'];
+            $("#zone").append(`<option value='${id}'>${zone_name}</option>`);
+          }
+          for (var i = 0; i < data.centers.length; i++) {
+            var id = data.centers[i]['_id'];
+            var center_name = data.centers[i]['school_display_name'];
+            $("#center").append(`<option value='${id}'>${center_name}</option>`);
+          }
+        });
+        $(document).on('change', '#zone', function () {
+          var id = $(this).val();
+          var valueLength = $(this).val() ? $(this).val().length : 0;
+          if (zonesList == valueLength) {
+            $('#sel_zone_check').prop('checked',true);
+          } else {
+            $('#sel_zone_check').prop('checked',false);
+          }
+          $('#sel_center_check').prop('checked',false);
+          $("#center").val("");
+
+          $("#clr_center").css('visibility', 'hidden');
+          if(id){
+            $.ajax({
+              method: 'POST',
+              url: `/admin/lead/centerfilter`,
+              data: {
+                type: id
+              },
+              dataType: 'json',
+              success: function (response) {
+                $("#center").html("");
+                var len = response.data.length;
+                for (var i = 0; i < len; i++) {
+                  var id = response.data[i]['_id'];
+                  var school_name = response.data[i]['school_display_name'];
+                  $("#center").append(`<option value='${id}'>${school_name}</option>`);
+
+                }
+                 $("#center").selectpicker("refresh");
+              }
+            });
+          }else{
+            $("#center").val("");
+            $("#clr_zone").css('visibility', 'hidden');
+            for (var i = 0; i < data.centers.length; i++) {
+              //- console.log(data.centers[i])
+              var id = data.centers[i]['_id'];
+              var center_name = data.centers[i]['school_display_name'];
+              $("#center").append(`<option value='${id}'>${center_name}</option>`);
+            }
+          }
+        });
+        $('#clr_zone').click(function(e) {
+          $("#center").val("");
+          $("#clr_center").css('visibility', 'hidden');
+          $('#sel_zone_check').prop('checked',false);
+          $('#sel_center_check').prop('checked',false);
+          for (var i = 0; i < data.centers.length; i++) {
+            var id = data.centers[i]['_id'];
+            var center_name = data.centers[i]['school_display_name'];
+            $("#center").append(`<option value='${id}'>${center_name}</option>`);
+          }
+        });
+      }else{
+        let countriesList = $("#country option").length;
+        let zonesList = $("#zone option").length;
+        let centersList = $("#center option").length;
+        $(document).on('change', '#country', function () {
+          var id = $(this).val();
+          var valueLength = $(this).val() ? $(this).val().length : 0;
+          if (countriesList == valueLength) {
+            $('#sel_country_check').prop('checked',true);
+          } else {
+            $('#sel_country_check').prop('checked',false);
+          }
+          $('#sel_zone_check').prop('checked',false);
+          $('#sel_center_check').prop('checked',false);
+          $("#clr_zone").css('visibility', 'hidden');
+          $("#clr_center").css('visibility', 'hidden');
+          if(id){
+            $("#zone").val("");
+            $("#center").val("");
+            $("#clr_zone").css('visibility', 'hidden');
+            $("#clr_center").css('visibility', 'hidden');
+            for (var i = 0; i < data.zones.length; i++) {
+              var id = data.zones[i]['_id'];
+              var zone_name = data.zones[i]['name'];
+              $("#zone").append(`<option value='${id}'>${zone_name}</option>`);
+            }
+            for (var i = 0; i < data.centers.length; i++) {
+              var id = data.centers[i]['_id'];
+              var center_name = data.centers[i]['school_display_name'];
+              $("#center").append(`<option value='${id}'>${center_name}</option>`);
+            }
+          }else{
+            $("#zone").val("");
+            $("#center").val("");
+            $("#clr_zone").css('visibility', 'hidden');
+            $("#clr_center").css('visibility', 'hidden');
+            $("#clr_country").css('visibility', 'hidden');
+            for (var i = 0; i < data.zones.length; i++) {
+              var id = data.zones[i]['_id'];
+              var zone_name = data.zones[i]['name'];
+              $("#zone").append(`<option value='${id}'>${zone_name}</option>`);
+            }
+            for (var i = 0; i < data.centers.length; i++) {
+              var id = data.centers[i]['_id'];
+              var center_name = data.centers[i]['school_display_name'];
+              $("#center").append(`<option value='${id}'>${center_name}</option>`);
+            }
+            $("#center").selectpicker("refresh");
+          }
+        });
+        $('#clr_country').click(function(e) {
+          $("#zone").val("");
+          $("#center").val("");
+          $("#clr_zone").css('visibility', 'hidden');
+          $("#clr_center").css('visibility', 'hidden');
+           $('#sel_country_check').prop('checked',false);
+           $('#sel_zone_check').prop('checked',false);
+          $('#sel_center_check').prop('checked',false);
+          for (var i = 0; i < data.zones.length; i++) {
+            var id = data.zones[i]['_id'];
+            var zone_name = data.zones[i]['name'];
+            $("#zone").append(`<option value='${id}'>${zone_name}</option>`);
+          }
+          for (var i = 0; i < data.centers.length; i++) {
+            var id = data.centers[i]['_id'];
+            var center_name = data.centers[i]['school_display_name'];
+            $("#center").append(`<option value='${id}'>${center_name}</option>`);
+          }
+        });
+        $(document).on('change', '#zone', function () {
+          var id = $(this).val();
+          var valueLength = $(this).val() ? $(this).val().length : 0;
+          if (zonesList == valueLength) {
+            $('#sel_zone_check').prop('checked',true);
+          } else {
+            $('#sel_zone_check').prop('checked',false);
+          }
+          $('#sel_center_check').prop('checked',false);
+          $("#clr_center").css('visibility', 'hidden');
+          $("#center").val("");
+          if(id){
+            $("#center").val("");
+            for (var i = 0; i < data.centers.length; i++) {
+              var center_id = data.centers[i]['_id'];
+              var center_name = data.centers[i]['school_display_name'];
+              var zone_id = data.centers[i]['zone_id'];
+              if(id.includes(zone_id)){
+                $("#center").append(`<option value='${center_id}'>${center_name}</option>`);
+              }
+            }
+          }else{
+            $("#center").val("");
+            $("#clr_zone").css('visibility', 'hidden');
+            for (var i = 0; i < data.centers.length; i++) {
+              var id = data.centers[i]['_id'];
+              var center_name = data.centers[i]['school_display_name'];
+              $("#center").append(`<option value='${id}'>${center_name}</option>`);
+            }
+          }
+        });
+        $('#clr_zone').click(function(e) {
+          $("#center").val("");
+          $("#clr_center").css('visibility', 'hidden');
+          $('#sel_zone_check').prop('checked',false);
+          $('#sel_center_check').prop('checked',false);
+
+          for (var i = 0; i < data.centers.length; i++) {
+            var id = data.centers[i]['_id'];
+            var center_name = data.centers[i]['school_display_name'];
+            $("#center").append(`<option value='${id}'>${center_name}</option>`);
+          }
+        });
+      }
+      $(document).on('change', '#center', function () {
+          var id = $(this).val();
+          if(!id){
+            $("#clr_center").css('visibility', 'hidden');
+          }
+      })
+      $(document).on('change', '#program', function () {
+          var id = $(this).val();
+          if(!id){
+            $("#clr_program").css('visibility', 'hidden');
+          }
+      })
+      $(document).on('change', '#know_us', function () {
+         let knowList = $("#know_us option").length;
+          var id = $(this).val();
+          var valueLength = $(this).val() ? $(this).val().length : 0;
+          if (knowList == valueLength) {
+            $('#sel_know_check').prop('checked',true);
+          } else {
+            $('#sel_know_check').prop('checked',false);
+          }
+
+          if(!id){
+            $("#clr_know_us").css('visibility', 'hidden');
+          }
+      })
+      $(document).on('change', '#status', function () {
+         let statusList = $("#status option").length;
+          var id = $(this).val();
+          var valueLength = $(this).val() ? $(this).val().length : 0;
+          if (statusList == valueLength) {
+            $('#sel_status_check').prop('checked',true);
+          } else {
+            $('#sel_status_check').prop('checked',false);
+          }
+
+          if(!id){
+            $("#clr_status").css('visibility', 'hidden');
+          }
+      })
+      $("#clr_country").css('visibility', 'hidden');
+      $("#clr_zone").css('visibility', 'hidden');
+      $("#clr_center").css('visibility', 'hidden');
+      $("#clr_date_range").css('visibility', 'hidden');
+      $("#clr_src_cat").css('visibility', 'hidden');
+      $("#clr_search").css('visibility', 'hidden');
+      $("#clr_stage").css('visibility', 'hidden');
+      $("#clr_program").css('visibility', 'hidden');
+      $("#clr_know_us").css('visibility', 'hidden');
+      $("#clr_status").css('visibility', 'hidden');
+
+      //- table.column(2).visible(false);
+      table.column(4).visible(false);
+      table.column(5).visible(false);
+      table.column(7).visible(false);
+      //- table.column(9).visible(false);
+      table.column(9).visible(false);
+      table.column(11).visible(false);
+
+      //- this code is for hide and show the columns via dropdown
+      $('.dropdown-menu .form-check-input').on('click', function (e) {
+        // Get the column API object
+        var column = table.column($(this).attr('data-column'));
+        // Toggle the visibility
+        column.visible(!column.visible());
+      });
+
+      $('.dataTables_filter ').css('display', 'none')
+
+      table.buttons().container().appendTo($('.excelexport'));
+
+      $('input[name="date_range"]').daterangepicker({
+        autoUpdateInput: false,
+        startDate: moment().startOf('isoWeek'),
+        endDate: moment().endOf('isoWeek'),
+        ranges: {
+            'Today': [moment(), moment()],
+            'Yesterday':[moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'This Week': [moment().startOf('isoWeek'), moment().endOf('isoWeek').add(1, 'days')],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            //- 'Overdue(All)':[moment().subtract(1825, 'days'), moment().subtract(1, 'days')],
+          },
+        locale: {
+          cancelLabel: 'Clear'
+        }
+      });
+
+      //- function cb (start, end) {
+      //-   $('input[name="date_range"]').val(start.format('MM/DD/YYYY') + ' - ' + end.format('MM/DD/YYYY'));
+      //- }
+      //- cb(moment().startOf('isoWeek'), moment().endOf('isoWeek'));
+
+      $('input[name="date_range"]').on('apply.daterangepicker', function(ev, picker) {
+          $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+          table
+            .columns(4) // for start date
+            .search(picker.startDate.format('MM/DD/YYYY')) // for start date
+            .columns(5) // for end date
+            .search(picker.endDate.format('MM/DD/YYYY')) // for end date
+            .draw();
+          $("#clr_date_range").css('visibility', 'visible');
+      });
+
+      $('input[name="date_range"]').on('cancel.daterangepicker', function(ev, picker) {
+        $(this).val('');
+        $("#clr_date_range").css('visibility', 'hidden');
+      });
+
+
+      $('#country').on('change', function () {
+        $('#zone').val('');
+        $('#center').val('');
+        table
+          .columns(0)
+          .search(this.value)
+          .draw();
+        $("#clr_country").css('visibility', 'visible');
+      });
+
+      $('#clr_country').click(function (e) {
+        $("#clr_country").css('visibility', 'hidden');
+        $("#country").val(null).select2({placeholder: "Select Country",theme: "bootstrap"});
+        table
+          .columns(0)
+          .search("")
+          .draw();
+      })
+
+      $('#zone').on('change', function () {
+        $('#center').val('');
+        table
+          .columns(1)
+          .search(this.value)
+          .draw();
+        $("#clr_zone").css('visibility', 'visible');
+      });
+
+      $('#clr_zone').click(function (e) {
+        $("#clr_zone").css('visibility', 'hidden');
+        $("#zone").val(null).select2({placeholder: "Select Zone",theme: "bootstrap"});
+        table
+          .columns(1)
+          .search("")
+          .draw();
+      });
+
+      $('#center').on('change', function () {
+        let centersList = $("#center option").length;
+        var id = $(this).val();
+        var valueLength = $(this).val() ? $(this).val().length : 0;
+          if (centersList == valueLength) {
+            $('#sel_center_check').prop('checked',true);
+          } else {
+            $('#sel_center_check').prop('checked',false);
+          }
+          //- if(!id){
+          //-   $("#clr_center").css('visibility', 'hidden');
+          //- }
+        table
+          .columns(2)
+          .search(this.value)
+          .draw();
+        $("#clr_center").css('visibility', 'visible');
+      });
+
+      $('#clr_center').click(function (e) {
+        $("#clr_center").css('visibility', 'hidden');
+        $('#sel_center_check').prop('checked',false);
+        $("#center").val(null).select2({placeholder: "Select Center",theme: "bootstrap"});
+        table
+          .columns(2)
+          .search("")
+          .draw();
+      });
+
+      $('#date').on('change', function () {
+        table
+          .columns(4)
+          .search(this.value)
+          .draw();
+        $("#clr_date_range").css('visibility', 'visible');
+      });
+
+      $("#clr_date_range").click(function (e) {
+        cb(moment().startOf('isoWeek'), moment().endOf('isoWeek'));
+        $("#clr_date_range").css('visibility', 'hidden');
+        //- $('#date').val('')
+        table
+          .columns(4) // for start date
+          .search("") // for start date
+          .columns(5) // for end date
+          .search("") // for end date
+          .draw();
+      });
+
+      $('#source_category').on('change', function () {
+        table
+          .columns(3)
+          .search(this.value)
+          .draw();
+        $("#clr_src_cat").css('visibility', 'visible');
+      });
+
+      $('#clr_src_cat').click(function (e) {
+        $("#clr_src_cat").css('visibility', 'hidden');
+        $("#source_category").val(null).selectpicker();
+        table
+          .columns(3)
+          .search("")
+          .draw();
+      });
+      $('#stage').on('change', function () {
+        table
+          .columns(6)
+          .search(this.value)
+          .draw();
+        $("#clr_stage").css('visibility', 'visible');
+      });
+
+      $('#clr_stage').click(function (e) {
+        $("#clr_stage").css('visibility', 'hidden');
+        $("#stage").val(null).selectpicker();
+        table
+          .columns(6)
+          .search("")
+          .draw();
+      });
+      $('#program').on('change', function () {
+        let programsList = $("#program option").length;
+        var id = $(this).val();
+        var valueLength = $(this).val() ? $(this).val().length : 0;
+          if (programsList == valueLength) {
+            $('#sel_program_check').prop('checked',true);
+          } else {
+            $('#sel_program_check').prop('checked',false);
+          }
+
+        table
+          .columns(7)
+          .search(this.value)
+          .draw();
+        $("#clr_program").css('visibility', 'visible');
+      });
+
+      $('#clr_program').click(function (e) {
+        $("#clr_program").css('visibility', 'hidden');
+        $('#sel_program_check').prop('checked',false);
+        $("#program").val(null).selectpicker();
+        table
+          .columns(7)
+          .search("")
+          .draw();
+      });
+      $('#know_us').on('change', function () {
+        table
+          .columns(8)
+          .search(this.value)
+          .draw();
+        $("#clr_know_us").css('visibility', 'visible');
+      });
+
+      $('#clr_know_us').click(function (e) {
+        $("#clr_know_us").css('visibility', 'hidden');
+        $('#sel_know_check').prop('checked',false);
+        $("#know_us").val(null).selectpicker();
+        table
+          .columns(8)
+          .search("")
+          .draw();
+      });
+      $('#status').on('change', function () {
+        table
+          .columns(9)
+          .search(this.value)
+          .draw();
+        $("#clr_status ").css('visibility', 'visible');
+      });
+
+      $('#clr_status ').click(function (e) {
+        $("#clr_status ").css('visibility', 'hidden');
+         $('#sel_status_check').prop('checked',false);
+        $("#status").val(null).select2({placeholder: "Select status",theme: "bootstrap"});
+        table
+          .columns(9)
+          .search("")
+          .draw();
+      });
+
+      $('#searchbox').keyup(function(){
+        table.search($(this).val()).draw();
+        $("#clr_search").css('visibility', 'visible');
+      });
+
+      $('#clr_search').click(function (e) {
+        $("#clr_search").css('visibility', 'hidden');
+        $("#searchbox").val("");
+        table.search("").draw();
+      });
+
+
+      $('#clear_filter').click(function() {
+        window.location.reload();
+        return;
+      })
+    });
+    $(document).on('click','#show_filter', function(){
+      $('.filter').slideToggle()
+    })
+    function generateQR() {
+      $.ajax({
+        type: 'GET',
+        url: '/admin/qrcode/generate',
+        data: {
+          packages: ""
+        },
+        success: function (result) {
+          console.log(result,"result");
+          $.fancybox.open(`
+              <img src="${result.data}" width="300" height="300">
+              <br/>
+              <button class="btn btn-color" type="button" onclick="openLeadForm('${result.main_url}')" style="margin-right:70px;">Open parent form</button>
+              <button class="btn btn-color" type="button" onclick='printImg("${result.data}")'>Print</button>
+
+          `);
+
+        }
+      })
+    }
+    function openLeadForm(url) {
+      //- alert(url);
+      window.open(url, '_blank');
+      return;
+    }
+    function printImg(url){
+      var win = window.open('');
+      console.log(url)
+      win.document.write('<img src="' + url + '" onload="window.print();window.close()" width="500" height="500"/>');
+      win.focus();
+    }
+    function redirectToEditleed (lead_id) {
+      window.location.href = `/admin/lead/view/${lead_id}`;
+    }
+    function redirectToEditleed2 (lead_id) {
+      window.location.href = `/admin/lead/add/followup/${lead_id}`;
+    };
+    function sall (msg, time) {
+      var SweetAlert2Demo = function () {
+        //== Demos
+        var initDemos = function () {
+          swal(msg, {
+            buttons: false,
+            timer: time,
+            backdrop:true,
+            closeOnClickOutside: false,
+            closeOnEsc: false
+          })
+        };
+
+        return {
+            //== Init
+            init: function () {
+              initDemos();
+            },
+          };
+        }();
+      jQuery(document).ready(function () {
+        SweetAlert2Demo.init();
+      });
+    };
+    function openFancyBox (centers, center_name, center_id, lead_id, lead_no) {
+      //- console.log(centers,"---centers");
+      $.fancybox.open(`
+        <form method="POST" style="display: inline-block; width: 100%; max-width: 660px;" class="fancybox-content">
+          <h2 class="mb-3">Currently this lead belongs to <strong>${center_name}</strong></h2>
+          <p style="display: none">
+            <input type='hidden' name="employee_id" class="form-control"></input>
+          </p>
+          <input type='hidden' name="old_center_name" id="old_center_name" class="form-control" value="${center_name}"></input>
+          <p>
+            <div class="col-md-12">
+              <div class="form-group form-group-default">
+                <label>Transfer to:</label>
+                <select id="assigned_to" class="form-control" name="assigned_to" required>
+                  <option value="">Select center to transfer</option>
+                  ${centers.map(cen => `${cen._id !== center_id ? `<option value="${cen._id}" data-centername="${cen.school_display_name}">${cen.school_display_name}</option>` : ``}`)}
+                </select>
+              </div>
+            </div>
+            <div class="col-md-12 pro_cat_pop_div" style="display:none;">
+              <div class="form-group form-group-default">
+                <label>Select Program Category for transfered center:</label>
+                <select id="pro_cat_pop" class="form-control" name="pro_cat" required>
+                  <option value="">Select Program Category</option>
+
+                </select>
+              </div>
+            </div>
+            <div class="col-md-12 pro_pop_div" style="display:none;">
+              <div class="form-group form-group-default">
+                <label>Select Program for transfered center:</label>
+                <select id="pro_pop" class="form-control" name="pro">
+                  <option value="">Select Program</option>
+
+                </select>
+              </div>
+            </div>
+          </p>
+          <p class="mb-0">
+            <button class="btn btn-primary btn-block password_btn" id="submit-btn" onclick="transferLead('${lead_id}', '${lead_no}');" type="button" disabled=true>Submit</button>
+          </p>
+        </form>
+      `);
+      $('#assigned_to').select2({
+        placeholder: 'Select center to transfer',
+        type: 'bootstrap'
+      });
+      $('#pro_cat_pop').select2({
+        placeholder: 'Select Program Category',
+        type: 'bootstrap'
+      });
+      $('#pro_pop').select2({
+        placeholder: 'Select Program',
+        type: 'bootstrap'
+      });
+    }
+    function openTransferLeadPopup (lead_id, center_id, center_name, lead_no) {
+      sall("Please wait...", 12000);
+      let centers = [];
+      $.ajax({
+        method: 'POST',
+        url: `/admin/lead/get/center/accordingtouser`,
+        data: {
+          center_id
+        },
+        dataType: 'json',
+        success: function (response) {
+          swal.close();
+          centers = response.data;
+          openFancyBox(centers, center_name, center_id, lead_id, lead_no);
+        }
+      });
+    };
+    function transferLead (lead_id, lead_no) {
+      var centerName = $("#assigned_to").find('option:selected').attr("data-centername");
+      $.fancybox.close();
+      sall("Please wait...", 12000);
+      $.ajax({
+        method: 'POST',
+        url: `/admin/lead/transfer/lead`,
+        data: {
+          lead_id,
+          center_id: $("#assigned_to").val() || "",
+          pro_cat: $("#pro_cat_pop").val() || "",
+          pro: $("#pro_pop").val() || "",
+          old_center_name: $("#old_center_name").val() || ""
+        },
+        dataType: 'json',
+        success: function (response) {
+          swal.close();
+          sall(`Lead no. ${lead_no} transferred to ${centerName}`, 10000);
+          window.location.reload();
+          return;
+        }
+      });
+
+      return;
+    }
+    $(document).ready(function () {
+      // FOR PROGRAM CATEGORY
+      $(document).on('change', '#assigned_to', function () {
+        var id = $(this).val();
+        //- console.log(id,"center_pop");
+        sall("Please wait...", 12000);
+        $.ajax({
+          method: 'POST',
+          url: `/admin/lead/center`,
+          data: {
+            type: id
+          },
+          dataType: 'json',
+          success: function (response) {
+            console.log(response,"-----response");
+            swal.close();
+            $('.pro_cat_pop_div').css('display','block');
+            $("#pro_cat_pop").val("");
+            $("#pro_pop").val("");
+            if (response.data && response.data.length) {
+              $("#pro_cat_pop").append(`<option value=''>Select Program Category</option>`);
+              var len = response.data.length;
+              for (var i = 0; i < len; i++) {
+                var id = response.data[i]['_id'];
+                var title = response.data[i]['title'];
+                $("#pro_cat_pop").append(`<option value='${id}'>${title}</option>`);
+              }
+            } else {
+              $("#pro_cat_pop").val("");
+            }
+            // submit button disabled/enabled
+            var centerVal = $("#assigned_to").val();
+            var proCat = $("#pro_cat_pop").val();
+            if (centerVal && proCat) {
+              $('#submit-btn').prop('disabled', false);
+            } else {
+              $('#submit-btn').prop('disabled', true);
+            }
+          }
+        });
+      });
+
+      // FOR PROGRAM
+      $(document).on('change', '#pro_cat_pop', function () {
+        var id = $(this).val();
+        sall("Please wait...", 12000);
+        $.ajax({
+          method: 'POST',
+          url: `/admin/lead/dropdown`,
+          data: {
+            type: id
+          },
+          dataType: 'json',
+          success: function (response) {
+            //- console.log(response,"response");
+            swal.close();
+            $('.pro_pop_div').css('display','block');
+            $("#pro_pop").val("");
+            if (response.data && response.data.length) {
+              $("#pro_pop").append(`<option value=''>Select Program</option>`);
+              var len = response.data.length;
+              for (var i = 0; i < len; i++) {
+                var id = response.data[i]['_id'];
+                var title = response.data[i]['program_name'];
+                $("#pro_pop").append(`<option value='${id}'>${title}</option>`);
+              }
+            } else {
+              $("#pro_pop").val("");
+            }
+            // submit button disabled/enabled
+            var centerVal = $("#assigned_to").val();
+            var proCat = $("#pro_cat_pop").val();
+            if (centerVal && proCat) {
+              $('#submit-btn').prop('disabled', false);
+            } else {
+              $('#submit-btn').prop('disabled', true);
+            }
+          }
+        });
+      });
+
+      //- new lead design
+      //- $(".form-check-input").change(function(){
+      //-   $('.filter-div select').trigger("select2:close");
+      //- });
+      //- column dropdown functions
+      //- $("#columns").select2({
+      //-   placeholder: "Select Columns",
+      //-   theme: "bootstrap"
+      //- });
+      $('#dropdownMenuButton').on('click', function(e) {
+        $('.lead-flex-container .dropdown-menu').slideToggle();
+      });
+      //- export to excel function
+      $("#exporttoExcelBtn").click(function(){
+        $('.buttons-excel').click()
+      });
+    })

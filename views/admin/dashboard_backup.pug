@@ -1,0 +1,340 @@
+extends layout-admin
+
+block content
+	.main-panel
+		.container
+			.panel-header.bg-primary-gradient
+				.page-inner.py-5
+					.d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+						div
+							h2.text-white.pb-2.fw-bold Dashboard
+							h5.text-white.op-7.mb-2 Welcome to inventory Admin Panel
+						.ml-md-auto.py-2.py-md-0
+							//- a.btn.btn-white.btn-border.btn-round.mr-2(href='index.html#') Manage
+							a.btn.btn-secondary.btn-round(href='/admin/stock/view/cart') View Cart
+			.page-inner.mt--5
+				//-.row.mt--2
+					.col-md-12
+						.card.full-height
+							.card-body
+								.card-title Overall statistics
+								.card-category Daily information about statistics in system
+								.d-flex.flex-wrap.justify-content-around.pb-2.pt-4
+									.px-2.pb-2.pb-md-0.text-center
+										#circles-1
+										h6.fw-bold.mt-3.mb-0 Users
+									.px-2.pb-2.pb-md-0.text-center
+										#circles-2
+										h6.fw-bold.mt-3.mb-0 Vehicles
+									.px-2.pb-2.pb-md-0.text-center
+										#circles-3
+										h6.fw-bold.mt-3.mb-0 Stations
+									.px-2.pb-2.pb-md-0.text-center
+										#circles-4
+										h6.fw-bold.mt-3.mb-0 Bookings
+				.row
+					.col-md-12
+						.card
+							.card-header
+								h4.card-title Search here with spare name...
+									a.btn.btn-primary.download_pdf_btn.btn-sm(style="color:white;display:none;") Download searched products
+								//-p.card-category
+									| Create searchable, sortable, and filterable lists and tables with the simple but powerful List.js plugin. Please read the
+									a(target='_blank' href='http://listjs.com/') official plugin documentation
+									|  for a full list of options. The following options are available via the
+									code data
+									|  attributes to initialize the plugin without any JavaScript:
+							.card-body
+								pre= h.dump(stocks.length)
+								//- pre= h.dump(warehouses)
+								#name-list(data-toggle='lists' data-lists-values='["name"]')
+									input.form-control.search.mb-2#product_input(type='search' placeholder="Type here..." onkeyup="showHideBtn()" autofocus)
+									//- button.btn.btn-primary.sort(data-sort='name')
+										| Sort
+									ul.paginationTop
+									ul.list-group.list-group-bordered.list
+										each stock in stocks
+											li.list-group-item
+												span.name #{stock.product_id.name} (#{stock.product_id.alt_name ? `${stock.product_id.alt_name}` : "Not provided"}) - #{stock.warehouse_id.name} - #{stock.qty} qty
+												if stock.qty !== 0
+													a(href='javascript:void(0)', class="shift-right", onclick=`transferTo('${stock._id}', '${stock.product_id.name}', '${stock.product_id._id}', '${stock.warehouse_id.name}', '${stock.warehouse_id._id}', '${stock.qty}')`)
+														span.badge.badge-primary.badge-pill Transfer to
+													a(href='javascript:void(0)', style='padding-left: 25px;', onclick=`addToCart('${stock._id}', '${stock.product_id.name}', '${stock.warehouse_id.name}', '${stock.qty}', '${stock.product_id._id}', '${stock.warehouse_id._id}', '${stock.product_id.price}')`)
+														span.badge.badge-primary.badge-pill Add to cart
+									ul.pagination
+
+	block script
+		//-- list.js
+		script(src='/admin/assets/js/plugin/list.js/list.min.js')
+		//-- fancybox
+		script(src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js")
+
+	script.
+		var clientObj = !{JSON.stringify(clients)};
+		var warehouseObj = !{JSON.stringify(warehouses)};
+		var options = {
+			valueNames: ['name'],
+			page: 20,
+			pagination: true
+		};
+		var nameList = new List('name-list', options);
+
+		function addToCart (stock_id, product_name, warehouse_name, qty, product_id, warehouse_id, price) {
+			$.fancybox.open(`
+				<form action="/admin/stock/add/to/cart/${stock_id}" method="POST" style="display: inline-block; width: 100%; max-width: 660px;" class="fancybox-content">
+					<h2 class="mb-3">Add product <strong>${product_name}</strong> to cart from <strong>${warehouse_name}</strong> warehouse</h2>
+					<h3 class="mb-3">Total quantity available: <strong>${qty}</strong></h3>
+					<p>
+						<input type='hidden' name="product_id" id="product_id" class="form-control" value="${product_id}"></input>
+					</p>
+					<p>
+						<input type='hidden' name="warehouse_id" id="warehouse_id" class="form-control" value="${warehouse_id}"></input>
+					</p>
+					<p>
+						<input type='hidden' name="product_name" id="product_name" class="form-control" value="${product_name}"></input>
+					</p>
+					<p>
+						<input type='hidden' name="warehouse_name" id="warehouse_name" class="form-control" value="${warehouse_name}"></input>
+					</p>
+					<p>
+						<input type='hidden' name="total_qty" id="total_qty" class="form-control" value="${qty}"></input>
+					</p>
+					<p>
+						<input type='hidden' name="price" id="price" class="form-control" value="${price}"></input>
+					</p>
+					<p>
+						<input type='text' name="qty" class="form-control" id="qty_text" placeholder="Type your quantity here" onkeyup="checkNumber('${qty}')" required></input>
+					</p>
+					<p id="demo" style="color: #FF0000"></p>
+					<p class="mb-0">
+						<button class="btn btn-primary btn-block" id="submit-btn" type="button">Add to cart</button>
+					</p>
+				</form>
+			`);
+			$(document).ready(function() {
+				$('#submit-btn').click(function () {
+					var productID = $('#product_id').val();
+					var warehouseID = $('#warehouse_id').val();
+					var productName = $('#product_name').val();
+					var warehouseName = $('#warehouse_name').val();
+					var qtyText = $('#qty_text').val();
+					var totalQty = $('#total_qty').val();
+					var price = $('#price').val();
+
+					$.ajax({
+						type: 'POST',
+						url: `/admin/stock/add/to/cart/${stock_id}`,
+						data: {
+							productID,
+							warehouseID,
+							productName,
+							warehouseName,
+							qtyText,
+							totalQty,
+							price
+						},
+						success: function(result) {
+							//- console.log(result);
+							//- alert(result);
+							if (result == 'success') {
+								$.fancybox.close();
+								$.notify({
+									message: 'Added to cart successfully! <a href="/admin/stock/view/cart">View cart →</a>'
+								},{
+									type: 'success',
+									showProgressbar: false
+								},
+								{
+									offset: 20,
+									spacing: 10,
+									z_index: 1031,
+									delay: 5000,
+									timer: 1000
+								});
+							} else {
+								$.fancybox.close();
+								$.notify({
+									message: 'This product is already in cart! <a href="/admin/stock/view/cart">View cart →</a>'
+								},{
+									type: 'danger',
+									showProgressbar: false
+								},
+								{
+									offset: 20,
+									spacing: 10,
+									z_index: 1031,
+									delay: 5000,
+									timer: 1000
+								});
+							}
+						}
+					})
+				})
+			});
+		}
+		function transferTo (stock_id, product_name, product_id, warehouse_name, warehouse_id, qty) {
+			$.fancybox.open(`
+				<form action="/admin/stock/transfer/${stock_id}" method="POST" style="display: inline-block; width: 100%; max-width: 660px;" class="fancybox-content">
+					<h2 class="mb-3">Transfer product <strong>${product_name}</strong> from <strong>${warehouse_name}</strong> warehouse to..</h2>
+					<h3 class="mb-3">Total quantity available: <strong>${qty}</strong></h3>
+					<p style="display: none">
+						<input type='hidden' name="product_id" class="form-control" value='${product_id}'></input>
+					</p>
+					<p style="display: none">
+						<input type='hidden' name="ware" class="form-control" value='${stock_id}'></input>
+					</p>
+					<p style="display: none">
+						<input type='hidden' name="qtyy" class="form-control" value='${qty}'></input>
+					</p>
+					<p>
+						<input type='text' name="qty" class="form-control" id="qty_text" placeholder="Type your quantity here" onkeyup="checkNumber('${qty}')" required></input>
+					</p>
+					<p id="demo" style="color: #FF0000"></p>
+					<p>
+						<select class="form-control" name="warehouse_id">
+							${warehouseObj.map(warehouse => `
+								<option value=${warehouse._id} ${warehouse._id == warehouse_id ? 'disabled' : null}>${warehouse.name}</option>
+							`)}
+						</select>
+					</p>
+					<p class="mb-0">
+						<button class="btn btn-primary btn-block" id="submit-btn" type="submit">Transfer</button>
+					</p>
+				</form>
+			`);
+		}
+		function checkNumber(qty) {
+			var x = document.getElementById("qty_text").value;
+
+			// If x is Not a Number or less than one or greater than 10
+			if (isNaN(x)) {
+				text = "Your input is not a number.";
+				document.getElementById("submit-btn").disabled = true;
+			} else if (parseInt(x) > parseInt(qty)) {
+				text = "Your input is more than the quantity. Please check!";
+				document.getElementById("submit-btn").disabled = true;
+			} else if (x.includes('.') || x.includes('-') || x.includes('+')) {
+				text = "This is not a valid number. Please check!";
+				document.getElementById("submit-btn").disabled = true;
+			} else {
+				text = "";
+				document.getElementById("submit-btn").disabled = false;
+			}
+			document.getElementById("demo").innerHTML = text;
+		}
+		function showHideBtn() {
+			var inputValue = document.getElementById("product_input").value;
+
+			var inputArr = inputValue.split("");
+
+			if (inputArr.length >= 3) {
+				$('.download_pdf_btn').css('display','inline');
+			} else {
+				$('.download_pdf_btn').css('display','none');
+			}
+		}
+		$('.download_pdf_btn').click(function () {
+			var inputVal = document.getElementById("product_input").value;
+
+			var SweetAlert2Demo = function () {
+
+			//== Demos
+			var initDemos = function () {
+				swal("Please wait while downloading is in progress...", {
+					buttons: false,
+					timer: 12000,
+					backdrop:true,
+					closeOnClickOutside: false,
+					closeOnEsc: false
+				})
+			};
+
+			return {
+					//== Init
+					init: function () {
+						initDemos();
+					},
+				};
+			}();
+
+			jQuery(document).ready(function () {
+				SweetAlert2Demo.init();
+			});
+
+			$.ajax({
+				type: 'POST',
+				url: '/admin/dashboard/download/searched/product',
+				data: {
+					productName: inputVal
+				},
+				success: function(result) {
+					//- console.log(result);
+					if (result.type == 'success') {
+						swal.close();
+						$.notify({
+							message: 'PDF Generated!'
+						},{
+							type: 'success',
+							showProgressbar: false
+						},
+						{
+							offset: 20,
+							spacing: 10,
+							z_index: 1031,
+							delay: 5000,
+							timer: 1000
+						});
+
+						setTimeout(function () {
+							//- window.location.href = result.fileName;
+							var win = window.open(result.fileName, "_blank") || window.location.replace(result.fileName);
+							win.onload = function () {
+                    $.ajax({
+                      type: 'POST',
+                      url: '/api/helper/remove/pdf',
+                      data: {
+                        file: result.file
+                      },
+                      success: function (final) {
+                        if (final.message == 'success') {
+                          //- console.log('file got deleted');
+                          return;
+                        } else {
+                          $.notify({
+                            message: 'File not getting deleted!'
+                          },{
+                            type: 'error',
+                            showProgressbar: false
+                          },
+                          {
+                            offset: 20,
+                            spacing: 10,
+                            z_index: 1031,
+                            delay: 5000,
+                            timer: 1000
+                          });
+                        }
+                      }
+                    })
+                  }
+						}, 1000)
+						return;
+					} else {
+						$.notify({
+							message: 'Something went wrong!'
+						},{
+							type: 'danger',
+							showProgressbar: false
+						},
+						{
+							offset: 20,
+							spacing: 10,
+							z_index: 1031,
+							delay: 5000,
+							timer: 1000
+						});
+						return;
+					}
+				}
+			})
+		})

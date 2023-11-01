@@ -1,0 +1,145 @@
+extends layout-admin
+
+block content
+  #cover-spin
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        div(style="padding:5px 20px 0px 20px;")
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold View All Users
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              .lead-flex-container
+                div.form-group
+                  if checkSuperAdmin
+                    a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/employee/pending/approvals') Pending Approvals
+                  if h.checkPermission(session.user, permissionCacheData, "UserAddUser") || checkSuperAdmin
+                    a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/employee/add') Add User
+                  a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+      .page-inner
+        //- pre= h.dump(employees)
+        .row
+          .col-md-12
+            .card.card-with-nav
+              .card-body
+                //- ========================================================================
+                .row
+                  .col-md-3
+                    .form-group
+                      label(for='country',style="margin-bottom:0px;") Country
+                      select#country(name='country[]' multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
+                        each country in data.countries
+                          option(value=country._id) #{country.country_name}
+                  .col-md-3
+                    .form-group
+                      label(for='zone',style="margin-bottom:0px;") Zone
+                      select#zone(name='zone[]' multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
+                        each zone in data.zones
+                          option(value=zone._id) #{zone.name}
+                  .col-md-3
+                    .form-group
+                      label(for='center',style="margin-bottom:0px;") Center
+                      select#center(name='center[]' multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
+                        each center in data.centers
+                          option(value=center.school_display_name) #{center.school_display_name}
+                  .col-md-3
+                    .form-group.text-center
+                      button.btn.btn-primary#show_filter(type="button" style='margin-top:20px;margin-left:-40px;')
+                        i.fa.fa-filter
+                        |  Additional Filter
+                //- ========================================================================
+                .row.filter(style="left: 15px;padding-left:10px;")
+                  .col-md-3
+                    .form-group
+                      label(for='role',style="margin-bottom:0px;") Role
+                      br
+                      select#role(name='role[]' multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
+                        each role in roles
+                          option(value=role._id) #{role.name}
+                  .col-md-3
+                    .form-group
+                      label(for='status',style="margin-bottom:0px;") Status
+                      br
+                      select#status(name='status[]'  data-container="body" data-live-search="true" data-actions-box="true").selectpicker
+                        option(value='') Select status
+                        option(value=1) Active
+                        option(value=0) Inactive
+                hr
+                .table-responsive
+                  .col-sm-12
+                    table#multi-filter-select.display.table.table-striped.table-hover.dataTable(role='grid', aria-describedby='basic-datatables_info')
+                      thead
+                        tr(role='row')
+                          th Name
+                          th Email
+                          th Mobile
+                          th Center Assigned
+                          th Role Assigned
+                          //- th Created Date
+                          th Status
+                          th(style="display:none") country
+                          th(style="display:none") zone
+                          th(style="display:none") Role_id
+                          th(style="display:none") statusss
+                          th Action
+                          //- th Country
+                      tbody
+                        each user in employees
+                          a(href="#")
+                            tr.odd(role='row')
+                              td.sorting_1 #{user.name}
+                                if user.admin_approval == 0
+                                  span.badge.badge-danger.nowrap(style="font-size: 10px !important;") Not Approved Yet
+                              td #{user.email}
+                              td #{user.mobile}
+                              td #{user.center_id.map((e) => e.school_display_name)}
+                              td #{user.role_id && user.role_id.name ? user.role_id.name : "Not Provided"}
+                              //- td #{user.createdAt.toString().split(" ").slice(0, 4).join(" ")}
+                              td #{user.status == 'active' ? 'Active' : 'Inactive'}
+                              td(style="display:none") #{user.country_id  ? user.country_id.map((e) => e._id) : "Not Provided"}
+                              td(style="display:none") #{user.zone_id ?  user.zone_id.map((e) => e._id) : "Not Provided"}
+                              td(style="display:none") #{user.role_id && user.role_id._id ?  user.role_id._id : "Not Provided"}
+                              td(style="display:none") #{user.status == "active" ? 1 : 0}
+                              td
+                                ul.user_tbl_action_btn
+                                  if h.checkPermission(session.user, permissionCacheData, "UserEditUser") || checkSuperAdmin
+                                    li
+                                      a.btn.btn-link.btn-primary(href=`/admin/employee/edit/${user._id}` title="Edit User")
+                                        i.fa.fa-edit
+                                  if h.checkPermission(session.user, permissionCacheData, "UserViewPassword") || checkSuperAdmin
+                                    li
+                                      a.btn.btn-link.btn-primary(href="javascript:void(0);" title="View Password" onclick=`viewPassword("${user._id}");`)
+                                        i.fas.fa-eye
+                                  if h.checkPermission(session.user, permissionCacheData, "UserSendMail") || checkSuperAdmin
+                                    li
+                                      a.btn.btn-link.btn-primary(href="javascript:void(0);" title="Send Mail" onclick=`sendMail("${user._id}");`)
+                                        i.fas.fa-paper-plane
+                                  if h.checkPermission(session.user, permissionCacheData, "UserResetPassword") || checkSuperAdmin
+                                    li
+                                      a.btn.btn-link.btn-primary(href="javascript:void(0);" title="Reset Password" onclick=`resetPassword("${user._id}");`)
+                                        i.fas.fa-key
+
+                .row
+  block script
+    script(type='text/javascript' src='https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js')
+    link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css")
+    script(src="/admin/custom/all-pending-employees.js")
+
+  script.
+    var data = !{JSON.stringify(data)};
+    var currentUser = !{JSON.stringify(session.user)};
+    $('.filter').css('display', 'none');
+    $(document).ready(function() {
+      dom: 'Bfrtip',
+      $(document).on('click','#show_filter', function(){
+        $('.filter').slideToggle()
+      })
+      $("#country").selectpicker();
+      $("#zone").selectpicker();
+      $("#status").selectpicker();
+      $("#role").selectpicker();
+      $("#center").selectpicker("refresh");
+
+    })

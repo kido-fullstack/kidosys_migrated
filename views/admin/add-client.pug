@@ -1,0 +1,151 @@
+extends layout-admin
+
+block content
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        .page-inner.py-5
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold Add Client
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/client/all') All Client
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+      .page-inner
+        .row
+          .col-md-12
+            .card
+              form(action="/admin/client/add", method="POST")
+                .card-body
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='name')
+                      | Name
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#name.form-control(type='text', name='name', placeholder='Enter Name', required='')
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='company_name')
+                      | Company Name
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#name.form-control(type='text', name='company_name', placeholder='Enter Company Name', required='')
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='company_name')
+                      | SPOC
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#name.form-control(type='text', name='spoc', placeholder='Enter special point of contact', required='')
+                  .form-group.form-show-validation.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='email')
+                      | Email Address
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#email.form-control(type='email', name='email', placeholder='Enter Email', required='', value="saleskennex3@gmail.com")
+                      //- small#emailHelp.form-text.text-muted We'll never share your email with anyone else.
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='Mobile No.')
+                      | Mobile No.
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#name.form-control(type='text', name='mobile', placeholder='Enter Mobile No.', required="", value="9769767204")
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='transport')
+                      | Transport
+                      span.required-label
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#transport.form-control(type='text', name='transport', placeholder='Enter Transport')
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='Mobile No.')
+                      | Landline 1
+                      span.required-label
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#name.form-control(type='text', name='landline_1', placeholder='Enter Landline 1')
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='Mobile No.')
+                      | Landline 2
+                      span.required-label
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#name.form-control(type='text', name='landline_2', placeholder='Enter Landline 2')
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='Mobile No.')
+                      | Landline 3
+                      span.required-label
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#name.form-control(type='text', name='landline_3', placeholder='Enter Landline 3')
+                  //- .form-group.form-show-validation.row
+                  //-   label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='user_type')
+                  //-     | User Type
+                  //-   .col-lg-7.col-md-9.col-sm-8
+                  //-     .select2-input
+                  //-       select#state.form-control(name='user_type', required='')
+                  //-         option(value='user') User
+                  //-         option(value='admin') Admin
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='Mobile No.')
+                      | State
+                      span.required-label
+                    .col-lg-7.col-md-9.col-sm-8
+                      .select2-input
+                        select#state-id.form-control(name='state')
+                          option(value="0") -- Select --
+                          each state in states
+                            option(value=state.id) #{state.state_name}
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='Mobile No.')
+                      | City
+                      span.required-label
+                    .col-lg-7.col-md-9.col-sm-8
+                      select#city-id.form-control(name='city')
+                        option(value='0') -- Select --
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='Mobile No.')
+                      | Address
+                      span.required-label
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#name.form-control(type='text', name='address', placeholder='Enter address')
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='Mobile No.')
+                      | GST
+                      span.required-label
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#name.form-control.gst(type='text', name='gst', placeholder='Enter gst')
+                      p(id="demo" style="color: #FF0000")
+                  .form-group.form-show-validation.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='status')
+                      | Status
+                    .col-lg-7.col-md-9.col-sm-8
+                      .select2-input
+                        select#state.form-control(name='status', required='')
+                          option(value='active') Active
+                          option(value='inactive') Inactive
+                .card-action
+                  .row
+                    .col-md-12
+                      button.btn.btn-color(type="submit" id="submit-btn") Add Client
+
+  block script
+    script(src="/admin/custom/add-client.js")
+
+  script.
+    $(document).ready(function () {
+      $('.gst').keyup(function () {
+        var inputValues = $(this).val();
+        var gstInFormat = new RegExp('^([0][1-9]|[1-2][0-9]|[3][0-7])([A-Z]{5})([0-9]{4})([A-Z]{1}[1-9A-Z]{1})([Z]{1})([0-9A-Z]{1})+$');
+
+        if (inputValues == '') {
+          document.getElementById("submit-btn").disabled = false;
+          $('p#demo').text('');
+          return;
+        } else if (gstInFormat.test(inputValues)) {
+          document.getElementById("submit-btn").disabled = false;
+          $('p#demo').text('');
+          return;
+        } else {
+          document.getElementById("submit-btn").disabled = true;
+          $('p#demo').text('Please Enter Valid GST Number');
+          return;
+        }
+        //- alert(inputValues);
+      })
+    });

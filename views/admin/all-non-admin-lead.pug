@@ -1,0 +1,431 @@
+extends layout-admin
+
+block content
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        .page-inner.py-5
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold View All Leads
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              if !checkSuperAdmin
+                a.btn.btn-white.btn-border.btn-round.mr-2(href='javascript:void(0);' onclick='generateQR();') Generate QR
+              if h.checkPermission(session.user, permissionCacheData, "LeadAdd") || checkSuperAdmin
+                a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/lead/add') Add Lead
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+      .page-inner
+        .row
+          .col-md-12
+            .card.card-with-nav.filter
+              .card-body
+                //- pre= h.dump(leads)
+                .row
+                  .col-md-3
+                    .form-group
+                      label(for='country') Country
+                      select#country.select2(name='country')
+                        option(value='') Select Country
+                        //- each center in centers
+                        //-   option(value=center.center_name) #{center.center_name}
+                  .col-md-3
+                    .form-group
+                      label(for='zone') Zone
+                      select#zone.select2(name='zone')
+                        option(value='') Select Lead Zone
+                        //- each leadCategory in leadCategories
+                        //-   option(value=leadCategory.name) #{leadCategory.name}
+                  .col-md-3
+                    .form-group
+                      label(for='center') Center
+                      select#center.select2(name='center')
+                        option(value='') Select Center
+                        //- each status in statuses
+                        //-   option(value=status.name) #{status.name}
+                  .col-md-3
+                    .form-group
+                      label(for='type') Date Range
+                        input#date.form-control(type='text')
+                  .col-md-3
+                    .form-group
+                      label(for='source_category') Source Category
+                      select#source_category.select2(name='source_category')
+                        option(value='') Select Source Category
+                        //- each leadCategory in leadCategories
+                        //-   option(value=leadCategory.name) #{leadCategory.name}
+                  .col-md-3
+                    .form-group
+                      label(for='source') Source
+                      select#source.select2(name='source')
+                        option(value='') Select Source
+                        //- each status in statuses
+                        //-   option(value=status.name) #{status.name}
+                  .col-md-3
+                    .form-group
+                      label(for='type') Search
+                        br
+                        input.form-control#searchbox(type='text' placeholder='Search..' name='search' style='width: 300px;height: 38px;')
+
+                  .col-md-3(style="margin-top:25px;")
+                    button.excelexport.btn-primary-wrapper(type="button")
+
+                  //- .col-md-2
+                  //-   button.btn.btn-primary#excel(type="button" style='margin-top:26px;')
+                  //-     | Export to Excel
+                  .col-md-12
+                    button.btn.btn-primary#clear_filter(type="button" style='margin-top:26px;float:right;')
+                      | Clear Filter
+
+
+            .card.card-with-nav
+              .card-body
+                //- pre= h.dump(leads)
+                .row
+                  .col-md-2
+                    button.btn.btn-primary#show_filter(type="button" style='margin-top:26px;')
+                      | Filter
+                hr
+                p.demo
+                  a#lead_id.toggle-vis.btn.btn-primary.btn-sm(href="" data-column="0" style="color: #fff; margin: 0px 10px;")
+                    | Lead ID
+                  a#ld_dte.toggle-vis.btn.btn-primary.btn-sm(href="" data-column="1" style="color: #fff; margin: 0px 10px;")
+                    | Date
+                  a#lt_up.toggle-vis.btn.btn-primary.btn-sm(href="" data-column="2" style="color: #fff; margin: 0px 10px;")
+                    | Last Updated
+                  a#ld_name.toggle-vis.btn.btn-primary.btn-sm(href="" data-column="3" style="color: #fff; margin: 0px 10px;")
+                    | Lead Name
+                  a#fir_name.toggle-vis.btn.btn-primary.btn-sm(href="" data-column="4" style="color: #fff; margin: 0px 10px;")
+                    | First Name
+                  a#last_name.toggle-vis.btn.btn-primary.btn-sm(href="" data-column="5" style="color: #fff; margin: 0px 10px;")
+                    | Last Name
+                  a#ld_type.toggle-vis.btn.btn-primary.btn-sm(href="" data-column="6" style="color: #fff; margin: 0px 10px;")
+                    | Stage
+                  a#stage.toggle-vis.btn.btn-primary.btn-sm(href="" data-column="7" style="color: #fff; margin: 0px 10px;")
+                    | Type
+                  a#sch_name.toggle-vis.btn.btn-primary.btn-sm(href="" data-column="8" style="color: #fff; margin: 0px 10px;")
+                    | School Name
+                  a#src_name.toggle-vis.btn.btn-primary.btn-sm(href="" data-column="9" style="color: #fff; margin: 0px 10px;")
+                    | Source
+                  a#prg_cat.toggle-vis.btn.btn-primary.btn-sm(href="" data-column="10" style="color: #fff; margin: 0px 10px;")
+                    | Program Category
+                  a#prg.toggle-vis.btn.btn-primary.btn-sm(href="" data-column="11" style="color: #fff; margin: 0px 10px;")
+                    | Program
+                  //- a#status_id.toggle-vis.btn.btn-primary.btn-sm(href="" style="color: #fff; margin: 0px 10px;")
+                  //-   | Status ID
+                  //- a#sub_status_id.toggle-vis.btn.btn-primary.btn-sm(href="" style="color: #fff; margin: 0px 10px;")
+                  //-   | Sub-Status ID
+
+                .table-responsive
+                  .col-sm-12
+                    table#basic-datatables.display.table.table-striped.table-hover.dataTable(role='grid', aria-describedby='basic-datatables_info')
+                      thead
+                        tr(role='row')
+                          th Lead Id
+                          th Date
+                          th Last Updated
+                          th Lead Name
+                          th First Name
+                          th Last Name
+                          th Stage
+                          th Type
+                          th School Name
+                          th Source
+                          th Program Category
+                          th Program
+                          //- th Status
+                          //- th Sub Status
+                          //- th Latest Follow-Up Schedule
+                          //- th Parent Name
+                          //- th Child Name
+                          //- th Category
+                          //- th Center
+                          //- th Status
+                          //- th Sub Status
+                          //- th Action
+                          th FollowUp
+                      tbody
+                        //- each lead in leads
+                        //-   a(href="#")
+                        //-     tr.odd(role='row')
+                        //-       //- td.sorting_1 #{moment(lead.lead_date).format("MMM Do YY")}
+                        //-       th #{lead.lead_no}
+                        //-       th #{moment(lead.createdAt).format('L')}
+                        //-       th #{moment(lead.updatedAt).format('L')}
+                        //-       th #{lead.parent_name}
+                        //-       td #{lead.child_first_name}
+                        //-       td #{lead.child_last_name}
+                        //-       td #{lead.stage}
+                        //-       td #{lead.school_id.school_name }
+                        //-       td #{lead.source_category}
+                        //-       td #{lead.program_id ? lead.program_id.program_name : 'not provided' }
+                        //-       //- td #{moment(lead.follow_ups_id.slice(-1)[0].follow_up_date).format("MMM Do YY")}
+                        //-       //- td #{lead.parent_name}
+                        //-       //- td #{lead.child_first_name}
+                        //-       //- td #{lead.lead_category}
+                        //-       //- td #{lead.center_id.center_name}
+                        //-       //- td #{lead.follow_ups_id.slice(-1)[0].follow_status}
+                        //-       //- td #{lead.follow_ups_id.slice(-1)[0].follow_sub_status}
+                        //-       td
+                        //-         //- a.btn.btn-link.btn-primary(href=`/admin/lead/view/detail/${lead._id}`)
+                        //-         //-   i.fa.fa-eye
+                        //-         //- a.btn.btn-link.btn-primary(href=`/admin/lead/add/followup/${lead._id}`)
+                        //-         //-   i.fa.fa-plus
+                        //-         a.btn.btn-link.btn-primary(href=`/admin/lead/edit/${lead._id}`)
+                        //-           i.fa.fa-edit
+                        //-       td
+                        //-         a.btn.btn-link.btn-primary(href=`/admin/lead/add/followup/${lead._id}`)
+                        //-           i.fa.fa-plus
+                .row
+
+  block script
+    script(type='text/javascript' src='https://cdn.jsdelivr.net/momentjs/latest/moment.min.js')
+    script(type='text/javascript' src='https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js')
+
+  script.
+    //- $('.filter').hide()
+    $('.filter').css('display', 'none')
+    $(document).ready(function() {
+      $("#country").select2({
+        theme: "bootstrap"
+      });
+      $("#zone").select2({
+        theme: "bootstrap"
+      });
+      $("#center").select2({
+        theme: "bootstrap"
+      });
+      $("#source_category").select2({
+        theme: "bootstrap"
+      });
+      $("#source").select2({
+        theme: "bootstrap"
+      });
+
+      //- $('.filter').hide()
+      var table = $('#basic-datatables').DataTable({
+        bProcessing: true,
+        bServerSide: true,
+        pagination: true,
+        ordering: false,
+        dom: 'Bfrtip',
+        buttons: [{
+            extend: 'excel',
+            text: 'Export to excel',
+            className: 'btn btn-primary exp_btn',
+            title: `leads_${Date.now()}`,
+            exportOptions: {
+              columns: [0, 1, 2, 3, 4, 5, 6, 7, 8]
+            }
+          }
+        ],
+        sAjaxSource: "/admin/lead/datatable",
+        fnServerParams: function ( data ) {
+          //- console.log("data", data);
+          //- data.push({ "name": "more_data", "value": "my_value" })
+          //- var startDatee;
+          //- var endDatee;
+          //- var dates = $('#fromTo span').html();
+          //- if (dates) {
+          //-   console.log('not empty');
+          //-   startDatee = moment(new Date(dates.split("-")[0])).format("DD/MM/YYYY");
+          //-   endDatee = moment(new Date(dates.split("-")[1])).format("DD/MM/YYYY");
+          //-   data.push( { "name": "start", "value": startDatee }, { "name": "end", "value": endDatee } );
+          //- } else {
+          //-   console.log('empty');
+          //- }
+        }
+      });
+
+      table.column(2).visible(false);
+      table.column(4).visible(false);
+      table.column(5).visible(false);
+      //- table.column(9).visible(false);
+      //- table.column(10).visible(false);
+      //- table.column(8).visible(false);
+      //- table.column(9).visible(false);
+
+      $('a.toggle-vis').on('click', function (e) {
+        e.preventDefault();
+        // Get the column API object
+        var column = table.column($(this).attr('data-column'));
+        // Toggle the visibility
+        column.visible(!column.visible());
+        //- console.log(column.visible());
+      });
+
+      $('.dataTables_filter ').css('display', 'none')
+      $('#searchbox').keyup(function(){
+        table.search($(this).val()).draw() ;
+      })
+
+      table.buttons().container().appendTo($('.excelexport'))
+
+
+      //- $('#center').select2({
+      //-   theme: "bootstrap"
+      //- })
+      //- $('#lead_cat').select2({
+      //-   theme: "bootstrap"
+      //- })
+      //- $('#status').select2({
+      //-   theme: "bootstrap"
+      //- })
+
+      $('#date').daterangepicker({
+        ranges: {
+           'LatestUp':[moment(), moment()],
+            'Today': [moment(), moment()],
+            'Tomorrow': [moment().add(1, 'days'), moment().add(1, 'days')],
+            'Overdue': [moment().subtract(365, 'days'), moment()],
+            //- 'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+            //- 'This Month': [moment().startOf('month'), moment().endOf('month')],
+            //- 'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+          },
+      })
+
+      //- flatpickr("#date", {
+      //-   mode: "range",
+      //-   dateFormat: "Y-m-d",
+      //-   onChange: function (dates) {
+      //-     console.log(dates);
+      //-     if (dates.length == 2) {
+      //-       console.log('trigger');
+      //-       $.ajax({
+      //-         type: 'POST',
+      //-         url: `/admin/lead/filter/date`,
+      //-         dataType: "json",
+      //-         data: {
+      //-           dates: dates
+      //-         },
+      //-         success: function(result) {
+      //-           console.log(result);
+      //-           if (result.code == 200) {
+      //-             table.clear().rows.add(result.data.newArr).draw();
+      //-             return;
+      //-           }
+      //-         }
+      //-       })
+      //-     }
+      //-   }
+      //- });
+
+      $.ajax({
+        type: 'GET',
+        url: '/admin/lead/filter',
+        data: {
+          packages: ""
+        },
+        success: function (response) {
+          //- console.log("result",response);
+          $("#country").empty();
+          $("#zone").empty();
+          $("#center").empty();
+
+          var countriesData = response.data && response.data.countries ? response.data.countries.length : [];
+          var zonesData = response.data && response.data.zones ? response.data.zones.length : [];
+          var centersData = response.data && response.data.centers ? response.data.centers.length : [];
+
+          if (countriesData == 0) {
+            $("#country").append(`<option value='' disabled>No data found</option>`);
+          }
+          if (zonesData == 0) {
+            $("#zone").append(`<option value='' disabled>No data found</option>`);
+          }
+          if (centersData == 0) {
+            $("#center").append(`<option value='' disabled>No data found</option>`);
+          }
+          $("#country").append(`<option value=''>Select Country</option>`);
+          $("#zone").append(`<option value=''>Select Country</option>`);
+          $("#center").append(`<option value=''>Select Country</option>`);
+
+          for (var i = 0; i < countriesData; i++) {
+            var id = response.data.countries[i]['_id'];
+            var name = response.data.countries[i]['country_name'];
+
+            $("#country").append(`<option value='${id}'>${name}</option>`);
+          }
+          for (var i = 0; i < zonesData; i++) {
+            var id = response.data.zones[i]['_id'];
+            var name = response.data.zones[i]['name'];
+
+            $("#zone").append(`<option value='${id}'>${name}</option>`);
+          }
+          for (var i = 0; i < centersData; i++) {
+            var id = response.data.centers[i]['_id'];
+            var name = response.data.centers[i]['school_display_name'];
+
+            $("#center").append(`<option value='${id}'>${name}</option>`);
+          }
+        }
+      })
+
+      $('#center').on('change', function () {
+        table
+          .columns(6)
+          .search(this.value)
+          .draw();
+      });
+
+      $('#lead_cat').on('change', function () {
+        table
+          .columns(5)
+          .search(this.value)
+          .draw();
+      });
+
+      $('#status').on('change', function () {
+        table
+          .columns(7)
+          .search(this.value)
+          .draw();
+      });
+      $('#date').on('change', function () {
+        //- console.log(this.value,"this,date")
+        table
+          .columns(2)
+          .search(this.value)
+          .draw();
+      });
+
+      $('#clear_filter').click(function() {
+        window.location.reload();
+        return;
+      })
+    });
+    $(document).on('click','#show_filter', function(){
+      //- console.log("clicked")
+      $('.filter').toggle()
+      //- $('.filter').show()
+      //- $('#show_filter').hide()
+    })
+    function generateQR() {
+      $.ajax({
+        type: 'GET',
+        url: '/admin/qrcode/generate',
+        data: {
+          packages: ""
+        },
+        success: function (result) {
+          //- console.log(result,"result");
+          $.fancybox.open(`
+              <img src="${result.data}" width="300" height="300">
+              <br/>
+              <button type='button' onclick='printImg("${result.data}")'>Print</button>
+
+          `);
+
+        }
+      })
+    }
+    function printImg(url){
+      var win = window.open('');
+      win.document.write('<img src="' + url + '" onload="window.print();window.close()" width="500" height="500"/>');
+      win.focus();
+    }
+    function redirectToEditleed (lead_id) {
+      window.location.href = `/admin/lead/edit/${lead_id}`;
+    }
+    function redirectToEditleed2 (lead_id) {
+      window.location.href = `/admin/lead/add/followup/${lead_id}`;
+    }

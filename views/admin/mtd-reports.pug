@@ -1,0 +1,843 @@
+extends layout-admin
+
+block content
+  #cover-spin
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        div(style="padding:5px 20px 0px 20px;")
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.fw-bold View MTD Reports
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              .lead-flex-container
+                div.form-group
+                  a#MTDReporttoExcel.btn.btn-white.btn-border.btn-round.mr-2(href='javascript:void(0)',style="height: 45px;margin-top: 0px;") Export to Excel
+                  a#clear_filter.btn.btn-white.btn-border.btn-round.mr-2(href='javascript:void(0)',style="height: 45px;margin-top: 0px;") Clear Filter
+      .page-inner
+        .row
+          .col-md-12
+            .card.card-with-nav
+              //- pre= h.dump(tblHeaders)
+              //- pre= h.dump(listOfSchools)
+              //- pre= h.dump(reportsData)
+              .card-body
+                .row
+                  .col-md-3
+                    .form-group
+                      label(for='country',style="margin-bottom:0px;") Country
+                      select#country(name='country[]' multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
+                        each country in countries
+                          option(value=country._id) #{country.country_name}
+                  .col-md-3
+                    .form-group
+                      label(for='zone',style="margin-bottom:0px;") Zone
+                      select#zone(name='zone[]' multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
+                        each zone in zones
+                          option(value=zone._id) #{zone.name}
+                  .col-md-3
+                    .form-group
+                      label(for='center',style="margin-bottom:0px;") Center
+                      select#center(name='center[]' multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
+                        each center in centers
+                          option(value=center._id) #{center.school_display_name}
+                  .col-md-3
+                    .form-group
+                      label(for='type' style="width: 100%;margin-bottom:0px;") Date Range
+                      input#date.form-control(type='text' name="date_range" value="" readonly style="height:40px !important")
+                      a#clr_date_range(href="javascript:void(0)" style="margin-top: 3px;float: right;text-decoration: none;z-index:9999")
+                        i.fa.fa-times(style="position: absolute;right: 35px;top: 42px;z-index: 99999;")
+                  //-.col-md-3
+                    .form-group.text-center
+                      button.btn.btn-primary#show_filter(type="button" style='margin-top:20px;margin-left:-40px;')
+                        i.fa.fa-filter
+                        |  Additional Filter
+                      button.btn.btn-primary#clear_filter(type="button" style='margin-top:20px;margin-left: 20px;')
+                        //- i.fa.fa-times
+                        | &nbsp;Clear Filter
+                //- ========================================================================
+                .row.filter(style="left: 15px;padding-left:10px;")
+                  .col-md-4
+                    .form-group
+                      label(for='center',style="margin-bottom:0px;") Center
+                      select#center(name='center[]' multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
+                        each center in centers
+                          option(value=center._id) #{center.school_display_name}
+                  .col-md-4
+                    .form-group
+                      label(for='type' style="width: 100%;margin-bottom:0px;") Date Range
+                      input#date.form-control(type='text' name="date_range" value="" readonly style="height:40px !important")
+                      a#clr_date_range(href="javascript:void(0)" style="margin-top: 3px;float: right;text-decoration: none;z-index:9999")
+                        i.fa.fa-times(style="position: absolute;right: 35px;top: 42px;z-index: 99999;")
+                hr
+                .table-responsive
+                  .col-sm-12
+                    table#mtd_reports.display.table.table-striped.table-hover.dataTable.mtd-rep(style='width:100%')
+                      thead
+                        if tblHeaders.length
+                          tr
+                            th.col-4(rowspan='2') Date
+                            each zone in tblHeaders
+                              th(colspan=`${zone.schools.length}` style="border-bottom: 1px solid #cbc9c9 !important;") #{zone.zone_name}
+                          tr
+                            each zoneCenter in tblHeaders
+                              each center in zoneCenter.schools
+                                th #{center.school_display_name}
+                            th Total
+                      tbody
+                      tfoot
+                        tr
+                          th
+                          th
+                          each school in listOfSchools
+                            th
+                .row
+
+  block script
+    script(type='text/javascript' src='https://cdn.jsdelivr.net/momentjs/latest/moment.min.js')
+    script(type='text/javascript' src='https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js')
+    script(type='text/javascript' src='https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js')
+    link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css")
+    script(src='https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js')
+
+  script.
+    var table;
+    $('.filter').css('display', 'none');
+    var countries = !{JSON.stringify(countries)};
+    var zones = !{JSON.stringify(zones)};
+    var centers = !{JSON.stringify(centers)};
+    //- console.log(countries);
+    //- console.log(zones);
+    //- console.log(centers);
+
+    $(document).ready(function () {
+      var total_records = 0;
+      table = $('#mtd_reports').DataTable({
+        ordering: false,
+        searching: false,
+        //- paging: false,
+        bProcessing: true,
+        bServerSide: true,
+        pagination: true,
+        autoWidth: false,
+        pageLength: 100,
+        sAjaxSource: "/admin/reports/datatable/mtd",
+        columnDefs: [
+          { "width": "20%", "targets": 0 }
+        ],
+        drawCallback: function (settings, start, end, max, total, pre) {
+          total_records = this.fnSettings().fnRecordsTotal();
+          // Output the data for the visible rows to the browser's console
+          //- console.log( api.rows( {page:'current'} ).data() );
+          //- console.log(table.page.info().page + 1);
+        },
+        fnServerParams: function (data, osettings) {
+          //- console.log(data);
+          data.push({
+            "name": "country",
+            "value": $('#country').val()
+          });
+          data.push({
+            "name": "zone",
+            "value": $('#zone').val()
+          });
+          data.push({
+            "name": "center",
+            "value": $('#center').val()
+          });
+          data.push({
+            "name": "dates",
+            "value": $('input[name="date_range"]').val()
+          });
+        },
+        footerCallback: function (tfoot, data, start, end, display) {
+          //- console.log('hihihi');
+          //- console.log(data);
+          var api = this.api();
+
+          // Iterate over each column
+          api.columns().every(function (index) {
+            var columnData = this.data();
+            var sum = 0;
+
+            if (index !== 0) { // Exclude the first column from sum calculation
+              sum = columnData.reduce(function (a, b) {
+                // Parsing the data as numbers before summing
+                return parseFloat(a) + parseFloat(b);
+              }, 0);
+            }
+
+            // Display "Total" in the footer of the first column
+            if (index === 0) {
+              $(this.footer()).html("Total");
+            } else {
+              // Update the footer cell with the sum for other columns
+              $(this.footer()).html(sum);
+            }
+          });
+        }
+      });
+      dom: 'Bfrtip',
+      $(document).on('click','#show_filter', function () {
+        $('.filter').slideToggle()
+      })
+
+      $("#MTDReporttoExcel").on("click", function() {
+        $('#cover-spin').show(0);
+        if(total_records > 0) {
+          //- table.button('.buttons-excel').trigger();
+          var stardate = "";
+          var enddate = "";
+          if($("#date").val() != ""){
+            stardate = ($("#date").val().split("-"))[0];
+            enddate = ($("#date").val().split("-"))[1];
+          }
+          var center = $("#center").val();
+          var country = $("#country").val();
+          var zone = $("#zone").val();
+          //- window.open("/admin/reports/export?search_key="+search_key+"&stardate="+stardate+"&enddate="+enddate+"&stage="+stage);
+          let exportApi = `/admin/reports/mtd/export?stardate=${stardate}&enddate=${enddate}&country=${country ? JSON.stringify(country) : ""}&zone=${zone ? JSON.stringify(zone) : ""}&center=${center ? JSON.stringify(center) : ""}`;
+          //- return;
+          //- console.log(exportApi);
+          $('#cover-spin').hide(0);
+          window.open(exportApi);
+          return false;
+        } else {
+          $('#cover-spin').hide(0);
+          sall("No data found!", 2500);
+          return;
+        }
+      });
+
+      $('#clear_filter').click(function() {
+        window.location.reload();
+        return;
+      })
+
+      $("#country").selectpicker({
+        noneSelectedText : 'All'
+      });
+      $("#zone").selectpicker({
+        noneSelectedText : 'All'
+      });
+      $("#status").selectpicker({
+        noneSelectedText : 'All'
+      });
+      $("#role").selectpicker({
+        noneSelectedText : 'All'
+      });
+      $("#center").selectpicker({
+        noneSelectedText : 'All'
+      });
+
+      $("#clr_date_range").css('visibility', 'hidden');
+      $('input[name="date_range"]').daterangepicker({
+        autoUpdateInput: false,
+        startDate: moment().startOf('isoWeek'),
+        endDate: moment().endOf('isoWeek'),
+        locale: {
+          cancelLabel: 'Clear'
+        }
+      });
+
+      $('input[name="date_range"]').on('apply.daterangepicker', function(ev, picker) {
+        $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+        table
+          .columns(3) // for start date
+          .search(picker.startDate.format('MM/DD/YYYY')) // for start date
+          .columns(4) // for end date
+          .search(picker.endDate.format('MM/DD/YYYY')) // for end date
+          .draw();
+        $("#clr_date_range").css('visibility', 'visible');
+      });
+
+      $('input[name="date_range"]').on('cancel.daterangepicker', function(ev, picker) {
+        $(this).val('');
+        table
+          .columns(3) // for start date
+          .search("") // for start date
+          .columns(4) // for end date
+          .search("") // for end date
+          .draw();
+        $("#clr_date_range").css('visibility', 'hidden');
+      });
+
+      $(document).on("click", "#clr_date_range", function () {
+        $('input[name="date_range"]').val('');
+        table
+          .columns(3) // for start date
+          .search("") // for start date
+          .columns(4) // for end date
+          .search("") // for end date
+          .draw();
+        $("#clr_date_range").css('visibility', 'hidden');
+      });
+
+      $(document).on('change', '#country', function () {
+        $('#cover-spin').show(0);
+        var id = $(this).val();
+        table.destroy();
+        if (id) {
+          $("#zone").val("");
+          $("#center").val("");
+          $.ajax({
+            method: 'POST',
+            url: `/admin/lead/zonefilter`,
+            data: {
+              type: id
+            },
+            dataType: 'json',
+            success: function (response) {
+              //- console.log(response,"response")
+
+              $("#zone").val("");
+              $("#zone option").remove();
+              $("#center").val("");
+              $("#center option").remove();
+              $("#center").selectpicker("refresh");
+              //- $("#program").append(`<option value=''>Select Program</option>`);
+
+              var len = response.data.length;
+              for (var i = 0; i < len; i++) {
+                //- console.log(i);
+                var id = response.data[i]['_id'];
+                var zone_name = response.data[i]['name'];
+                $("#zone").append(`<option value='${id}'>${zone_name}</option>`);
+                $("#zone").selectpicker("refresh");
+              }
+              if (response.centers && response.centers.length > 0) {
+                for (var i = 0; i < response.centers.length; i++) {
+                  //- console.log(i, "--centers");
+                  var id = response.centers[i]['_id'];
+                  var school_name = response.centers[i]['school_display_name'];
+                  $("#center").append(`<option value='${id}'>${school_name}</option>`);
+
+                }
+              }
+              $("#center").selectpicker("refresh");
+              // $(".testi_class").select2("refresh");
+            }
+          });
+
+          // ajax call for header
+          $.ajax({
+            method: 'POST',
+            url: `/admin/reports/get/header/dyamically`,
+            data: {
+              country_id: id,
+              zone_id: $("#zone").val() || [],
+              center_id: $("#center").val() || []
+            },
+            dataType: 'json',
+            success: function (response) {
+              if (response && response.data && response.data.length == 0) {
+                sall('No center assigned for this country.', 2000);
+              }
+              var thead = $("thead");
+              var tfoot = $("tfoot");
+              $("tbody").empty();
+              // Empty the thead element
+              thead.empty();
+              tfoot.empty();
+
+              //- $("#mtd_reports").empty();
+              if (response && response.data && response.data.length) {
+                thead.append(`
+                  <tr>
+                    <th class="col-4" rowspan="2">Date</th>
+                    ${response.data.map(zone => `
+                      <th colspan=${zone.schools.length} style="border-bottom: 1px solid #cbc9c9 !important;">${zone.zone_name}</th>
+                    `).join("")}
+                  </tr>
+                  <tr>
+                    ${response.data.map(zoneCenter => `
+                      ${zoneCenter.schools.map(center => `
+                        <th>${center.school_display_name}</th>
+                      `).join("")}
+                    `).join("")}
+                    <th>Total</th>
+                  </tr>
+                `);
+
+                var listOfSchools = _.flatMap(response.data, 'schools').map(school => school.school_display_name);
+
+                tfoot.append(`
+                  <tr>
+                    <th></th>
+                    <th></th>
+                    ${listOfSchools.map(school => `
+                      <th></th>
+                    `)}
+                  </tr>
+                `);
+              }
+
+              // Regenerate DataTable
+              regenerateTable();
+            }
+          });
+        } else {
+          $("#zone").val("");
+          $("#zone option").remove();
+          $("#zone").selectpicker("refresh");
+          $("#center").val("");
+          $("#center option").remove();
+          $("#center").selectpicker("refresh");
+          $("#clr_zone").css('visibility', 'hidden');
+          $("#clr_center").css('visibility', 'hidden');
+          $("#clr_country").css('visibility', 'hidden');
+          for (var i = 0; i < zones.length; i++) {
+            //- console.log(data.zones[i])
+            var id = zones[i]['_id'];
+            var zone_name = zones[i]['name'];
+            //- console.log(id,"id")
+            //- console.log(zone_name,"zone_name")
+            $("#zone").append(`<option value='${id}'>${zone_name}</option>`);
+            $("#zone").selectpicker("refresh");
+          }
+          for (var i = 0; i < centers.length; i++) {
+            //- console.log(data.centers[i])
+            var id = centers[i]['_id'];
+            var center_name = centers[i]['school_display_name'];
+            //- console.log(id,"id")
+            //- console.log(zone_name,"zone_name")
+            $("#center").append(`<option value='${id}'>${center_name}</option>`);
+            $("#center").selectpicker("refresh");
+          }
+
+          // ajax call for header
+          $.ajax({
+            method: 'POST',
+            url: `/admin/reports/get/header/dyamically`,
+            data: {
+              country_id: $("#zone").val() || [],
+              zone_id: $("#zone").val() || [],
+              center_id: $("#center").val() || []
+            },
+            dataType: 'json',
+            success: function (response) {
+              //- console.log(response,"-----header response");
+              if (response && response.data && response.data.length == 0) {
+                sall('No center assigned for this country.', 2000);
+              }
+              var thead = $("thead");
+              var tfoot = $("tfoot");
+              $("tbody").empty();
+              // Empty the thead element
+              thead.empty();
+              tfoot.empty();
+
+              //- $("#mtd_reports").empty();
+              thead.append(`
+                <tr>
+                  <th class="col-4" rowspan="2">Date</th>
+                  ${response.data.map(zone => `
+                    <th colspan=${zone.schools.length} style="border-bottom: 1px solid #cbc9c9 !important;">${zone.zone_name}</th>
+                  `).join("")}
+                </tr>
+                <tr>
+                  ${response.data.map(zoneCenter => `
+                    ${zoneCenter.schools.map(center => `
+                      <th>${center.school_display_name}</th>
+                    `).join("")}
+                  `).join("")}
+                  <th>Total</th>
+                </tr>
+              `);
+
+              var listOfSchools = _.flatMap(response.data, 'schools').map(school => school.school_display_name);
+
+              tfoot.append(`
+                <tr>
+                  <th></th>
+                  <th></th>
+                  ${listOfSchools.map(school => `
+                    <th></th>
+                  `)}
+                </tr>
+              `);
+
+              // Regenerate DataTable
+              regenerateTable();
+            }
+          });
+        }
+        table
+          .columns(0)
+          .search(this.value)
+          .draw();
+      });
+
+      $(document).on('change', '#zone', function () {
+        $('#cover-spin').show(0);
+        var id = $(this).val();
+        table.destroy();
+        $("#center").val("");
+
+        $("#clr_center").css('visibility', 'hidden');
+        if(id){
+          $.ajax({
+            method: 'POST',
+            url: `/admin/lead/centerfilter`,
+            data: {
+              type: id
+            },
+            dataType: 'json',
+            success: function (response) {
+              $("#center").html("");
+              var len = response.data.length;
+              for (var i = 0; i < len; i++) {
+                var id = response.data[i]['_id'];
+                var school_name = response.data[i]['school_display_name'];
+                $("#center").append(`<option value='${id}'>${school_name}</option>`);
+              }
+              $("#center").selectpicker("refresh");
+            }
+          });
+
+          // ajax call for header
+          $.ajax({
+            method: 'POST',
+            url: `/admin/reports/get/header/dyamically`,
+            data: {
+              country_id: $("#country").val() || [],
+              zone_id: id,
+              center_id: $("#center").val() || []
+            },
+            dataType: 'json',
+            success: function (response) {
+              //- console.log(response,"-----header response");
+              if (response && response.data && response.data.length == 0) {
+                sall('No center assigned for this zone.', 2000);
+              }
+              var thead = $("thead");
+              var tfoot = $("tfoot");
+              $("tbody").empty();
+              // Empty the thead element
+              thead.empty();
+              tfoot.empty();
+
+              //- $("#mtd_reports").empty();
+              if (response && response.data && response.data.length) {
+                thead.append(`
+                  <tr>
+                    <th class="col-4" rowspan="2">Date</th>
+                    ${response.data.map(zone => `
+                      <th colspan=${zone.schools.length} style="border-bottom: 1px solid #cbc9c9 !important;">${zone.zone_name}</th>
+                    `).join("")}
+                  </tr>
+                  <tr>
+                    ${response.data.map(zoneCenter => `
+                      ${zoneCenter.schools.map(center => `
+                        <th>${center.school_display_name}</th>
+                      `).join("")}
+                    `).join("")}
+                    <th>Total</th>
+                  </tr>
+                `);
+
+                var listOfSchools = _.flatMap(response.data, 'schools').map(school => school.school_display_name);
+
+                tfoot.append(`
+                  <tr>
+                    <th></th>
+                    <th></th>
+                    ${listOfSchools.map(school => `
+                      <th></th>
+                    `)}
+                  </tr>
+                `);
+              }
+              // Regenerate DataTable
+              regenerateTable();
+            }
+          });
+        } else {
+          $("#center").val("");
+          $("#center option").remove();
+          $("#center").selectpicker("refresh");
+          for (var i = 0; i < centers.length; i++) {
+            //- console.log(data.centers[i])
+            var id = centers[i]['_id'];
+            var center_name = centers[i]['school_display_name'];
+            $("#center").append(`<option value='${id}'>${center_name}</option>`);
+            $("#center").selectpicker("refresh");
+          }
+          // ajax call for header
+          $.ajax({
+            method: 'POST',
+            url: `/admin/reports/get/header/dyamically`,
+            data: {
+              country_id: $("#country").val() || [],
+              zone_id: $("#zone").val() || [],
+              center_id: $("#center").val() || []
+            },
+            dataType: 'json',
+            success: function (response) {
+              //- console.log(response,"-----header response");
+              if (response && response.data && response.data.length) {
+                sall('No center assigned for this zone.', 2000);
+              }
+              var thead = $("thead");
+              var tfoot = $("tfoot");
+              $("tbody").empty();
+              // Empty the thead element
+              thead.empty();
+              tfoot.empty();
+
+              //- $("#mtd_reports").empty();
+              thead.append(`
+                <tr>
+                  <th class="col-4" rowspan="2">Date</th>
+                  ${response.data.map(zone => `
+                    <th colspan=${zone.schools.length} style="border-bottom: 1px solid #cbc9c9 !important;">${zone.zone_name}</th>
+                  `).join("")}
+                </tr>
+                <tr>
+                  ${response.data.map(zoneCenter => `
+                    ${zoneCenter.schools.map(center => `
+                      <th>${center.school_display_name}</th>
+                    `).join("")}
+                  `).join("")}
+                  <th>Total</th>
+                </tr>
+              `);
+
+              var listOfSchools = _.flatMap(response.data, 'schools').map(school => school.school_display_name);
+
+              tfoot.append(`
+                <tr>
+                  <th></th>
+                  <th></th>
+                  ${listOfSchools.map(school => `
+                    <th></th>
+                  `)}
+                </tr>
+              `);
+              // Regenerate DataTable
+              regenerateTable();
+            }
+          });
+        }
+        //- table
+        //-   .columns(1)
+        //-   .search(this.value)
+        //-   .draw();
+      });
+
+      $(document).on('change', '#center', function () {
+        $('#cover-spin').show(0);
+        var id = $(this).val();
+        table.destroy();
+
+        if (id) {
+          // ajax call for header
+          $.ajax({
+            method: 'POST',
+            url: `/admin/reports/get/header/dyamically`,
+            data: {
+              country_id: $("#country").val() || [],
+              zone_id: $("#zone").val() || [],
+              center_id: id
+            },
+            dataType: 'json',
+            success: function (response) {
+              //- console.log(response,"-----header response");
+              if (response && response.data && response.data.length) {
+                var thead = $("thead");
+                var tfoot = $("tfoot");
+                $("tbody").empty();
+                // Empty the thead element
+                thead.empty();
+                tfoot.empty();
+
+                //- $("#mtd_reports").empty();
+                thead.append(`
+                  <tr>
+                    <th class="col-4" rowspan="2">Date</th>
+                    ${response.data.map(zone => `
+                      <th colspan=${zone.schools.length} style="border-bottom: 1px solid #cbc9c9 !important;">${zone.zone_name}</th>
+                    `).join("")}
+                  </tr>
+                  <tr>
+                    ${response.data.map(zoneCenter => `
+                      ${zoneCenter.schools.map(center => `
+                        <th>${center.school_display_name}</th>
+                      `).join("")}
+                    `).join("")}
+                    <th>Total</th>
+                  </tr>
+                `);
+
+                var listOfSchools = _.flatMap(response.data, 'schools').map(school => school.school_display_name);
+
+                tfoot.append(`
+                  <tr>
+                    <th></th>
+                    <th></th>
+                    ${listOfSchools.map(school => `
+                      <th></th>
+                    `)}
+                  </tr>
+                `);
+                // Regenerate DataTable
+                regenerateTable();
+              }
+            }
+          });
+        } else {
+          // ajax call for header
+          $.ajax({
+            method: 'POST',
+            url: `/admin/reports/get/header/dyamically`,
+            data: {
+              country_id: $("#country").val() || [],
+              zone_id: $("#zone").val() || [],
+              center_id: $("#center").val() || []
+            },
+            dataType: 'json',
+            success: function (response) {
+              //- console.log(response,"-----header response");
+              if (response && response.data && response.data.length) {
+                var thead = $("thead");
+                var tfoot = $("tfoot");
+                $("tbody").empty();
+                // Empty the thead element
+                thead.empty();
+                tfoot.empty();
+
+                //- $("#mtd_reports").empty();
+                thead.append(`
+                  <tr>
+                    <th class="col-4" rowspan="2">Date</th>
+                    ${response.data.map(zone => `
+                      <th colspan=${zone.schools.length} style="border-bottom: 1px solid #cbc9c9 !important;">${zone.zone_name}</th>
+                    `).join("")}
+                  </tr>
+                  <tr>
+                    ${response.data.map(zoneCenter => `
+                      ${zoneCenter.schools.map(center => `
+                        <th>${center.school_display_name}</th>
+                      `).join("")}
+                    `).join("")}
+                    <th>Total</th>
+                  </tr>
+                `);
+
+                var listOfSchools = _.flatMap(response.data, 'schools').map(school => school.school_display_name);
+
+                tfoot.append(`
+                  <tr>
+                    <th></th>
+                    <th></th>
+                    ${listOfSchools.map(school => `
+                      <th></th>
+                    `)}
+                  </tr>
+                `);
+                // Regenerate DataTable
+                regenerateTable();
+              }
+            }
+          });
+        }
+        table
+          .columns(2)
+          .search(this.value)
+          .draw();
+      });
+    })
+
+    function regenerateTable() {
+      $('#cover-spin').hide(0);
+      table = $('#mtd_reports').DataTable({
+        ordering: false,
+        searching: false,
+        //- paging: false,
+        bProcessing: true,
+        bServerSide: true,
+        pagination: true,
+        autoWidth: false,
+        pageLength: 100,
+        sAjaxSource: "/admin/reports/datatable/mtd",
+        columnDefs: [
+          { "width": "20%", "targets": 0 }
+        ],
+        drawCallback: function (settings) {
+          var api = this.api();
+          // Output the data for the visible rows to the browser's console
+          //- console.log( api.rows( {page:'current'} ).data() );
+          //- console.log(table.page.info().page + 1);
+        },
+        fnServerParams: function (data, osettings) {
+          //- console.log(data);
+          data.push({
+            "name": "country",
+            "value": $('#country').val()
+          });
+          data.push({
+            "name": "zone",
+            "value": $('#zone').val()
+          });
+          data.push({
+            "name": "center",
+            "value": $('#center').val()
+          });
+          data.push({
+            "name": "dates",
+            "value": $('input[name="date_range"]').val()
+          });
+        },
+        footerCallback: function (tfoot, data, start, end, display) {
+          //- console.log('hihihi');
+          //- console.log(data);
+          var api = this.api();
+
+          // Iterate over each column
+          api.columns().every(function (index) {
+            var columnData = this.data();
+            var sum = 0;
+
+            if (index !== 0) { // Exclude the first column from sum calculation
+              sum = columnData.reduce(function (a, b) {
+                // Parsing the data as numbers before summing
+                return parseFloat(a) + parseFloat(b);
+              }, 0);
+            }
+
+            // Display "Total" in the footer of the first column
+            if (index === 0) {
+              $(this.footer()).html("Total");
+            } else {
+              // Update the footer cell with the sum for other columns
+              $(this.footer()).html(sum);
+            }
+          });
+        }
+      });
+    }
+    function sall (msg, time) {
+      var SweetAlert2Demo = function () {
+        //== Demos
+        var initDemos = function () {
+          swal(msg, {
+            buttons: false,
+            timer: time,
+            backdrop:true,
+            closeOnClickOutside: false,
+            closeOnEsc: false
+          })
+        };
+
+        return {
+            //== Init
+            init: function () {
+              initDemos();
+            },
+          };
+        }();
+      jQuery(document).ready(function () {
+        SweetAlert2Demo.init();
+      });
+    };

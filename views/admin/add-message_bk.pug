@@ -1,0 +1,149 @@
+extends layout-admin
+
+block content
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        div(style="padding:5px 20px 0px 20px;")
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold Add Message
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/message/all') All Message
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+      .page-inner
+        .row
+          .col-md-12
+            .card
+              form(action="/admin/message/add", method="POST")
+                .card-body
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='name')
+                      | Title
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#msg_title.form-control(type='text', name='msg_title', placeholder='Enter Message Title', required='')
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='name')
+                      | Message
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      textarea.form-control(rows='5', cols='5', id="msg_desc", name="msg_desc") Hi @client_name,
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='name')
+                      | Upload file
+                      //- span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#pdf_file.form-control(type='text' disabled)
+                      input#pdf_filee.form-control(type='hidden' name='pdf_file' placeholder='PDF link')
+                      button.btn.btn-color.btn-xs(type="button" onclick="uploadImages()") Upload File
+
+                  .form-group.form-show-validation.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='country_id')
+                      | Status
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      .selectgroup.w-100
+                        label.selectgroup-item
+                          input.selectgroup-input(type='radio' name='status' value='active' checked='' required)
+                          span.selectgroup-button Active
+                        label.selectgroup-item
+                          input.selectgroup-input(type='radio' name='status' value='inactive')
+                          span.selectgroup-button Inactive
+                .card-action
+                  .row
+                    .col-md-12
+                      button.btn.btn-color(type="submit") Add Message
+
+  #cdn-browser-modal.modal.fade(style='z-index: 9999;')
+    .modal-dialog.modal-xl(style="max-width: 80%;")
+      .modal-content
+        #cdn-browser.cdn-browser.d-flex.flex-column(v-cloak='')
+          .files-nav.flex-shrink-0
+            .d-flex.justify-content-between
+              .col-left.d-flex.align-items-center
+                .filter-item
+                  input.form-control(type='text' placeholder='Search file name....' v-model='filter.s' @keyup.enter='filter.page = 1;reloadLists()')
+                .filter-item
+                  button.btn.btn-color.btm-block(style="background-color: rgb(0 53 107);color: #fff;" @click='filter.page = 1;reloadLists()')
+                    i.fa.fa-search
+                    |  Search
+                .filter-item
+                  small
+                    i(style="color: #000000;") Total: {{total}} files
+              .col-right
+                i.fa-spin.fa.fa-spinner.icon-loading
+                button.btn.btn-pick-files(style="background-color: rgb(0 53 107); color: rgb(255 255 255);")
+                  span
+                    i.fa.fa-upload
+                    |  Upload
+                  input(multiple='' type='file' name='files[]' ref='files')
+          .upload-new(v-show='showUploader' display='none')
+            input.my-pond(type='file' name='filepond[]')
+          .files-list(style="background-color: #00356b;")
+            .files-wraps(:class="'view-'+viewType")
+              file-item(v-for='(file,index) in files' :key='index' :view-type='viewType' :selected='selected' :file='file' v-on:select-file='selectFile')
+            p.no-files-text.text-center(v-show='!total && apiFinished' style='display: none')
+              | No file
+              | found
+            .text-center(v-if='totalPage > 1')
+              nav(aria-label='Page navigation example')
+                ul.pagination
+                  li.page-item(:class='{disabled:filter.page <= 1}')
+                    a.page-link(v-if='filter.page <=1') Previous
+                    a.page-link(href='#' v-if='filter.page > 1' v-on:click='changePage(filter.page-1,$event)') Previous
+                  li.page-item(v-if='p >= (filter.page-3) && p <= (filter.page+3)' :class='{active: p == filter.page}' v-for='p in totalPage' @click='changePage(p,$event)')
+                    a.page-link(href='#') {{p}}
+                  li.page-item(:class='{disabled:filter.page >= totalPage}')
+                    a.page-link(v-if='filter.page >= totalPage') Next
+                    a.page-link(href='#' v-if='filter.page < totalPage' v-on:click='changePage(filter.page+1,$event)') Next
+          .browser-actions.d-flex.justify-content-between.flex-shrink-0(v-if='selected.length')
+            .col-left(v-show='selected.length')
+              div(v-if='selected && selected.length')
+                .count-selected {{selected.length}} file selected
+                .clear-selected(@click='selected=[]')
+                  i unselect
+            .col-right(v-show='selected.length')
+              button.btn.btn-success(:class='{disabled:!selected.length}' @click='sendFiles')
+                | Use
+                | file
+  script#file-item-template(type='text/x-template').
+    <div class="file-item" :class="fileClass(file)">
+      <div class="inner" :class="{active:selected.indexOf(file._id) !== -1 }" @click="selectFile(file)" :title="file.file_name">
+        <div class="file-thumb" v-if="viewType=='grid'" v-html="getFileThumb(file)">
+        </div>
+        <div class="file-name">{{file.file_name.split('/').pop()}}</div>
+        <span class="file-checked-status" v-show="selected.indexOf(file._id) !== -1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M186.301 339.893L96 249.461l-32 30.507L186.301 402 448 140.506 416 110z"/></svg>
+        </span>
+      </div>
+    </div>
+
+  block script
+    script(src="/admin/assets/js/core/bootstrap.min.js")
+    script(src="/admin/assets/js/vue.min.js")
+    script(src="/admin/assets/js/upload.js")
+
+  script.
+    function uploadImages() {
+        uploaderModal.show({
+            multiple: true,
+            file_type: 'image',
+            onSelect: function onSelect(files) {
+              console.log(files);
+                if (files.length) {
+                    document.querySelector('#pdf_file').setAttribute('value', files[0].file_name);
+                    document.querySelector('#pdf_filee').setAttribute('value', files[0].file_name);
+                };
+            }
+        });
+    };
+
+    $(document).ready(function() {
+      $('#msg_desc').on('keydown', function() {
+        window.onbeforeunload = function() {
+          return '';
+        }
+      });
+    })

@@ -1,0 +1,25 @@
+extends email-layout
+
+block content
+  p Dear #{msg.lead_name},
+  p My name is #{msg.sal} #{msg.spoc}, and I am the #{msg.designation} at Kido #{msg.center_name}. I am pleased to confirm your school tour on&nbsp;
+    span.title-email-bold #{msg.date}
+    | &nbsp;at&nbsp;
+    span.title-email-bold #{msg.time}.
+  p As a part of our school tour, we spend time with parents trying to understand their preschool requirements for their children. A brief tour of the premises will include visiting the classrooms, where you can see and understand our learning aids and teaching methodologies.
+  p Our tours are detailed to suit the needs of parents, which could vary from our award-winning curriculum, safety, and hygiene policies, or the qualification and training of our teachers- or something as simple as socialization or settling your child into the preschool environment.
+  p
+    | If you cannot make it for the tour, please keep us informed or&nbsp;
+    strong reschedule
+    |  it for another day and time convenient to you by emailing at&nbsp;
+    a(href=`mailto:${msg.email}`) #{msg.email}
+    |  or by calling at #{msg.contact} or by messaging at #{msg.whatsapp}.
+
+  p I will be available Monday to Friday, #{msg.mon_fir_start} to #{msg.mon_fir_end} ( Saturdays by appointment), to help with any queries you may have.
+  p Thank you, and I look forward to seeing you at Kido soon!
+  p
+    | Best Regards,
+    br
+    | #{msg.sal} #{msg.spoc} - #{msg.designation}.
+    br
+    | #{msg.center_main_name}.

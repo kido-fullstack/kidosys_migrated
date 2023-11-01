@@ -1,0 +1,47 @@
+extends email-layout
+
+block content
+  p Dear #{msg.lead_name},
+  p Thank you for contacting the Kido International Preschool & Daycare team at #{msg.center_name}.
+  p Across the world and in #{msg.center_name}, we create magical learning spaces where children flourish and thrive.
+  //- p.title-email What we offer
+  ul
+    li International preschool and daycare for eight months to 6 years.
+    li Learning spaces infused with cutting edgy pedagogy.
+    li Customised education for each child.
+    li Half-day and full-day childcare services.
+    li STEM-based learning.
+    li Explorer and Skill days.
+    li Afterschool programs.
+    li
+      | Free access to
+      a(href="https://share.hsforms.com/1mE9eZR3XS4q2cp-q-t9BRA5lexp" target="_blank")  Kido Club
+      |  - An exclusive portal for Kido parents for Events, activities, courses, and more.
+  //- p.title-email Kido Club
+  br
+  //- h3 BOOK A SCHOOL TOUR
+  p My name is #{msg.sal} #{msg.spoc}, and I am the #{msg.designation} at Kido #{msg.center_name}. I invite you to visit the center to see our fantastic settings, meet our teachers and learn all about us!
+
+  p You can reach out to me by emailing at #{msg.email} or by calling at #{msg.contact} or by messaging at #{msg.whatsapp}.
+
+  p Watch the video to know more about us -&nbsp;
+    //- a(href=`${msg.video}` target="_blank") Click here.
+    a(href=`https://www.youtube.com/watch?v=NgoodAfg0Sg` target="_blank") Click here.
+  p.title-email There's a lot more
+  p
+    | You can visit our
+    a(href=msg.website target="_blank")  Website
+    |  to learn more about
+    a(href="https://www.kidoschools.com/in/in-curriculum/" target="_blank")  our curriculum
+    |  and our
+    a(href="https://www.kidoschools.com/in/in-events/" target="_blank")  latest events.
+
+  p We look forward to seeing you at Kido.
+  p.title-email There's a lot more
+  p
+    | Best Regards,
+    br
+    | #{msg.sal} #{msg.spoc} - #{msg.designation}.
+    br
+    | #{msg.center_main_name}.
+  //- p.grey-mark This mail is auto-generated mail. Please do not reply to this mail.

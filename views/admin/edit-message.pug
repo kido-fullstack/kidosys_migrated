@@ -1,0 +1,225 @@
+extends layout-admin
+
+block content
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        .page-inner.py-5
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold Edit Message
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/message/all') All Message
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+      .page-inner
+        .row
+          .col-md-12
+            .card
+              form#form-submit(action=`/admin/message/edit/${message._id}`, method="POST")
+                .card-body
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='name')
+                      | Title
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#msg_title.form-control(type='text', name='msg_title', placeholder='Enter Message Title', value=message.title required='')
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='name')
+                      | Message
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      textarea.form-control(rows='15', cols='5', id="msg_desc", name="msg_desc") #{message.msg}
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='name')
+                      | Upload file
+                      //- span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      .form-group
+                        //- label(for='Multi Image')
+                        .input-file.input-file-image
+                          .form-group
+                            .row.custom_li
+                          //- img.img-upload-preview.img-circle(width='200' height='200' src='/admin/assets/img/upload.png' alt='preview' id="imgBox")
+                          button.btn.btn-color(type="button" onclick="uploadMultiImages()") Upload File(s)
+                  .form-group.form-show-validation.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='country_id')
+                      | Status
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      .selectgroup.w-100
+                        label.selectgroup-item
+                          input.selectgroup-input(type='radio' name='status' value='active' checked=message.status=="active" required)
+                          span.selectgroup-button Active
+                        label.selectgroup-item
+                          input.selectgroup-input(type='radio' name='status' checked=message.status=="inactive" value='inactive')
+                          span.selectgroup-button Inactive
+                .card-action
+                  .row
+                    .col-md-12
+                      button.btn.btn-color.sub_form(type="submit") Save Changes
+
+  #cdn-browser-modal.modal.fade(style='z-index: 9999;')
+    .modal-dialog.modal-xl(style="max-width: 80%;")
+      .modal-content
+        #cdn-browser.cdn-browser.d-flex.flex-column(v-cloak='')
+          .files-nav.flex-shrink-0
+            .d-flex.justify-content-between
+              .col-left.d-flex.align-items-center
+                .filter-item
+                  input.form-control(type='text' placeholder='Search file name....' v-model='filter.s' @keyup.enter='filter.page = 1;reloadLists()')
+                .filter-item
+                  button.btn.btn-color.btm-block(style="background-color: rgb(0 53 107);color: #fff;" @click='filter.page = 1;reloadLists()')
+                    i.fa.fa-search
+                    |  Search
+                .filter-item
+                  small
+                    i(style="color: #000000;") Total: {{total}} files
+              .col-right
+                i.fa-spin.fa.fa-spinner.icon-loading
+                button.btn.btn-pick-files(style="background-color: rgb(0 53 107); color: rgb(255 255 255);")
+                  span
+                    i.fa.fa-upload
+                    |  Upload
+                  input(multiple='' type='file' name='files[]' ref='files')
+          .upload-new(v-show='showUploader' display='none')
+            input.my-pond(type='file' name='filepond[]')
+          .files-list(style="background-color: #00356b;")
+            .files-wraps(:class="'view-'+viewType")
+              file-item(v-for='(file,index) in files' :key='index' :view-type='viewType' :selected='selected' :file='file' v-on:select-file='selectFile')
+            p.no-files-text.text-center(v-show='!total && apiFinished' style='display: none')
+              | No file
+              | found
+            .text-center(v-if='totalPage > 1')
+              nav(aria-label='Page navigation example')
+                ul.pagination
+                  li.page-item(:class='{disabled:filter.page <= 1}')
+                    a.page-link(v-if='filter.page <=1') Previous
+                    a.page-link(href='#' v-if='filter.page > 1' v-on:click='changePage(filter.page-1,$event)') Previous
+                  li.page-item(v-if='p >= (filter.page-3) && p <= (filter.page+3)' :class='{active: p == filter.page}' v-for='p in totalPage' @click='changePage(p,$event)')
+                    a.page-link(href='#') {{p}}
+                  li.page-item(:class='{disabled:filter.page >= totalPage}')
+                    a.page-link(v-if='filter.page >= totalPage') Next
+                    a.page-link(href='#' v-if='filter.page < totalPage' v-on:click='changePage(filter.page+1,$event)') Next
+          .browser-actions.d-flex.justify-content-between.flex-shrink-0(v-if='selected.length')
+            .col-left(v-show='selected.length')
+              div(v-if='selected && selected.length')
+                .count-selected {{selected.length}} file selected
+                .clear-selected(@click='selected=[]')
+                  i unselect
+            .col-right(v-show='selected.length')
+              button.btn.btn-success(:class='{disabled:!selected.length}' @click='sendFiles')
+                | Use
+                | file
+  script#file-item-template(type='text/x-template').
+    <div class="file-item" :class="fileClass(file)">
+      <div class="inner" :class="{active:selected.indexOf(file._id) !== -1 }" @click="selectFile(file)" :title="file.file_name">
+        <div class="file-thumb" v-if="viewType=='grid'" v-html="getFileThumb(file)">
+        </div>
+        <div class="file-name">{{file.file_name.split('/').pop()}}</div>
+        <span class="file-checked-status" v-show="selected.indexOf(file._id) !== -1">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M186.301 339.893L96 249.461l-32 30.507L186.301 402 448 140.506 416 110z"/></svg>
+        </span>
+      </div>
+    </div>
+
+  block script
+    script(src="/admin/assets/js/core/bootstrap.min.js")
+    script(src="/admin/assets/js/vue.min.js")
+    script(src="/admin/assets/js/upload.js")
+
+  script.
+    var message = !{JSON.stringify(message)};
+    //- console.log(message);
+
+    document.querySelector('#msg_desc').onclick = function() {
+      window.onbeforeunload = function() {
+        return '';
+      };
+    }
+
+    $("#form-submit").submit(function () {
+      window.onbeforeunload = null;
+      $(".sub_form").attr("disabled", true);
+      return true;
+    });
+
+    var arrayEmpty = [];
+    if (message.attachment.length){
+      //- alert('heuy')
+      arrayEmpty.push(...message.attachment)
+      var html = "";
+      for (var i = 0; i < arrayEmpty.length; i++) {
+        html += `
+          <div class="col-6 col-sm-4 file_div" id="file_${i}_column">
+            <button id="x" type="button" class="btn_${i}" onclick="removeEl('file_${i}_column',${i})">x</button>
+              <label class="imagecheck mb-4" id="file_${i}" >
+                <input type="text" value="${arrayEmpty[i]}" class="imagecheck-input" id="file_${i}" name="pdf_file[${i}]">
+                <figure class="imagecheck-figure" id="file_${i}">
+                  ${arrayEmpty[i].split(".")[1] == "pdf" ? `<a href='${arrayEmpty[i]}' target="_blank"><img src="/admin/assets/img/pdf_name.svg" alt="title" class="imagecheck-image" id="file_${i}"></a>` : `<a href='${arrayEmpty[i]}' target="_blank"><img src="${arrayEmpty[i]}" alt="title" class="imagecheck-image" id="file_${i}"></a>`}
+                </figure>
+              </label>
+          </div>
+        `;
+        //- console.log(i,"i");
+        //- console.log(arrayEmpty,"files")
+      };
+      $('.custom_li').append(html);
+    }
+
+    function uploadMultiImages() {
+      uploaderModal.show({
+          multiple: true,
+          file_type: 'image',
+          onSelect: function onSelect(files) {
+            let oldArray = arrayEmpty.length
+            arrayEmpty.push(...files)
+              if (files.length) {
+                  //- console.log(files.length);
+                  var html = "";
+                  for (var i = oldArray; i < arrayEmpty.length; i++) {
+                    console.log(arrayEmpty);
+                    html += `
+                      <div class="col-6 col-sm-4 file_div" id="file_${i}_column">
+                        <button id="x" type="button" class="btn_${i}" onclick="removeEl('file_${i}_column',${i})">x</button>
+                          <label class="imagecheck mb-4" id="file_${i}" >
+                            <input type="text" value="${arrayEmpty[i].file_name}" class="imagecheck-input" id="file_${i}" name="pdf_file[${i}]">
+                            <figure class="imagecheck-figure" id="file_${i}">
+                              ${arrayEmpty[i].file_type.split("/")[0] == "image" ? `<a href='${arrayEmpty[i].file_name}' target="_blank"><img src="${arrayEmpty[i].file_name}" alt="title" class="imagecheck-image" id="file_${i}"></a>` : `<a href='${arrayEmpty[i].file_name}' target="_blank"><img src="/admin/assets/img/pdf_name.svg" alt="title" class="imagecheck-image" id="file_${i}"></a>`}
+                            </figure>
+                          </label>
+                      </div>
+                    `;
+                    //- $( `file_${i}_column` ).sortable();
+                    //- console.log(i,"i");
+                    //- console.log(arrayEmpty,"files")
+                  };
+                  $('.custom_li').append(html);
+                  //- document.querySelector('#image').setAttribute('value', files[0].file_name);
+                  //- document.querySelector('#imgBox').setAttribute('src', files[0].file_name)
+              };
+          }
+      });
+    };
+
+    function removeEl(id,i) {
+      //- alert(id);
+      //- console.log(id);
+      //- console.log(i)
+       arrayEmpty = arrayEmpty.filter((item, index)=>{
+        return index !== i;
+      });
+
+      //- console.log(arrayEmpty.length)
+      $(`#${id}`).remove();
+      $('.file_div').each(function(index){
+        $(this).attr('id', `file_${index}_column`);
+        $('button', this).attr('class', `btn_${index}`);
+        $('input', this).attr('name', `pdf_file[${index}]`);
+        $('input', this).attr('id', `file[${index}]`);
+        $('label', this).attr('id', `file[${index}]`);
+        $('figure', this).attr('id', `file[${index}]`);
+        $('img', this).attr('id', `file[${index}]`);
+        $('button', this).attr('onclick', `removeEl('file_${index}_column',${index})`);
+      })
+    }

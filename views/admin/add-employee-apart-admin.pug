@@ -1,0 +1,211 @@
+extends layout-admin
+
+block content
+  #cover-spin
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        div(style="padding:5px 20px 0px 20px;")
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold Add User
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/employee/all') All User
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+      .page-inner
+        .row
+          .col-md-12
+            .card
+              form#add_emp
+                .card-body
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='name')
+                      | First Name
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#first_name.form-control(type='text', name='first_name', placeholder='Enter First Name', required='')
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='name')
+                      | Last Name
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#last_name.form-control(type='text', name='last_name', placeholder='Enter Last Name', required='')
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='name')
+                      | User Unique ID
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#emp_unique_id.form-control(type='text', name='emp_unique_id', placeholder='Enter User ID', required='')
+                  .form-group.form-show-validation.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='email')
+                      | Email Address
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#email.form-control(type='email', name='email', placeholder='Enter Email', required='')
+                      //- small#emailHelp.form-text.text-muted We'll never share your email with anyone else.
+                  //- .form-group.form-show-validation.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='password')
+                      | Password
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#password.form-control(type='password', name='password', placeholder='Enter Password')
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='Mobile No.')
+                      | Mobile No.
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#mobile.form-control(type='number', name='mobile', placeholder='Enter Mobile No.', min="0", oninput="this.value = Math.abs(this.value)", autocomplete="off", required="")
+                  //- .form-group.form-show-validation.row
+                  //-   label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='user_type')
+                  //-     | User Type
+                  //-   .col-lg-7.col-md-9.col-sm-8
+                  //-     .select2-input
+                  //-       select#state.form-control(name='user_type', required='')
+                  //-         option(value='user') User
+                  //-         option(value='admin') Admin
+                  .form-group.form-show-validation.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='role_type')
+                      | Role Type
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      .select2-input
+                        select#role.form-control(name='role_type', required='')
+                          option(value='') --- Select Role ---
+                          each role in roles
+                            option(value=role._id) #{role.name}
+                  .form-group.form-show-validation.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='status')
+                      | Status
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      .selectgroup.w-100
+                        label.selectgroup-item
+                          input.selectgroup-input(type='radio' name='status' value='active' checked='' required)
+                          span.selectgroup-button Active
+                        label.selectgroup-item
+                          input.selectgroup-input(type='radio' name='status' value='inactive')
+                          span.selectgroup-button Inactive
+                .card-action
+                  .row
+                    .col-md-12
+                      button.btn.btn-color.sub_form(type="submit") Add User
+
+  script.
+    $(document).ready(function () {
+      //- $("#add_emp").submit(function () {
+      //-   $(".sub_form").attr("disabled", true);
+      //-   $('#cover-spin').show(0);
+      //-   return true;
+      //- });
+
+      $('#role').select2({
+        placeholder: "Select Role",
+        theme: "bootstrap",
+        closeOnSelect: true
+      });
+
+      var vRules = {
+        first_name: {
+          required: true
+        },
+        last_name: {
+          required: true
+        },
+        emp_unique_id: {
+          required: true
+        },
+        email: {
+          required: true,
+          email: true
+        },
+        mobile: {
+          required: true,
+          number: true,
+          minlength: 10,
+          maxlength: 10
+        },
+        role: {
+          required: true
+        },
+        status: {
+          required: true
+        }
+      };
+      var vMessages = {
+        first_name: {
+          required: "Please enter first name."
+        },
+        last_name: {
+          required: "Please enter last name."
+        },
+        emp_unique_id: {
+          required: "Please enter employee unique ID."
+        },
+        mobile: {
+          required: "Please enter mobile number."
+        },
+        role: {
+          required: "Please enter role."
+        },
+        status: {
+          required: "Please select status."
+        },
+        email: {
+          required: "Please enter email address."
+        }
+      };
+
+      $("#add_emp").validate({
+        rules: vRules,
+        messages: vMessages,
+        submitHandler: function(form) {
+          var act = "/admin/employee/add/apart/admin";
+          $('#cover-spin').show(0);
+          $("#add_emp").ajaxSubmit({
+            url: act,
+            type: 'POST',
+            cache: false,
+            dataType: 'json',
+            clearForm: false,
+            success: function (response) {
+              console.log(response);
+              $('#cover-spin').hide(0);
+              if (response.code == 404) {
+                $.notify({
+                  message: response.message
+                },{
+                  type: 'error',
+                  showProgressbar: false
+                },
+                {
+                  offset: 20,
+                  spacing: 10,
+                  z_index: 1031,
+                  delay: 5000,
+                  timer: 1200
+                });
+              } else if (response.code == 200) {
+                console.log('Success');
+                $.notify({
+                  message: response.message
+                },{
+                  type: 'success',
+                  showProgressbar: false
+                },
+                {
+                  offset: 20,
+                  spacing: 10,
+                  z_index: 1031,
+                  delay: 5000,
+                  timer: 1200
+                });
+                setTimeout(() => {
+                  window.location.href = "/admin/employee/all";
+                }, 2000)
+              }
+            }
+          });
+        }
+      });
+    });

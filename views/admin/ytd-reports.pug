@@ -1,0 +1,569 @@
+extends layout-admin
+
+block content
+  #cover-spin
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        div(style="padding:5px 20px 0px 20px;")
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.fw-bold View YTD Reports
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              .lead-flex-container
+                div.form-group
+                  a#YTDReporttoExcel.btn.btn-white.btn-border.btn-round.mr-2(href='javascript:void(0)',style="height: 45px;margin-top: 0px;") Export to Excel
+                  a#clear_filter.btn.btn-white.btn-border.btn-round.mr-2(href='javascript:void(0)',style="height: 45px;margin-top: 0px;") Clear Filter
+      .page-inner
+        .row
+          .col-md-12
+            .card.card-with-nav
+              //- pre= h.dump(tblHeaders)
+              //- pre= h.dump(listOfSchools)
+              //- pre= h.dump(reportsData)
+              .card-body
+                .row
+                  .col-md-3
+                    .form-group
+                      label(for='type' style="width: 100%;margin-bottom:0px;") From Date
+                      input#month.monthPicker-start.form-control(type='text' name="date_range" value="" readonly style="height:40px !important")
+                      //- a#clr_date_range(href="javascript:void(0)" style="margin-top: 3px;float: right;text-decoration: none;z-index:9999")
+                        i.fa.fa-times(style="position: absolute;right: 35px;top: 42px;z-index: 99999;")
+                  .col-md-3
+                    .form-group
+                      label(for='type' style="width: 100%;margin-bottom:0px;") To Date
+                      input#month.monthPicker-end.form-control(type='text' name="date_range" value="" readonly style="height:40px !important")
+                      //- a#clr_date_range_end(href="javascript:void(0)" style="margin-top: 3px;float: right;text-decoration: none;z-index:9999")
+                        i.fa.fa-times(style="position: absolute;right: 35px;top: 42px;z-index: 99999;")
+                  .col-md-3
+                    .form-group
+                      label(for='country',style="margin-bottom:0px;") Country
+                      select#country(name='country[]' multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
+                        each country in countries
+                          option(value=country._id) #{country.country_name}
+                  .col-md-3
+                    .form-group
+                      label(for='zone',style="margin-bottom:0px;") Zone
+                      select#zone(name='zone[]' multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
+                        each zone in zones
+                          option(value=zone._id) #{zone.name}
+                  .col-md-3
+                    .form-group
+                      label(for='center',style="margin-bottom:0px;") Center
+                      select#center(name='center[]' multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
+                        each center in centers
+                          option(value=center._id) #{center.school_display_name}
+                hr
+                span.note-span Please use above filter(s) for results. You have to choose from & to dates first.
+                .table-responsive
+                  .col-sm-12
+                    table#ytd_reports.display.table.table-striped.table-hover.dataTable.mtd-rep(style='width:100%')
+                      thead
+                      tfoot
+
+  block script
+    script(type='text/javascript' src='https://cdn.jsdelivr.net/momentjs/latest/moment.min.js')
+    script(src='https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.10.0/dist/js/bootstrap-datepicker.min.js')
+    script(type='text/javascript' src='https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js')
+    link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css")
+    script(src='https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js')
+
+  script.
+    var table;
+    var total_records = 0;
+    var startDate = new Date();
+    var FromEndDate = new Date();
+    $('.filter').css('display', 'none');
+    var countries = !{JSON.stringify(countries)};
+    var zones = !{JSON.stringify(zones)};
+    var centers = !{JSON.stringify(centers)};
+
+    function generateTable(country, zone, center, start, end) {
+      $(".note-span").hide(0);
+      // generate headers first
+      // ajax call for header
+      $.ajax({
+        method: 'POST',
+        url: `/admin/reports/get/header/dyamically`,
+        data: {
+          country_id: $("#country").val() || [],
+          zone_id: $("#zone").val() || [],
+          center_id: $("#center").val() || []
+        },
+        dataType: 'json',
+        success: function (response) {
+          //- console.log(response,"-----header response");
+          if (response && response.data && response.data.length) {
+            var thead = $("thead");
+            var tfoot = $("tfoot");
+            $("tbody").empty();
+            // Empty the thead element
+            thead.empty();
+            tfoot.empty();
+            //- $("#mtd_reports").empty();
+            thead.append(`
+              <tr>
+                <th class="col-4" rowspan="2">Month</th>
+                ${response.data.map(zone => `
+                  <th colspan=${zone.schools.length} style="border-bottom: 1px solid #cbc9c9 !important;">${zone.zone_name}</th>
+                `).join("")}
+              </tr>
+              <tr>
+                ${response.data.map(zoneCenter => `
+                  ${zoneCenter.schools.map(center => `
+                    <th>${center.school_display_name}</th>
+                  `).join("")}
+                `).join("")}
+                <th>Total</th>
+              </tr>
+            `);
+
+            var listOfSchools = _.flatMap(response.data, 'schools').map(school => school.school_display_name);
+
+            tfoot.append(`
+              <tr>
+                <th></th>
+                <th></th>
+                ${listOfSchools.map(school => `
+                  <th></th>
+                `)}
+              </tr>
+            `);
+
+            genDT();
+          } else {
+            sall('No center assigned.', 2000);
+            $('#cover-spin').hide(0);
+            genDT();
+            $("thead").html("");
+          }
+        }
+      })
+    }
+
+    function genDT () {
+      $('#cover-spin').hide(0);
+      table = $('#ytd_reports').DataTable({
+      ordering: false,
+      searching: false,
+      //- paging: false,
+      bProcessing: true,
+      bServerSide: true,
+      pagination: true,
+      autoWidth: false,
+      pageLength: 100,
+      sAjaxSource: "/admin/reports/datatable/ytd",
+      columnDefs: [
+        { "width": "20%", "targets": 0 }
+      ],
+      drawCallback: function (settings) {
+        var api = this.api();
+        total_records = this.fnSettings().fnRecordsTotal();
+        console.log(total_records)
+        //- // Output the data for the visible rows to the browser's console
+        //- console.log( api.rows( {page:'current'} ).data() );
+        //- console.log(table.page.info().page + 1);
+      },
+      fnServerParams: function (data, osettings) {
+        //- console.log(data);
+        data.push({
+          "name": "country",
+          "value": $('#country').val()
+        });
+        data.push({
+          "name": "zone",
+          "value": $('#zone').val()
+        });
+        data.push({
+          "name": "center",
+          "value": $('#center').val()
+        });
+        data.push({
+          "name": "startDate",
+          "value": $('.monthPicker-start').val()
+        });
+        data.push({
+          "name": "endDate",
+          "value": $('.monthPicker-end').val()
+        });
+      },
+      footerCallback: function (tfoot, data, start, end, display) {
+        //- console.log('hihihi');
+        //- console.log(data);
+        var api = this.api();
+
+        // Iterate over each column
+        api.columns().every(function (index) {
+          var columnData = this.data();
+          var sum = 0;
+
+          if (index !== 0) { // Exclude the first column from sum calculation
+            sum = columnData.reduce(function (a, b) {
+              // Parsing the data as numbers before summing
+              return parseFloat(a) + parseFloat(b);
+            }, 0);
+          }
+
+          // Display "Total" in the footer of the first column
+          if (index === 0) {
+            $(this.footer()).html("Total");
+          } else {
+            // Update the footer cell with the sum for other columns
+            $(this.footer()).html(sum);
+          }
+        });
+      }
+    });
+    }
+
+    $(document).ready(function () {
+      $(document).on('click','#show_filter', function () {
+        $('.filter').slideToggle()
+      })
+
+      $('#clear_filter').click(function() {
+        $('#cover-spin').show(0);
+        window.location.reload();
+        return;
+      });
+
+      $("#YTDReporttoExcel").on("click", function() {
+        $('#cover-spin').show(0);
+        if (!$(".monthPicker-start").val()) {
+          $('#cover-spin').hide(0);
+          alert('Please choose Start & End date.');
+        }
+        if (!$(".monthPicker-end").val()) {
+          $('#cover-spin').hide(0);
+          alert('Please choose Start & End date.');
+        }
+        if(total_records > 0) {
+          //- table.button('.buttons-excel').trigger();
+          var stardate = "";
+          var enddate = "";
+          if($(".monthPicker-start").val() != ""){
+            stardate = $(".monthPicker-start").val().trim();
+            enddate = $(".monthPicker-end").val().trim();
+          }
+          var center = $("#center").val();
+          var country = $("#country").val();
+          var zone = $("#zone").val();
+          //- window.open("/admin/reports/export?search_key="+search_key+"&stardate="+stardate+"&enddate="+enddate+"&stage="+stage);
+          let exportApi = `/admin/reports/ytd/export?stardate=${stardate}&enddate=${enddate}&country=${country ? JSON.stringify(country) : ""}&zone=${zone ? JSON.stringify(zone) : ""}&center=${center ? JSON.stringify(center) : ""}`;
+          //- return;
+          //- console.log(exportApi);
+          $('#cover-spin').hide(0);
+          window.open(exportApi);
+          return false;
+        } else {
+          $('#cover-spin').hide(0);
+          sall("No data found!", 2500);
+          return;
+        }
+      });
+
+      $("#country").selectpicker({
+        noneSelectedText : 'All'
+      });
+      $("#zone").selectpicker({
+        noneSelectedText : 'All'
+      });
+      $("#center").selectpicker({
+        noneSelectedText : 'All'
+      });
+
+      $("#clr_date_range").css('visibility', 'hidden');
+      $("#clr_date_range_end").css('visibility', 'hidden');
+
+      $('.monthPicker-start').datepicker({
+        format: "mm/yyyy",
+        startView: "months",
+        minViewMode: "months"
+      }).on('changeDate', function(selected){
+        startDate = new Date(selected.date.valueOf());
+        startDate.setDate(startDate.getDate(new Date(selected.date.valueOf())));
+        $('.monthPicker-end').datepicker('setStartDate', startDate);
+
+        $("#clr_date_range").css('visibility', 'visible');
+        $('.monthPicker-start').datepicker('hide');
+        // initiate datatable here
+        var country = $("#country").val();
+        var zone = $("#zone").val();
+        var center = $("#center").val();
+        var start = $(".monthPicker-start").val();
+        var end = $(".monthPicker-end").val();
+        ///---------------------------------------
+        if (start && end) {
+          if (table) {
+            table.destroy();
+          }
+          generateTable(country, zone, center, start, end);
+        } else {
+          $('#cover-spin').hide(0);
+          //- sall("Please choose from & to dates to get the results.", 2500);
+        }
+      });
+
+      $('.monthPicker-end').datepicker({
+        format: "mm/yyyy",
+        startView: "months",
+        minViewMode: "months"
+      }).on('changeDate', function(selected){
+        FromEndDate = new Date(selected.date.valueOf());
+        FromEndDate.setDate(FromEndDate.getDate(new Date(selected.date.valueOf())));
+        $('.monthPicker-start').datepicker('setEndDate', FromEndDate);
+
+        $("#clr_date_range_end").css('visibility', 'visible');
+        $('.monthPicker-end').datepicker('hide');
+        // initiate datatable here
+        var country = $("#country").val();
+        var zone = $("#zone").val();
+        var center = $("#center").val();
+        var start = $(".monthPicker-start").val();
+        var end = $(".monthPicker-end").val();
+        ///---------------------------------------
+        if (start && end) {
+          if (table) {
+            table.destroy();
+          }
+          generateTable(country, zone, center, start, end);
+        } else {
+          $('#cover-spin').hide(0);
+          //- sall("Please choose from & to dates to get the results.", 2500);
+        }
+      });
+
+      $(document).on("click", "#clr_date_range", function () {
+        $('#cover-spin').hide(0);
+        $('input[name="date_range"]').val('');
+        $("#clr_date_range").css('visibility', 'hidden');
+        $("#clr_date_range_end").css('visibility', 'hidden');
+        $("#country").val("");
+        $("#center").val("");
+        $("#zone").val("");
+        table
+          .columns(3) // for start date
+          .search("") // for start date
+          .draw();
+        table.destroy();
+      });
+
+      $(document).on("click", "#clr_date_range_end", function () {
+        $('#cover-spin').hide(0);
+        $('input[name="date_range"]').val('');
+        $("#clr_date_range").css('visibility', 'hidden');
+        $("#clr_date_range_end").css('visibility', 'hidden');
+        $("#country").val("");
+        $("#center").val("");
+        $("#zone").val("");
+        table.destroy();
+        $(".note-span").show(0);
+        $("thead").empty();
+      });
+
+      $(document).on('change', '#country', function () {
+        $('#cover-spin').show(0);
+        var id = $(this).val();
+        var start = $(".monthPicker-start").val();
+        var end = $(".monthPicker-end").val();
+        //- table.destroy();
+        if (id) {
+          $("#zone").val("");
+          $("#center").val("");
+          $.ajax({
+            method: 'POST',
+            url: `/admin/lead/zonefilter`,
+            data: {
+              type: id
+            },
+            dataType: 'json',
+            success: function (response) {
+              //- console.log(response,"response")
+              $("#zone").val("");
+              $("#zone option").remove();
+              $("#center").val("");
+              $("#center option").remove();
+              $("#center").selectpicker("refresh");
+              //- $("#program").append(`<option value=''>Select Program</option>`);
+
+              var len = response.data.length;
+              for (var i = 0; i < len; i++) {
+                //- console.log(i);
+                var id = response.data[i]['_id'];
+                var zone_name = response.data[i]['name'];
+                $("#zone").append(`<option value='${id}'>${zone_name}</option>`);
+                $("#zone").selectpicker("refresh");
+              }
+              if (response.centers && response.centers.length > 0) {
+                for (var i = 0; i < response.centers.length; i++) {
+                  //- console.log(i, "--centers");
+                  var id = response.centers[i]['_id'];
+                  var school_name = response.centers[i]['school_display_name'];
+                  $("#center").append(`<option value='${id}'>${school_name}</option>`);
+
+                }
+              }
+              $("#center").selectpicker("refresh");
+              // Regenerate DataTable
+              if (start && end) {
+                if (table) {
+                  table.destroy();
+                }
+                generateTable($("#country").val(), $("#zone").val(), $("#center").val(), $(".monthPicker-start").val(), $(".monthPicker-end").val());
+              } else {
+                $('#cover-spin').hide(0);
+                sall("Please choose from & to dates to get the results.", 2500);
+              }
+            }
+          });
+        } else {
+          console.log('No ID!!');
+          $("#zone").val("");
+          $("#zone option").remove();
+          $("#zone").selectpicker("refresh");
+          $("#center").val("");
+          $("#center option").remove();
+          $("#center").selectpicker("refresh");
+          $("#clr_zone").css('visibility', 'hidden');
+          $("#clr_center").css('visibility', 'hidden');
+          $("#clr_country").css('visibility', 'hidden');
+          for (var i = 0; i < zones.length; i++) {
+            //- console.log(data.zones[i])
+            var id = zones[i]['_id'];
+            var zone_name = zones[i]['name'];
+            //- console.log(id,"id")
+            //- console.log(zone_name,"zone_name")
+            $("#zone").append(`<option value='${id}'>${zone_name}</option>`);
+            $("#zone").selectpicker("refresh");
+          }
+          for (var i = 0; i < centers.length; i++) {
+            //- console.log(data.centers[i])
+            var id = centers[i]['_id'];
+            var center_name = centers[i]['school_display_name'];
+            //- console.log(id,"id")
+            //- console.log(zone_name,"zone_name")
+            $("#center").append(`<option value='${id}'>${center_name}</option>`);
+            $("#center").selectpicker("refresh");
+          }
+          // Regenerate DataTable
+          if (start && end) {
+            if (table) {
+              table.destroy();
+            }
+            generateTable($("#country").val(), $("#zone").val(), $("#center").val(), $(".monthPicker-start").val(), $(".monthPicker-end").val());
+          } else {
+            $('#cover-spin').hide(0);
+            sall("Please choose from & to dates to get the results.", 2500);
+          }
+        }
+        //- table
+        //-   .columns(0)
+        //-   .search(this.value)
+        //-   .draw();
+      });
+
+      $(document).on('change', '#zone', function () {
+        $('#cover-spin').show(0);
+        var id = $(this).val();
+        var start = $(".monthPicker-start").val();
+        var end = $(".monthPicker-end").val();
+        //- table.destroy();
+        $("#center").val("");
+        $("#clr_center").css('visibility', 'hidden');
+        if(id){
+          $.ajax({
+            method: 'POST',
+            url: `/admin/lead/centerfilter`,
+            data: {
+              type: id
+            },
+            dataType: 'json',
+            success: function (response) {
+              $("#center").html("");
+              var len = response.data.length;
+              for (var i = 0; i < len; i++) {
+                var id = response.data[i]['_id'];
+                var school_name = response.data[i]['school_display_name'];
+                $("#center").append(`<option value='${id}'>${school_name}</option>`);
+              }
+              $("#center").selectpicker("refresh");
+              if (start && end) {
+                if (table) {
+                  table.destroy();
+                }
+                generateTable($("#country").val(), id, $("#center").val(), $(".monthPicker-start").val(), $(".monthPicker-end").val());
+              } else {
+                $('#cover-spin').hide(0);
+                sall("Please choose from & to dates to get the results.", 2500);
+              }
+            }
+          });
+        } else {
+          $("#center").val("");
+          $("#center option").remove();
+          $("#center").selectpicker("refresh");
+          for (var i = 0; i < centers.length; i++) {
+            //- console.log(data.centers[i])
+            var id = centers[i]['_id'];
+            var center_name = centers[i]['school_display_name'];
+            $("#center").append(`<option value='${id}'>${center_name}</option>`);
+            $("#center").selectpicker("refresh");
+          }
+          if(start && end){
+            if (table) {
+              table.destroy();
+            }
+            generateTable($("#country").val(), id, $("#center").val(), $(".monthPicker-start").val(), $(".monthPicker-end").val());
+          } else {
+            $('#cover-spin').hide(0);
+            sall("Please choose from & to dates to get the results.", 2500);
+          }
+        }
+      });
+
+
+      $(document).on('change', '#center', function () {
+        $('#cover-spin').show(0);
+        var id = $(this).val();
+        var start = $(".monthPicker-start").val();
+        var end = $(".monthPicker-end").val();
+        // Regenerate DataTable
+        if (start && end) {
+          if (table) {
+            table.destroy();
+          }
+          generateTable($("#country").val(), $("#zone").val(), id, $(".monthPicker-start").val(), $(".monthPicker-end").val());
+        } else {
+          $('#cover-spin').hide(0);
+          sall("Please choose from & to dates to get the results.", 2500);
+        }
+      });
+    });
+
+    function sall (msg, time) {
+      var SweetAlert2Demo = function () {
+        //== Demos
+        var initDemos = function () {
+          swal(msg, {
+            buttons: false,
+            timer: time,
+            backdrop:true,
+            closeOnClickOutside: false,
+            closeOnEsc: false
+          })
+        };
+
+        return {
+            //== Init
+            init: function () {
+              initDemos();
+            },
+          };
+        }();
+      jQuery(document).ready(function () {
+        SweetAlert2Demo.init();
+      });
+    };
+
+

@@ -1,0 +1,158 @@
+extends layout-admin
+
+block content
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        .page-inner.py-5
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold Edit Follow-Up
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/center/all') All Centers
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+      .page-inner
+        .row
+          .col-md-12
+            //- pre= h.dump(followUp)
+            form.card(action=`/admin/lead/followup/edit/${followUp._id}` method="POST")
+              .card-header
+                .card-title Follow-Ups
+              .card-body
+                .row
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='exampleFormControlSelect1') Select Status
+                      span.required-label *
+                      select#status-id.form-control(name='follow_status', required='')
+                        option(value='') Select Status
+                        each status in statuses
+                          option(value=`${status._id}|${status.name}` selected=(status.name == followUp.follow_status)) #{status.name}
+                    .form-group
+                      label(for='exampleFormControlSelect1') Select Lead / Enquiry Stage
+                      span.required-label *
+                      select#exampleFormControlSelect1.form-control(name="enq_stage", required='')
+                        option(value='') Select Status
+                        option(value='Hot' selected=(followUp.enq_stage == 'Hot' ? 'selected' : null)) Hot
+                        option(value='Cold' selected=(followUp.enq_stage == 'Cold' ? 'selected' : null)) Cold
+                        option(value='Enrolled' selected=(followUp.enq_stage == 'Enrolled' ? 'selected' : null)) Enrolled
+                    .form-group
+                      label(for='updated_by')
+                      | Updated By
+                      span.required-label
+                      input#updated_by.form-control(type='text' value=currentUser disabled)
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='exampleFormControlSelect1') Select Sub Status
+                      span.required-label *
+                      select#substatus-id.form-control(name='follow_sub_status', required='')
+                        each subStatus in subStatuses
+                          option(value=`${subStatus.name}` selected=(subStatus.name == followUp.follow_sub_status)) #{subStatus.name}
+                    .form-group
+                      label(for='dob') Follow-Up Date
+                      span.required-label *
+                      .input-group
+                        input#follow_date.form-control(type='text' name='follow_up_date' required='' )
+                    .form-group
+                      label(for='notes') Notes
+                      textarea#notes.form-control(rows='5' name="notes") #{followUp.notes}
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='exampleFormControlSelect1') Action Planned / Taken
+                      span.required-label *
+                      select#action_planned.form-control(name='action_taken[]', required='')
+                        option(value='') Select Status
+                        each actionTaken in actionTakens
+                          option(value=`${actionTaken.name}` selected=(actionTaken.name == followUp.action_taken)) #{actionTaken.name}
+                    .form-group
+                      label Select Time
+                      span.required-label *
+                      .input-group
+                        input#follow_up_time.form-control(type='text' name='follow_up_time' required="")
+                        .input-group-append
+                          span.input-group-text
+                            i.fa.fa-clock
+                    .form-group
+                      label(for='notes') Remarks (For Office Use Only)
+                      textarea#notes.form-control(rows='5' name="remark") #{followUp.remark}
+                .card-action
+                  .row
+                    .col-md-12
+                      button.btn.btn-color(type="submit") Save Changes
+
+  block script
+    script(src="/admin/assets/js/plugin/moment/moment.min.js")
+    script(type='text/javascript' src='/admin/assets/js/plugin/datepicker/bootstrap-datetimepicker.min.js')
+
+  script.
+    var followObj = !{JSON.stringify(followUp)};
+    //- console.log(followObj.follow_up_time);
+
+    $(document).ready(function () {
+
+      $('#follow_date').datetimepicker({
+        format: 'MM/DD/YYYY',
+        defaultDate: followObj.follow_up_date
+      });
+
+      $('#follow_up_time').datetimepicker({
+        format: 'h:mm A',
+        defaultDate: moment(new Date()).hours(moment(followObj.follow_up_time, "h:mm A").format("HH")).minutes(moment(followObj.follow_up_time, "h:mm A").format("mm")).seconds(0).milliseconds(0)
+      });
+
+      $('#course_int').select2({
+        theme: "bootstrap"
+      });
+
+      $('#center_name').select2({
+        theme: "bootstrap"
+      });
+
+      $('#lead_cat').select2({
+        theme: "bootstrap"
+      });
+
+      $('#know_us').select2({
+        theme: "bootstrap"
+      });
+
+      $("#status-id").select2({
+        theme: "bootstrap"
+      });
+
+      $("#substatus-id").select2({
+        theme: "bootstrap"
+      });
+
+      $("#action_planned").select2({
+        theme: "bootstrap"
+      });
+
+      $(document).on('change', '#status-id', function () {
+        // alert('hey');
+        var statusId = $(this).val();
+        var onlyStatusId = statusId.split("|")[0];
+        //- console.log(onlyStatusId)
+        //- var onlyStateId = stateId.split("|")[0];
+        $("#substatus-id").empty().trigger("change");
+        $("#substatus-id").attr("required", "")
+
+        $.ajax({
+          url: `/admin/client/select/substatus/${onlyStatusId}`,
+          type: 'get',
+          dataType: 'json',
+          success: function (response) {
+            //- console.log(response);
+            var len = response.data.length;
+            for (var i = 0; i < len; i++) {
+              var id = response.data[i]['_id'];
+              var name = response.data[i]['name'];
+
+              $("#substatus-id").append("<option value='" + name + "'>" + name + "</option>");
+            }
+            $("#substatus-id").select2("refresh");
+          }
+        });
+      })
+    })

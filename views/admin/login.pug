@@ -1,0 +1,501 @@
+doctype html
+html(lang='en')
+	head
+		meta(http-equiv='Content-Type', content='text/html; charset=utf-8')
+		meta(http-equiv='X-UA-Compatible', content='IE=edge')
+		title= `${title} | Kido`
+		meta(content='width=device-width, initial-scale=1.0, shrink-to-fit=no', name='viewport')
+		link(rel='icon', href='/admin/assets/img/favicon_kido.png', type='image/x-icon')
+		//- Fonts and icons
+		script(src='/admin/assets/js/plugin/webfont/webfont.min.js')
+		script.
+			WebFont.load({
+			google: {"families":["Lato:300,400,700,900"]},
+			custom: {"families":["Flaticon", "Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands", "simple-line-icons"], urls: ['/admin/assets/css/fonts.min.css']},
+			active: function() {
+			sessionStorage.fonts = true;
+			}
+			});
+		//- CSS Files
+		link(rel='stylesheet', href='/admin/assets/css/bootstrap.min.css')
+		link(rel='stylesheet', href='/admin/assets/css/atlantis.css')
+		link(rel='stylesheet', type='text/css', href='/admin/assets/css/custom.css')
+	body.login
+		block messages
+				if locals.flashes
+					.inner
+						.flash-messages
+							- const categories = Object.keys(locals.flashes)
+							each category in categories
+								each message in flashes[category]
+									.flash(class=`flash--${category}`)
+										p.flash__text!= message
+										button.flash__remove(onClick="this.parentElement.remove()") &times;
+		.wrapper.wrapper-login.wrapper-login-full.p-0
+			.login-aside.w-50.d-flex.flex-column.align-items-center.justify-content-center.text-center.bg-white(style="background: #00356b !important;")
+				img(src="/admin/assets/img/logo.png", alt="inventory logo", width=250)
+				//- h1.title.fw-bold.mb-3 inventory
+				p.subtitle.op-7(style="padding-top: 10px; color: #fff;") Welcome to Admin panel.
+			.login-aside.w-50.d-flex.align-items-center.justify-content-center.bg-secondary-gradient(style="background: #ffffff !important;")
+				.container.container-login.container-transparent.animated.fadeIn
+					h3.text-center.text-white.sign_in_text(style="color: #000!important;") Sign In
+					form.login-form(action="/admin/account/login" id="eventForm" method="POST")
+						.form-group.username
+							label.placeholder(for='email')
+								b.text-white(style="color: #000!important;") Email
+							input#username.form-control(name='email', type='text', required='')
+						.form-group.password
+							label.placeholder(for='password')
+								b.text-white(style="color: #000!important;") Password
+							//- a.link.float-right(href='login3.html#') Forget Password ?
+							.position-relative
+								input#password.form-control(name='password', type='password', required='')
+								.show-password
+									i.icon-eye
+						.form-group.otp_section
+							label.placeholder(for='email')
+								b.text-white(style="color: #000!important;") Enter OTP (Valid for 2 minutes)
+							.otp-field
+								input#otp_1.custom(type='text' maxlength='1' autocomplete="off")
+								input#otp_2.custom(type='text' maxlength='1' autocomplete="off")
+								input#otp_3.custom.space(type='text' maxlength='1' autocomplete="off")
+								input#otp_4.custom(type='text' maxlength='1' autocomplete="off")
+								input#otp_5.custom(type='text' maxlength='1' autocomplete="off")
+								input#otp_6.custom(type='text' maxlength='1' autocomplete="off")
+							p.timer_otp
+								| Resend OTP in
+								span#countdowntimer &nbsp;15
+								|  Seconds
+							p.resend_otp
+								a(href="javascript:void(0);" onclick="resentOTP();") Resend OTP
+						.form-group.form-action-d-flex.mb-3
+							button.btn.btn-secondary.col-md-12.float-right.mt-3.mt-sm-0.fw-bold.has-spinner(type="button" onclick="signIn();" style="background: #00356b !important; border-color: #00356b !important;")
+								span.spinner
+									i.fa.fa-refresh.fa-spin
+								| Sign In
+					//- .login-account
+							span.msg Back to&nbsp;
+							a#show-signup.link(href='/') Main Site
+		script(src='/admin/assets/js/core/jquery.3.2.1.min.js')
+		script(src='/admin/assets/js/plugin/jquery-ui-1.12.1.custom/jquery-ui.min.js')
+		script(src='/admin/assets/js/core/popper.min.js')
+		script(src='/admin/assets/js/core/bootstrap.min.js')
+		script(src='/admin/assets/js/atlantis.min.js')
+		script(src='/admin/assets/js/plugin/sweetalert/sweetalert.min.js')
+		script(src='/admin/assets/js/plugin/bootstrap-notify/bootstrap-notify.min.js')
+		script(src='/admin/custom/login.js')
+
+		script.
+			let responseAdmin = !{JSON.stringify(responseAdmin)};
+			$('.flash-messages').delay(2100).hide('slow');
+			$('.otp_section').hide();
+			$('.has-spinner').click(function() {
+					$(this).toggleClass('active');
+			});
+			$('.resend_otp').hide();
+
+			// SWAl
+			function swalFeature() {
+				var SweetAlert2Demo = function () {
+					//== Demos
+					var initDemos = function () {
+						swal("Please wait...", {
+							buttons: false,
+							timer: 12000,
+							backdrop:true,
+							closeOnClickOutside: false,
+							closeOnEsc: false
+						})
+					};
+
+					return {
+							//== Init
+							init: function () {
+								initDemos();
+							},
+						};
+					}();
+
+				jQuery(document).ready(function () {
+					SweetAlert2Demo.init();
+				});
+			}
+
+			function signIn () {
+				//- console.log($.trim($('#username').val()));
+				function validateEmail($email) {
+					var emailReg = /^([a-zA-Z0-9._%+-]+)@([a-zA-Z0-9.-]+\.[a-z]{2,6})$/;
+					return emailReg.test( $email );
+				}
+				if ($.trim($('#username').val()) == '') {
+					$.notify({
+						message: responseAdmin.EMAIL_VALIDATION_ADMIN
+					},{
+						type: 'error',
+						showProgressbar: false
+					},
+					{
+						offset: 20,
+						spacing: 10,
+						z_index: 1031,
+						delay: 5000,
+						timer: 1200
+					});
+					return false;
+				}
+				if ($.trim($('#password').val()) == '') {
+					$.notify({
+						message: responseAdmin.PASSWORD_VALIDATION_ADMIN
+					},{
+						type: 'error',
+						showProgressbar: false
+					},
+					{
+						offset: 20,
+						spacing: 10,
+						z_index: 1031,
+						delay: 5000,
+						timer: 1200
+					});
+					return false;
+				}
+				if (!validateEmail($.trim($('#username').val()))) {
+					$.notify({
+						message: responseAdmin.VALID_EMAIL_ADMIN
+					},{
+						type: 'error',
+						showProgressbar: false
+					},
+					{
+						offset: 20,
+						spacing: 10,
+						z_index: 1031,
+						delay: 5000,
+						timer: 1200
+					});
+					return false;
+				}
+
+				// SWAL
+				swalFeature();
+
+				// OTP FEATURE
+				function handleOtp(e) {
+					const input = e.target;
+					let value = input.value;
+					let isValidInput = value.match(/[0-9]/gi);
+					input.value = "";
+					input.value = isValidInput ? value[0] : "";
+
+					let fieldIndex = input.dataset.index;
+					if (fieldIndex < inputs.length - 1 && isValidInput) {
+							input.nextElementSibling.focus();
+					}
+
+					if (e.key === "Backspace" && fieldIndex > 0) {
+							input.previousElementSibling.focus();
+					}
+
+					if (fieldIndex == inputs.length - 1 && isValidInput) {
+							submit();
+					}
+				}
+
+				function handleOnPasteOtp(e) {
+					const data = e.clipboardData.getData("text");
+					const value = data.split("");
+					if (value.length === inputs.length) {
+							inputs.forEach((input, index) => (input.value = value[index]));
+							submit();
+					}
+				}
+
+				function submit() {
+						swalFeature();
+						console.log("Submitting...");
+						// 👇 Entered OTP
+						let otp = "";
+						inputs.forEach((input) => {
+								otp += input.value;
+								input.disabled = true;
+								input.classList.add("disabled");
+						});
+						//- console.log(otp);
+						//- console.log('email--', $.trim($('#username').val()));
+						// 👉 Call API below
+						$.ajax({
+							type: 'POST',
+							url: `/admin/account/loginwithotp`,
+							data: {
+								email: $.trim($('#username').val()),
+								otp
+							},
+							success: function(result) {
+								//- console.log(result);
+								if (result.code == 500) {
+									swal.close();
+									$.notify({
+										message: result.message
+									},{
+										type: 'error',
+										showProgressbar: false
+									},
+									{
+										offset: 20,
+										spacing: 10,
+										z_index: 1031,
+										delay: 5000,
+										timer: 1200
+									});
+									$('.custom').val('');
+									inputs.forEach((input) => {
+										input.disabled = false;
+										input.classList.remove("disabled");
+									});
+									$('#otp_1').focus();
+									return false;
+								} else if (result.code == 200) {
+									swal.close();
+									$.notify({
+										message: result.message
+									},{
+										type: 'success',
+										showProgressbar: false
+									},
+									{
+										offset: 20,
+										spacing: 10,
+										z_index: 1031,
+										delay: 5000,
+										timer: 1200
+									});
+									window.location.replace("/admin/dashboard");
+									return;
+								}
+							}
+						})
+				}
+
+				const inputs = document.querySelectorAll(".otp-field input");
+				inputs.forEach((input, index) => {
+					input.dataset.index = index;
+					input.addEventListener("keyup", handleOtp);
+					input.addEventListener("paste", handleOnPasteOtp);
+				});
+
+
+				$.ajax({
+					type: 'POST',
+					url: `/admin/account/login`,
+					data: {
+						email: $.trim($('#username').val()),
+						password: $.trim($('#password').val())
+					},
+					success: function(result) {
+						//- console.log(result);
+						//- return;
+						if (result.code == 404) {
+							swal.close();
+							$.notify({
+								message: result.message
+							},{
+								type: 'error',
+								showProgressbar: false
+							},
+							{
+								offset: 20,
+								spacing: 10,
+								z_index: 1031,
+								delay: 5000,
+								timer: 1200
+							});
+							return false;
+						} else if (result.code == 500) {
+							swal.close()
+							$.notify({
+								message: result.message
+							},{
+								type: 'error',
+								showProgressbar: false
+							},
+							{
+								offset: 20,
+								spacing: 10,
+								z_index: 1031,
+								delay: 5000,
+								timer: 1200
+							});
+							return false;
+						} else if (result.code == 401) {
+							swal.close();
+							var SweetAlert2Demo = function () {
+							//== Demos
+								var initDemos = function () {
+									swal("You haven't changed your password for more than 90 days. Please update your password immediately.", {
+										//- buttons: false,
+										showDenyButton: true,
+										allowOutsideClick: false,
+										timer: 20000,
+										backdrop:true,
+										closeOnClickOutside: false,
+										closeOnEsc: false
+									}).then((success) => {
+											swal.close();
+											window.open(`/admin/account/passwordexpire?src_change=${result.data.user_id}`, '_blank');
+											return;
+										})
+								};
+
+							return {
+									//== Init
+									init: function () {
+										initDemos();
+									},
+								};
+							}();
+
+							jQuery(document).ready(function () {
+								SweetAlert2Demo.init();
+							});
+							return;
+							//- console.log(result);
+							//- window.open(`/admin/account/passwordexpire?src_change=${result.data.user_id}`, '_blank');
+							//- return;
+						} else if (result.code == 202) {
+							//- console.log('result -----', result);
+							swal.close();
+							$('.otp_section').show('slow');
+							$('#otp_1').focus();
+							$('.has-spinner').hide();
+							$('.username').hide();
+							$('.password').hide();
+							$('.sign_in_text').text("Sign in with OTP!");
+							var timeleft = 15;
+							var downloadTimer = setInterval(function(){
+								timeleft--;
+								document.getElementById("countdowntimer").textContent = ` ${timeleft}`;
+								if(timeleft <= 0) {
+									//- console.log('ZERO ho gaya hai');
+									clearInterval(downloadTimer);
+									$('.timer_otp').hide();
+									$('.resend_otp').show();
+								}
+							},1000);
+							return;
+						} else if (result.code == 200) {
+							swal.close()
+							$.notify({
+								message: result.message
+							},{
+								type: 'success',
+								showProgressbar: false
+							},
+							{
+								offset: 20,
+								spacing: 10,
+								z_index: 1031,
+								delay: 5000,
+								timer: 1200
+							});
+							window.location.replace("/admin/dashboard");
+							return;
+						}
+					}
+				})
+
+				//- $(document).on("keyup", ".custom", function () {
+				//- 	var val = $(this).val();
+				//- 	if(isNaN(val)){
+				//- 			val = val.replace(/[^0-9\.]/g,'');
+				//- 			if(val.split('.').length>2)
+				//- 					val =val.replace(/\.+$/,"");
+				//- 	}
+				//- 	$(this).val(val);
+				//- })
+			}
+
+			function resentOTP () {
+				swalFeature();
+				$.ajax({
+					type: 'POST',
+					url: `/admin/account/resendotp`,
+					data: {
+						email: $.trim($('#username').val()),
+					},
+					success: function(result) {
+						swal.close();
+						//- console.log(result);
+						if (result.code == 404) {
+							swal.close()
+							$.notify({
+								message: result.message
+							},{
+								type: 'error',
+								showProgressbar: false
+							},
+							{
+								offset: 20,
+								spacing: 10,
+								z_index: 1031,
+								delay: 5000,
+								timer: 1200
+							});
+							return false;
+						} else if (result.code == 500) {
+							swal.close()
+							$.notify({
+								message: result.message
+							},{
+								type: 'error',
+								showProgressbar: false
+							},
+							{
+								offset: 20,
+								spacing: 10,
+								z_index: 1031,
+								delay: 5000,
+								timer: 1200
+							});
+							return false;
+						} else if (result.code == 202) {
+							//- console.log('result -----', result);
+							swal.close();
+							$('.custom').val('');
+							$('#otp_1').focus();
+							$('.timer_otp').show();
+							$('.resend_otp').hide();
+
+							var timeleft = 15;
+							var downloadTimer = setInterval(function(){
+								timeleft--;
+								document.getElementById("countdowntimer").textContent = ` ${timeleft}`;
+								if(timeleft <= 0) {
+									//- console.log('ZERO ho gaya hai');
+									clearInterval(downloadTimer);
+									$('.timer_otp').hide();
+									$('.resend_otp').show();
+								}
+							},1000);
+
+							return;
+						} else if (result.code == 200) {
+							swal.close()
+							$.notify({
+								message: result.message
+							},{
+								type: 'success',
+								showProgressbar: false
+							},
+							{
+								offset: 20,
+								spacing: 10,
+								z_index: 1031,
+								delay: 5000,
+								timer: 1200
+							});
+							window.location.replace("/admin/dashboard");
+							return;
+						}
+					}
+				})
+			}

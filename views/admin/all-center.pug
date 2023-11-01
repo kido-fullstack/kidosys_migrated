@@ -1,0 +1,92 @@
+extends layout-admin
+
+block content
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        div(style="padding:5px 20px 0px 20px;")
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold View All Centers
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/center/add') Add Center
+      .page-inner
+        .row
+          .col-md-12
+            .card.card-with-nav
+              .card-body
+                //- pre= h.dump(centers)
+                .row
+                  .col-md-3
+                    .form-group
+                      label(for='exampleFormControlSelect') Select Status
+                      select#dropdown1.select2(name='status_dd')
+                        option(value='') Select Status
+                        option(value='enabled') Active
+                        option(value='disabled') In-active
+                .table-responsive
+                    //- .col-sm-12
+                    table#basic-datatables.display.table.table-striped.table-hover.dataTable(role='grid', aria-describedby='basic-datatables_info',style="table-layout:fixed")
+                      thead
+                        tr(role='row')
+                          th Zone
+                          th Center Name
+                          th SPOC Name
+                          th Center Number
+                          th Center Email ID
+                          th.w-25 Ops Hours
+                          th Action
+                          th(style="display:none") Status
+                      tbody
+                        each center in centers
+                          a(href="#")
+                            tr.odd(role='row')
+                              td.sorting_1 #{center.zone_id && center.zone_id.name ? center.zone_id.name : "Not Provided"}
+                              td #{center.school_display_name}
+                                if center.status == "inactive"
+                                  span.badge.badge-danger.nowrap(style="font-size:10px !important;") In-active
+                              td #{center.cor_spoc ? center.cor_spoc : "Not Provided"}
+                              td #{center.contact_number ? center.contact_number : "Not Provided"}
+                              td #{center.email_id ? center.email_id : "Not Provided"}
+                              td
+                                if center.mon_to_fri_start_time
+                                  | Mon-Fri:&nbsp; #{center.mon_to_fri_start_time} - #{center.mon_to_fri_end_time}
+                                if center.saturday_start_time
+                                  br
+                                  | Sat:&nbsp; #{center.saturday_start_time} - #{center.saturday_end_time}
+                                if center.sunday_start_time
+                                  br
+                                  | Sun:&nbsp; #{center.sunday_start_time} - #{center.sunday_end_time}
+                              td
+                                ul.center_tbl_action_btn
+                                  li
+                                    a.btn.btn-link.btn-primary(href=`/admin/center/view/detail/${center._id}`)
+                                      i.fa.fa-eye
+                                  li
+                                    //- - var hasPermission = h.checkPermission(session.user, permissionCacheData, "EditCenter");
+                                    //- if hasPermission
+                                    a.btn.btn-link.btn-primary( href=`/admin/center/edit/${center._id}`)
+                                      i.fa.fa-edit
+                              td(style="display:none") #{center.status == "active" ? "enabled" : "disabled"}
+                .row
+
+  script.
+    $(document).ready(function() {
+      $("#dropdown1").select2();
+      var table = $('#basic-datatables').DataTable({
+        ordering: true,
+        columnDefs: [{
+          orderable: false,
+          targets: [3, 5, 6]
+        }]
+      });
+
+      $('#dropdown1').on('change', function () {
+        table
+          .columns(7)
+          .search(this.value)
+          .draw();
+      });
+    });

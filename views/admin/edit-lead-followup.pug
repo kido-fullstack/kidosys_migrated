@@ -1,0 +1,259 @@
+extends layout-admin
+
+block content
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        .page-inner.py-5
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold Edit Follow Up
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              if h.checkPermission(session.user, permissionCacheData, "LeadListing") || checkSuperAdmin
+                a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/lead/all') All Leads
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+      .page-inner
+        .row
+          .col-md-12
+            //- pre= h.dump(followupJSONs)
+            .card
+              .card-header
+                .card-title Lead
+              .card-body
+                .row
+                  .col-md-6.col-lg-6
+                    .form-group
+                    each followup in followupJSONs
+                      ul.list-group.list-group-bordered
+                        li.list-group-item
+                          h2 Lead Detail →
+                        li.list-group-item
+                          strong Type -
+                          | #{followup.lead_id.type}
+                        li.list-group-item
+                          strong LD Date -
+                          | #{moment(followup.lead_id.createdAt).format('L')}
+                        li.list-group-item
+                          strong Lead Name -
+                          | #{followup.lead_id.parent_name}
+                        li.list-group-item
+                          strong Child Name -
+                          | #{followup.lead_id.child_first_name} #{followup.lead_id.child_last_name}
+                        li.list-group-item
+                          strong Call -
+                          | #{followup.lead_id.parent_first_contact}
+                        li.list-group-item
+                          strong Call 2 -
+                          | #{followup.lead_id.parent_second_contact}
+                        li.list-group-item
+                          strong Email -
+                          | #{followup.lead_id.parent_email}
+                        li.list-group-item
+                          strong Category -
+                          | #{followup.lead_id.source_category}
+                        li.list-group-item
+                          strong ProgramCategory -
+                          | #{followup.lead_id && followup.lead_id.programcategory_id && followup.lead_id.programcategory_id.title}
+                        li.list-group-item
+                          strong Program -
+                          | #{followup.lead_id && followup.lead_id.program_id && followup.lead_id.program_id.program_name}
+                        li.list-group-item
+                          strong Country -
+                          | #{followup.lead_id && followup.lead_id.parent_country && followup.lead_id.parent_country.country_name}
+                        li.list-group-item
+                          strong State -
+                          | #{followup.lead_id && followup.lead_id.parent_state && followup.lead_id.parent_state.state_name}
+                        li.list-group-item
+                          strong City -
+                          | #{followup.lead_id && followup.lead_id.parent_city && followup.lead_id.parent_city.city_name}
+                        li.list-group-item
+                          strong Gender -
+                          | &nbsp;#{followup.lead_id && followup.lead_id.child_gender}
+                        li.list-group-item
+                          strong Stage -
+                          | &nbsp;#{followup.lead_id.stage}
+                  each followup in followupJSONs
+                    form.col-md-6.col-lg-4(action=`/admin/lead/edit/followup/${followup._id}`, method="POST")
+                      .form-group
+                        label(for='exampleFormControlSelect1') Select Status
+                        span.required-label *
+                        select#status.form-control(name='follow_status', required='')
+                            //- option(value='') Select Status
+                            each status in statuses
+                              option(value=`${status._id}|${status.name}` data-type=status.type data-stage=status.stage selected=(status.name == followup.follow_status)) #{status.name}
+                      .form-group
+                        label(for='exampleFormControlSelect1') Select Sub Status
+                        span.required-label *
+                        select#substatus.form-control(name='follow_sub_status', required='')
+                            //- option(value='') -- Select --
+                      .form-group
+                        label(for='exampleFormControlSelect1') Action Planned / Taken
+                        span.required-label *
+                        select#action_planned.form-control(name='action_taken[]', required='',multiple='multiple' )
+                            //- option(value='') Select Action Planned
+                            each action in actions
+                              option(value=action.name selected=(followup.action_taken.includes(action.name) == true ? 'selected' : null)) #{action.name}
+                        //-       selected=(center.programcategory_id.includes(programcategory._id.toString()) == true ? 'selected' : null)
+                        input#stage.form-control(type='hidden' name='stage' placeholder='Enter stage' value=followup.enq_stage)
+                        input#lead_type.form-control(type='hidden' name='lead_type' placeholder='Enter stage' value=followup.type)
+                      .form-group
+                        label(for='notes') Notes
+                        textarea#notes.form-control(rows='5' name="notes") #{followup.notes}
+                      .form-group
+                        label(for='dob') Follow-Up Date
+                        span.required-label *
+                        .input-group
+                            input#follow_date.form-control(type='text' name='follow_up_date' required='' autocomplete="off" value=moment(followup.follow_up_date).format('L') onkeydown="return false;")
+                      .form-group
+                        label Select Time
+                        span.required-label *
+                      .input-group
+                            input#follow_up_time.form-control(type='text' name='follow_up_time'  required="" value=followup.follow_up_time)
+                            .input-group-append
+                            span.input-group-text
+                                i.fa.fa-clock
+                      .form-group
+                        label(for='updated_by')
+                        | Updated By
+                        span.required-label
+                        input#updated_by.form-control(type='text' value=currentUser.name disabled)
+                        input.form-control(type='hidden' name="updated_by" value=currentUser._id.toString() disabled hidden)
+                      .form-group
+                        .card-action
+                            .row
+                            .col-md-12
+                                button.btn.btn-color.btm-block(type="submit") Save Changes
+
+
+
+  block script
+    script(type='text/javascript' src='https://cdn.jsdelivr.net/momentjs/latest/moment.min.js')
+    script(type='text/javascript' src='https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js')
+    script(type='text/javascript' src='/admin/assets/js/plugin/datepicker/bootstrap-datetimepicker.min.js')
+
+  script.
+    var substatuses = !{JSON.stringify(substatuses)}
+    var followupJSONs = !{JSON.stringify(followupJSONs)}
+    $(document).ready(function () {
+      $('#action_planned').select2({
+        placeholder: "Select Action",
+        theme: "bootstrap"
+      });
+      $('#status').select2({
+        placeholder: "Select status",
+        theme: "bootstrap"
+      });
+      $('#substatus').select2({
+        placeholder: "Select substatus",
+        theme: "bootstrap"
+      });
+      //- $('#stage').hide()
+
+      $(`#follow_date`).daterangepicker({
+        singleDatePicker: true,
+        showDropdowns: true,
+        minYear: moment().year(),
+        maxYear: parseInt(moment().format('YYYY'),10),
+        autoApply: true
+      });
+      $('#follow_up_time').datetimepicker({
+        format: 'h:mm A',
+      });
+    //-   each followup in followupJSONs
+      //- console.log(followupJSONs)
+      const object = Object.assign({},...followupJSONs)
+      //- console.log(object.follow_sub_status,"object")
+      for (var i = 0; i < substatuses.length; i++) {
+        var id = substatuses[i]['_id'];
+        var name = substatuses[i]['name'];
+        //- console.log(name,"name")
+        //- console.log(lead.substatus_id,"subid")
+
+        // console.log(page.testimonials.includes(id));
+
+        if (object.follow_sub_status.includes(name)) {
+          $("#substatus").append(`<option value='${id}|${name}' selected=(${object.follow_sub_status.includes(name) == true ? 'selected' : null})>${name}</option>`);
+        }else{
+          $("#substatus").append(`<option value='${id}|${name}')>${name}</option>`);
+        }
+      }
+      $(document).on('change', '#status', function () {
+        var statusId = $(this).val();
+        var type = $(this).find(':selected').attr('data-type');
+        var stage = $(this).find(':selected').attr('data-stage');
+
+        $("#lead_type").val(type);
+        $("#stage").val(stage);
+
+        var id = statusId.split("|")[0];
+        //- console.log(id,"id")
+        $.ajax({
+        method: 'POST',
+        url: `/admin/lead/status`,
+        data: {
+          type: id
+        },
+        dataType: 'json',
+        success: function (response) {
+          //- console.log(response,"response")
+
+          $("#substatus").empty();
+          $("#substatus").append(`<option value=''>Select Sub Status</option>`);
+
+          var len = response.data.length;
+          if(len == 1){
+            for (var i = 0; i < len; i++) {
+            //- console.log(response.data[i]);
+            var id = response.data[i]['_id'];
+            var program_name = response.data[i]['name'];
+            var stage = response.data[i]['stage']
+
+            //- console.log(response,"responssse")
+            //- console.log(id,"id")
+            //- console.log(stage,"stage")
+
+
+          //-   // $(".testi_class").append("<option value='" + id + "'>" + name + "</option>");
+
+              $("#substatus").append(`<option value='${id}|${program_name}' selected>${program_name}</option>`);
+            }
+          }else{
+
+            for (var i = 0; i < len; i++) {
+              //- console.log(response.data[i]);
+              var id = response.data[i]['_id'];
+              var program_name = response.data[i]['name'];
+              var stage = response.data[i]['stage']
+
+              //- console.log(response,"responssse")
+              //- console.log(id,"id")
+              //- console.log(stage,"stage")
+
+
+            //-   // $(".testi_class").append("<option value='" + id + "'>" + name + "</option>");
+
+              $("#substatus").append(`<option value='${id}|${program_name}'>${program_name}</option>`);
+            }
+          }
+          //- for (var i = 0; i < len; i++) {
+          //-   var id = response.data[i]['_id'];
+          //-   var program_name = response.data[i]['name'];
+          //-   var stage = response.data[i]['stage']
+
+          //-   //- console.log(response,"responssse")
+          //-   //- console.log(id,"id")
+          //-   //- console.log(stage,"stage")
+
+
+          //- //-   // $(".testi_class").append("<option value='" + id + "'>" + name + "</option>");
+
+          //-   $("#substatus").append(`<option value='${id}|${program_name}'>${program_name}</option>`);
+          //-   //- $("#stage").val(stage);
+          //- }
+          // $(".testi_class").select2("refresh");
+          }
+        });
+
+      })
+    })

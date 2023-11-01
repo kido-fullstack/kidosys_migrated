@@ -1,0 +1,100 @@
+extends layout-admin
+
+block content
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        .page-inner.py-5
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold Edit Program
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/program/all') All Program
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+      .page-inner
+        .row
+          .col-md-12
+            .card
+              form(action=`/admin/program/edit/${program._id}`, method="POST")
+                .card-body
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='name')
+                      | Program Name
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#program_name.form-control(type='text', name='program_name', placeholder='Enter Program Name', value=program.program_name ,required='')
+                  .form-group.form-show-validation.row
+                      label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='prod')
+                        |  Program Category
+                        span.required-label *
+                      .col-lg-7.col-md-9.col-sm-8
+                        .select2-input
+                          select#programcategory.form-control(name='programcategory_id', required='')
+                            option(value='') Select Category
+                            each programcategory in programcategorys
+                              option(value=programcategory._id selected=(programcategory._id.toString() == program.programcategory_id._id.toString())) #{programcategory.title}
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='name')
+                      | Age From
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#min_age.form-control(type='text', name='min_age', placeholder='Enter Age From', required='' value=program.min_age)
+                      small#emailHelp.form-text.text-muted Please give input in months
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='name')
+                      | Max Age
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#max_age.form-control(type='text', name='max_age', placeholder='Enter Age To', required='' value=program.max_age)
+                      small#emailHelp.form-text.text-muted Please give input in months
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='name')
+                      | Program Description
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      textarea.form-control(rows='10', cols='10', id="program_desc", name="program_desc" required) #{program.program_desc}
+                  .form-group.form-show-validation.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='country_id')
+                      | Status
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      .selectgroup.w-100
+                        label.selectgroup-item
+                          input.selectgroup-input(type='radio' name='status' value='active' checked=program.status=="active" required)
+                          span.selectgroup-button Active
+                        label.selectgroup-item
+                          input.selectgroup-input(type='radio' name='status' checked=program.status=="inactive" value='inactive')
+                          span.selectgroup-button Inactive
+                .card-action
+                  .row
+                    .col-md-12
+                      button.btn.btn-color(type="submit") Save Changes
+
+  block script
+    script(src="https://cdn.ckeditor.com/4.11.4/basic/ckeditor.js")
+
+  script.
+    $(document).ready(function () {
+      $('#programcategory').select2({
+        theme: "bootstrap"
+      });
+      $(document).on("keyup", "#min_age", function () {
+        var val = $(this).val();
+        if(isNaN(val)){
+            val = val.replace(/[^0-9\.]/g,'');
+            if(val.split('.').length>2)
+                val =val.replace(/\.+$/,"");
+        }
+        $(this).val(val);
+      })
+      $(document).on("keyup", "#max_age", function () {
+        var val = $(this).val();
+        if(isNaN(val)){
+            val = val.replace(/[^0-9\.]/g,'');
+            if(val.split('.').length>2)
+                val =val.replace(/\.+$/,"");
+        }
+        $(this).val(val);
+      })
+    })

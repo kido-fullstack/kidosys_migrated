@@ -1,0 +1,25 @@
+extends email-layout
+
+block content
+  p Dear #{msg.lead_name},
+  p My name is #{msg.sal} #{msg.spoc}, and I am the #{msg.designation} at Kido #{msg.center_name}. I am pleased to confirm your school tour on&nbsp;
+    span.title-email-bold #{msg.date}
+    | &nbsp;at&nbsp;
+    span.title-email-bold #{msg.time}.
+  p.title-email What to expect on a Kido School Tour
+  ul
+    li Understanding your child's preschool requirements.
+    li Meet the teachers, explore our classrooms, and understand our learning and teaching methodologies.
+    li Details on our award-winning curriculum highlight what makes Kido the preferred preschool choice by parents.
+    li Safety and hygiene policies.
+    li Settling your child in a preschool environment.
+    li Registration and enrollment process.
+    li A one-on-one session with parents to address your questions.
+  p You can reach out to me by emailing at #{msg.email} or by calling at #{msg.contact} or by messaging at #{msg.whatsapp}.
+  p Thank you, and I look forward to seeing you at Kido soon!
+  p
+    | Best Regards,
+    br
+    | #{msg.sal} #{msg.spoc} - #{msg.designation}.
+    br
+    | #{msg.center_main_name}.

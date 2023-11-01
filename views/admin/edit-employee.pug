@@ -1,0 +1,170 @@
+extends layout-admin
+
+block content
+  .main-panel
+    .container
+      .panel-header.bg-primary-gradient
+        .page-inner.py-5
+          .d-flex.align-items-left.align-items-md-center.flex-column.flex-md-row
+            div
+              h2.text-white.pb-2.fw-bold Update Users
+              h5.text-white.op-7.mb-2 Welcome to Admin Panel
+            .ml-md-auto.py-2.py-md-0
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/employee/all') All User
+              a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
+      .page-inner
+        .row
+          .col-md-12
+            .card
+              form(action=`/admin/employee/edit/${employee._id}`, method="POST")
+                .card-body
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='name')
+                      | First Name
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#name.form-control(type='text', name='first_name', placeholder='Enter First Name', required='' value=employee.first_name)
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='name')
+                      | Last Name
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#name.form-control(type='text', name='last_name', placeholder='Enter Last Name', required='' value=employee.last_name)
+                  .form-group.form-show-validation.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='email')
+                      | Email Address
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#email.form-control(type='email', name='email', placeholder='Enter Email', value=employee.email, required='')
+                      //- small#emailHelp.form-text.text-muted We'll never share your email with anyone else.
+                  .form-group.form-show-validation.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='password')
+                      | Password
+                      span.required-label
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#password.form-control(type='password', name='password', placeholder='Enter Password', data-placement='bottom' data-toggle='popover', data-container='body', data-html='true', autocomplete="off")
+                      small#emailHelp.form-text.text-muted If you do not wish to change the password. Please leave it empty.
+                  .form-group.form-show-validation.row#c_password(style="display: none")
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='password')
+                      | Confirm Password
+                      span.required-label
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#confirm_password.form-control(type='password', name='confirm_password', placeholder='Enter Confirm Password', autocomplete="off")
+                      span#popover-cpassword.hide.block-help
+                        i.fa.fa-info-circle.text-danger(aria-hidden='true')
+                        |  Password don&apos;t match
+                      #popover-password(style="margin-top:20px;")
+                        p(style="margin-bottom: 4px;")
+                          | Password Strength:&nbsp;
+                          span#result
+                        .progress
+                          #password-strength.progress-bar.progress-bar-success(role='progressbar' aria-valuenow='40' aria-valuemin='0' aria-valuemax='100' style='width:0%')
+                        ul.list-unstyled
+                          li
+                            span.low-upper-case
+                              i.fas.fa-ban(aria-hidden='true')
+                            | &nbsp; 1 lowercase &amp; 1 uppercase
+                          li
+                            span.one-number
+                              i.fas.fa-ban(aria-hidden='true')
+                            |  &nbsp;1 number (0-9)
+                          li
+                            span.one-special-char
+                              i.fas.fa-ban(aria-hidden='true')
+                            |  &nbsp;1 Special Character (!@#$%^&amp;*).
+                          li
+                            span.eight-character
+                              i.fas.fa-ban(aria-hidden='true')
+                            | &nbsp; Atleast 8 Character
+                  .form-group.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='Mobile No.')
+                      | Mobile No.
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      input#name.form-control(type='number', name='mobile', min="0", oninput="this.value = Math.abs(this.value)", autocomplete="off", placeholder='Enter Mobile No.', value=employee.mobile, required="")
+                  //- .form-group.form-show-validation.row
+                  //-   label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='user_type')
+                  //-     | User Type
+                  //-   .col-lg-7.col-md-9.col-sm-8
+                  //-     .select2-input
+                  //-       select#state.form-control(name='user_type', required='')
+                  //-         option(value='user') User
+                  //-         option(value='admin') Admin
+                  .form-group.form-show-validation.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='role_type')
+                      | Role Type
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      .select2-input
+                        select#role.form-control(name='role_type', required='')
+                          option(value='') --- Select Role ---
+                          each role in roles
+                            option(value=role._id selected=(role._id.toString() === roleAssign.role_id.toString())) #{role.name}
+                  .form-group.form-show-validation.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='role_type')
+                      | Country(s)
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      .select2-input
+                        input#country.form-control(type='text', name='country', value=(employee.country_id && employee.country_id.length ? employee.country_id.map(country => `${country.country_name}`).join(", ") : "Not Provided") disabled)
+                  .form-group.form-show-validation.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='role_type')
+                      | Zone(s)
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      .select2-input
+                        input#zone.form-control(type='text', name='country', value=(employee.zone_id && employee.zone_id.length ? employee.zone_id.map(zone => `${zone.name}`).join(", ") : "Not Provided") disabled)
+                  .form-group.form-show-validation.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='role_type')
+                      | Center(s)
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      .select2-input
+                        input#center.form-control(type='text', name='country', value=(employee.center_id && employee.center_id.length ? employee.center_id.map(center => `${center.school_display_name}`).join(", ") : "Not Provided") disabled)
+                  .form-group.form-show-validation.row
+                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='country_id')
+                      | Status
+                      span.required-label *
+                    .col-lg-7.col-md-9.col-sm-8
+                      .selectgroup.w-100
+                        label.selectgroup-item
+                          input.selectgroup-input(type='radio' name='status' value='active' checked=employee.status=="active" required)
+                          span.selectgroup-button Active
+                        label.selectgroup-item
+                          input.selectgroup-input(type='radio' name='status' checked=employee.status=="inactive" value='inactive')
+                          span.selectgroup-button Inactive
+
+                .card-action
+                  .row
+                    .col-md-12
+                      button.btn.btn-color.edit_sub(type="submit") Save Changes
+
+  block script
+    script(src='/admin/custom/password_confirm.js')
+
+  script.
+    $(document).ready(function () {
+      $('#role').select2({
+        placeholder: "Select Role",
+        theme: "bootstrap",
+        closeOnSelect: true
+      });
+
+      $("#password").keyup(function () {
+        //- console.log('he7yyy');
+        //- alert('jjj');
+        var pass = $('#password').val();
+        if (pass) {
+          $("#emailHelp").hide();
+          $("#c_password").show();
+          $("#strength-blk").show();
+          $("#confirm_password").attr("required", true);
+        } else {
+          $('.edit_sub').attr("disabled", false);
+          $("#emailHelp").show();
+          $("#c_password").css("display", "none");
+          $("#strength-blk").css("display", "none");
+          $("#confirm_password").attr("required", false);
+        }
+      })
+    });

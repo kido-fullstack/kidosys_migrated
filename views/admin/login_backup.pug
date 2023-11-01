@@ -1,0 +1,74 @@
+doctype html
+html(lang='en')
+	head
+		meta(http-equiv='Content-Type', content='text/html; charset=utf-8')
+		meta(http-equiv='X-UA-Compatible', content='IE=edge')
+		title= `${title} | LMS`
+		meta(content='width=device-width, initial-scale=1.0, shrink-to-fit=no', name='viewport')
+		link(rel='icon', href='/admin/assets/img/favicon_kido.png', type='image/x-icon')
+		//- Fonts and icons
+		script(src='/admin/assets/js/plugin/webfont/webfont.min.js')
+		script.
+			WebFont.load({
+			google: {"families":["Lato:300,400,700,900"]},
+			custom: {"families":["Flaticon", "Font Awesome 5 Solid", "Font Awesome 5 Regular", "Font Awesome 5 Brands", "simple-line-icons"], urls: ['/admin/assets/css/fonts.min.css']},
+			active: function() {
+			sessionStorage.fonts = true;
+			}
+			});
+		//- CSS Files
+		link(rel='stylesheet', href='/admin/assets/css/bootstrap.min.css')
+		link(rel='stylesheet', href='/admin/assets/css/atlantis.css')
+		link(rel='stylesheet', type='text/css', href='/admin/assets/css/custom.css')
+	body.login
+		block messages
+				if locals.flashes
+					.inner
+						.flash-messages
+							- const categories = Object.keys(locals.flashes)
+							each category in categories
+								each message in flashes[category]
+									.flash(class=`flash--${category}`)
+										p.flash__text!= message
+										button.flash__remove(onClick="this.parentElement.remove()") &times;
+		.wrapper.wrapper-login.wrapper-login-full.p-0
+			.login-aside.w-50.d-flex.flex-column.align-items-center.justify-content-center.text-center.bg-white
+				img(src="/admin/assets/img/logo_mtt.png", alt="inventory logo", width=420)
+				//- h1.title.fw-bold.mb-3 inventory
+				p.subtitle.op-7(style="padding-top: 10px") Welcome to Admin panel.
+			.login-aside.w-50.d-flex.align-items-center.justify-content-center.bg-secondary-gradient
+				.container.container-login.container-transparent.animated.fadeIn
+					h3.text-center.text-white Sign In
+					form.login-form(action="/admin/account/login" id="eventForm" method="POST")
+						.form-group
+							label.placeholder(for='email')
+								b.text-white Email
+							input#username.form-control(name='email', type='text', required='')
+						.form-group
+							label.placeholder(for='password')
+								b.text-white Password
+							//- a.link.float-right(href='login3.html#') Forget Password ?
+							.position-relative
+								input#password.form-control(name='password', type='password', required='')
+								.show-password
+									i.icon-eye
+						.form-group.form-action-d-flex.mb-3
+							button.btn.btn-secondary.col-md-12.float-right.mt-3.mt-sm-0.fw-bold.has-spinner(type="submit")
+								span.spinner
+									i.fa.fa-refresh.fa-spin
+								| Sign In
+					//- .login-account
+							span.msg Back to&nbsp;
+							a#show-signup.link(href='/') Main Site
+		script(src='/admin/assets/js/core/jquery.3.2.1.min.js')
+		script(src='/admin/assets/js/plugin/jquery-ui-1.12.1.custom/jquery-ui.min.js')
+		script(src='/admin/assets/js/core/popper.min.js')
+		script(src='/admin/assets/js/core/bootstrap.min.js')
+		script(src='/admin/assets/js/atlantis.min.js')
+		script(src='/admin/custom/login.js')
+
+		script.
+			$('.flash-messages').delay(2100).hide('slow');
+			$('.has-spinner').click(function() {
+					$(this).toggleClass('active');
+			});
