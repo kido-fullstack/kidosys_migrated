@@ -1131,3 +1131,7 @@ input[type=checkbox]:checked:before {
 .headerBox,.headerBox:hover,.headerBox:focus,.headerBox:active{
   text-decoration: none;
 }
+
+.edt_knowus ul li:first-child .select2-selection__choice__remove {
+  display: none;
+}
