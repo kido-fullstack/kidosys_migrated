@@ -72,7 +72,7 @@ $(document).ready(function () {
   function dateCallBack (start, end) {
     $('#date').val(start.format('MM/DD/YYYY') + ' - ' + end.format('MM/DD/YYYY'));
   }
-  dateCallBack(moment().month("Apr").startOf('month'), moment().add(1, 'year').month("Mar").endOf('month'));
+  dateCallBack(moment().month("Jan").startOf('month'), moment().month("Dec").endOf('month'));
 
   // WHEN DATE RANGE IS SELECTED
   $('#date').on('apply.daterangepicker', function(ev, picker) {

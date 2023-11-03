@@ -19,7 +19,9 @@ block content
             //- pre= h.dump(followups && followups.length && followups[0].notes)
             .card
               .card-header
-                .card-title Lead (#{lead.lead_no})
+              a(href=`/admin/lead/edit/${lead._id}`)
+                .card-title(style="margin: 20px;") Lead (#{lead.lead_no})
+                 i.edit-icon(class="fa fa-edit" style="padding-left: 10px;")
               .card-body
                 .row
                   .col-md-6.col-lg-6
@@ -921,4 +923,7 @@ block content
     function redirectToallmessageemail (emailid) {
       console.log(emailid,"email")
       window.location.href = `/admin/lead/allmessage/${lead._id}|${"email"}|${emailid}`;
+    }
+    function redirectToEditfollowup (followup_id) {
+      window.location.href = `/admin/lead/edit/followup/${followup_id} `;
     }
