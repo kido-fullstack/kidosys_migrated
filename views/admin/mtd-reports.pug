@@ -241,6 +241,22 @@ block content
         }
       });
 
+      $('input[name="date_range"]').daterangepicker({
+        autoUpdateInput: false,
+        startDate: moment().startOf('isoWeek'),
+        endDate: moment().endOf('isoWeek'),
+        ranges: {
+            'Today': [moment(), moment()],
+            'Yesterday':[moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+            'This Week': [moment().startOf('isoWeek'), moment().endOf('isoWeek').add(1, 'days')],
+            'This Month': [moment().startOf('month'), moment().endOf('month')],
+            //- 'Overdue(All)':[moment().subtract(1825, 'days'), moment().subtract(1, 'days')],
+          },
+        locale: {
+          cancelLabel: 'Clear'
+        }
+      });  
+
       $('input[name="date_range"]').on('apply.daterangepicker', function(ev, picker) {
         $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
         table
