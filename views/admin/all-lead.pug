@@ -248,6 +248,7 @@ block content
                     table#all_lead.display.table.table-striped.table-hover.dataTable(role='grid', aria-describedby='basic-datatables_info')
                       thead
                         tr(role='row')
+                          th(data-orderable="false") Actions
                           th(data-bSortable="false") Lead ID
                           th Date
                           th Updated
@@ -264,7 +265,7 @@ block content
                           th Pro Cat
                           th Program
                           th Status
-                          th(data-orderable="false") Actions
+                          //- th(data-orderable="false") Actions
                       tbody
                 .row
 

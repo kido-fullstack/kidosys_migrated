@@ -3334,6 +3334,8 @@ exports.getEditLead = async (req, res, next) => {
   try {
     // console.log(req.body.adminCheck, "req.body");
     if (req.session.user.main && req.session.user.main == "super_admin") {
+      const nextlead = await Lead.findOne({_id: {$gt: ObjectId(req.params.lead_id) }}).limit(1);
+      const prevlead = await Lead.findOne({ _id: { $lt: ObjectId(req.params.lead_id) } }).sort({ _id: -1 }).limit(1);
       // console.log("welcome admin");
       const lead = await Lead.findOne({ _id: req.params.lead_id });
       // console.log("lead")
@@ -3427,7 +3429,7 @@ exports.getEditLead = async (req, res, next) => {
       ]);
       // console.log(citys,citys)
       const [
-        knowuss,
+        knowuss1,
         substatuses,
         actions,
         centers,
@@ -3443,6 +3445,12 @@ exports.getEditLead = async (req, res, next) => {
       ]);
       // console.log(lead)
       // console.log(citys,"citys")
+      var knowussVr = knowuss1;
+      var temp = (lead.parent_know_aboutus).reverse();
+      knowussVr.sort(function (a, b) {
+        return (temp).indexOf(b.name) - (temp).indexOf(a.name);
+      });
+      const knowuss = [...knowussVr];
       if (lead.type === "lead") {
         const StatusCollections = mongoose.connection.db.collection("statuses");
         const statuses = await StatusCollections.find({_id: {$nin :[ObjectId("64394ba0b858bfdf6844e96e"), ObjectId("64394baeb858bfdf6844e96f"), ObjectId("643d129984abb0ac02beacc6"), ObjectId("65265448d072d7ac1a6f022d"), ObjectId("65265479d072d7ac1a6f022e") ]} }).sort({
@@ -3450,6 +3458,8 @@ exports.getEditLead = async (req, res, next) => {
         }).toArray();
         // console.log(centers);
         res.render("admin/edit-lead", {
+          nextlead,
+          prevlead,
           title: "Edit Lead",
           lead,
           programcategorys,
@@ -3492,6 +3502,8 @@ exports.getEditLead = async (req, res, next) => {
           employees,
           states,
           citys,
+          nextlead,
+          prevlead,
         });
         return;
       }
@@ -3587,7 +3599,7 @@ exports.getEditLead = async (req, res, next) => {
       const centers = await Center.find({ _id: { $in: viewOption.centers } });
       // console.log(centers, "centers");
       // console.log(citys,citys)
-      const [knowuss, substatuses, actions, programs, lead, programcategorys] =
+      const [knowuss1, substatuses, actions, programs, lead, programcategorys] =
         await Promise.all([
           knowussPromises,
           substatusesPromise,
@@ -3598,6 +3610,12 @@ exports.getEditLead = async (req, res, next) => {
         ]);
       // console.log(lead)
       // console.log(citys,"citys")
+      var knowussVr = knowuss1;
+      var temp = (lead.parent_know_aboutus).reverse();
+      knowussVr.sort(function (a, b) {
+        return (temp).indexOf(b.name) - (temp).indexOf(a.name);
+      });
+      const knowuss = [...knowussVr];
       if (lead.type === "lead") {
         const StatusCollections = mongoose.connection.db.collection("statuses");
         const statuses = await StatusCollections.find({_id: {$nin :[ObjectId("64394ba0b858bfdf6844e96e"), ObjectId("64394baeb858bfdf6844e96f"), ObjectId("643d129984abb0ac02beacc6"), ObjectId("65265448d072d7ac1a6f022d"), ObjectId("65265479d072d7ac1a6f022e") ]} }).sort({
@@ -5864,10 +5882,11 @@ exports.datatableFollowupFilter = async (req, res, next) => {
     // console.log('End of the week:', endOfWeek.format('YYYY-MM-DD'));
     const startDate = startOfWeek.toDate();
     const endDate = endOfWeek.toDate();
+    const dtBgin = new Date("2023-01-01");
     // console.log("startDate-------", startDate);
     // console.log("endDate-------", endDate);
     // console.log("req.body", req.body);
-    const sortingArr = ["lead_no_val", "lead_date", "updatedAt", "parent_name", "child_first_name", "child_last_name", "stage", "type", `${req.session.user.main && req.session.user.main == req.config.admin.main ? 'school_id.school_display_name' : 'child_first_name'}`, "parent_know_aboutus", "source_category", "programcategory_id.title", "program_id.program_name", "status_id.name", "lead_no"];
+    const sortingArr = ["lead_no_val", "lead_date", "updatedAt", "parent_name", "child_first_name", "child_last_name", "stage", "type", `${req.session.user.main && req.session.user.main == req.config.admin.main ? 'school_id.school_display_name' : 'child_first_name'}`, "parent_know_aboutus", "source_category", "programcategory_id.title", "program_id.program_name", "status_id.name","substatus_id.name","lead_no"];
     let zoneCount = 0;
     let newArr = [];
     let findQue = {};
@@ -5880,7 +5899,7 @@ exports.datatableFollowupFilter = async (req, res, next) => {
       {
         '$match': {
           'follow_due_date': {
-            '$gte': startDate,
+            '$gte': dtBgin,
             '$lte': endDate
           }
         }
@@ -5892,7 +5911,23 @@ exports.datatableFollowupFilter = async (req, res, next) => {
           'foreignField': '_id',
           'as': 'status_id'
         }
-      }, {
+      }, 
+      {
+        '$lookup': {
+          'from': 'substatuses',
+          'localField': 'substatus_id',
+          'foreignField': '_id',
+          'as': 'substatus_id'
+        }
+      },
+      {
+        '$unwind': {
+          'path': '$substatus_id',
+          // 'includeArrayIndex': 'string',
+          // 'preserveNullAndEmptyArrays': true
+        }
+      },
+      {
         '$unwind': {
           'path': '$status_id',
           // 'includeArrayIndex': 'string',
@@ -6149,7 +6184,17 @@ exports.datatableFollowupFilter = async (req, res, next) => {
         }
       });
     }
-
+    if (req.query.substatus) {
+      // console.log(center,"center")
+      findQue = {
+        substatus_id:  mongoose.Types.ObjectId(req.query.substatus)
+      };
+      aggregateQue.unshift({
+        '$match': {
+          'substatus_id': mongoose.Types.ObjectId(req.query.substatus)
+        }
+      });
+    }
     if (req.query.sSearch_3) {
       findQue = {
         source_category: req.query.sSearch_3
@@ -8353,7 +8398,7 @@ exports.uploadExcelPost = async (req, res, next) => {
             enrolled: 0,
             follow_due_date: new Date(dateByTimeZone),
             follow_due_time: "",
-            is_external: 0,
+            is_external: 2,
             external_source: "",
             sibling: 0,
             is_related: null,
