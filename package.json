@@ -33,9 +33,9 @@
     "html-to-text": "^9.0.0",
     "html2pug": "^4.0.0",
     "http-errors": "^2.0.0",
-    "jimp": "^0.16.2",
+    "jimp": "^0.22.10",
     "joi": "^17.8.1",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.2",
     "juice": "^8.1.0",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
@@ -65,6 +65,6 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "nodemon": "^2.0.20"
+    "nodemon": "^3.0.1"
   }
 }
