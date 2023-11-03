@@ -1,6 +1,5 @@
 require('dotenv').config();
 
-
 module.exports = Object.assign({}, {
     server: {
         port: process.env.PORT || 49006,
