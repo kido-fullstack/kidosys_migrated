@@ -2975,9 +2975,9 @@ body {
   background: #1f283e !important;
 }
 
-.logo-header[data-background-color="blue"] {
-  background: #00356b !important;
-}
+/* .logo-header[data-background-color="blue"] {
+  background: #967bb6 !important;
+} */
 
 .logo-header[data-background-color="blue2"] {
   background: #1269DB !important;
@@ -3199,9 +3199,9 @@ body {
   background-color: #dcdbdb;
 }
 
-.sidebar[data-background-color="blue"] {
-  background: #00356b !important;
-}
+/* .sidebar[data-background-color="blue"] {
+  background: #967bb6 !important;
+} */
 
 .sidebar[data-background-color="blue"] .user {
   margin-top: 0px;
@@ -22590,11 +22590,11 @@ body[data-background-color="dark"] .board {
   background: linear-gradient(-45deg, #0A0B11, #1f283e) !important;
 }
 
-.bg-primary-gradient {
-  background: #00356b !important;
-  background: -webkit-linear-gradient(legacy-direction(-45deg), #06418E, #00356b) !important;
-  background: linear-gradient(346deg, #0b4fa7, #00356b) !important;
-}
+/* .bg-primary-gradient {
+  background: #967bb6 !important;
+  background: -webkit-linear-gradient(legacy-direction(-45deg), #967bb6, #967bb6) !important;
+  background: linear-gradient(346deg, #967bb6, #967bb6) !important;
+} */
 
 .bg-secondary-gradient {
   background: #2A2F5B !important;

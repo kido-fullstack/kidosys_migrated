@@ -185,7 +185,8 @@ block content
         bServerSide: true,
         pagination: true,
         ordering: true,
-        //- dom: 'Bfrtip',
+        lengthMenu: [ [25, 50, -1], [25, 50, "All"] ],
+        dom: 'lifrtp',
         order: [[2, 'desc']],
         buttons: [{
             extend: 'excel',
@@ -306,7 +307,7 @@ block content
               }
             },
             {
-              data: 'parent_know_aboutus',
+              data: 'source_category',
               render: function (data, type, row) {
                 return `${data && data ? data : 'Not Provided'}`
               }
@@ -407,6 +408,10 @@ block content
             data.push({
                 "name": "stage",
                 "value": $('#stage').val()
+            });
+            data.push({
+                "name": "substatus",
+                "value": $('#substatus').val()
             });
         }
       });
@@ -797,6 +802,40 @@ block content
           if(!id){
             $("#clr_status").css('visibility', 'hidden');
           }
+
+          $("#substatus").empty();
+
+          $.each(id, function (k, v) {
+
+            $.ajax({
+              method: 'POST',
+              url: `/admin/lead/status`,
+              data: {
+                type: v
+              },
+              dataType: 'json',
+              success: function (response) {
+                $("#substatus").append(`<option value=''>Select Substatus</option>`);
+                var len = response.data.length;
+                if(len == 1){
+                  for (var i = 0; i < len; i++) {
+                  var id = response.data[i]['_id'];
+                  var program_name = response.data[i]['name'];
+                  var stage = response.data[i]['stage']
+                    $("#substatus").append(`<option value='${id}' selected>${program_name}</option>`);
+                  }
+                }else{
+                  for (var i = 0; i < len; i++) {
+                    var id = response.data[i]['_id'];
+                    var program_name = response.data[i]['name'];
+                    var stage = response.data[i]['stage']
+
+                    $("#substatus").append(`<option value='${id}'>${program_name}</option>`);
+                  }
+                }
+              }
+            });
+    }); 
       })
       $(document).on('change', '#program', function () {
           var id = $(this).val();
@@ -871,7 +910,8 @@ block content
       function cb (start, end) {
         $('input[name="date_range"]').val(start.format('MM/DD/YYYY') + ' - ' + end.format('MM/DD/YYYY'));
       }
-      cb(moment().startOf('isoWeek'), moment().endOf('isoWeek'));
+      //- cb(moment().startOf('isoWeek'), moment().endOf('isoWeek'));
+      cb(moment("01/01/2023"), moment());
 
       $('input[name="date_range"]').on('apply.daterangepicker', function(ev, picker) {
           $(this).val(picker.startDate.format('YYYY/MM/DD') + ' - ' + picker.endDate.format('YYYY/MM/DD'));
@@ -1041,7 +1081,15 @@ block content
           .columns(7)
           .search(this.value)
           .draw();
-        $("#clr_status ").css('visibility', 'visible');
+      $("#clr_status ").css('visibility', 'visible');
+      });
+
+       $('#substatus').on('change', function () {
+        table
+          .columns(7)
+          .search(this.value)
+          .draw();
+      $("#clr_status ").css('visibility', 'visible');
       });
 
       $('#clr_status ').click(function (e) {

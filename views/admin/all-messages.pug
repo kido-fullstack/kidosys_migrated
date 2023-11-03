@@ -41,6 +41,7 @@ block content
                           if session.user && session.user.main == "super_admin"
                             th Created by
                           th Status
+                          th Count
                           th Action
                       tbody
                         each message in messages
@@ -58,6 +59,7 @@ block content
                               if session.user && session.user.main == "super_admin"
                                 td #{message.createdBy && message.createdBy.first_name ? message.createdBy.first_name : "System"} #{message.createdBy && message.createdBy.last_name ? message.createdBy.last_name : "Admin"}
                               td #{message.status == 'active' ? 'Active' : 'Inactive'}
+                              td #{message.count}
                               td
                                 if h.checkPermission(session.user, permissionCacheData, "MessageEdit") || checkSuperAdmin
                                   a.btn.btn-link.btn-primary(href=`/admin/message/edit/${message._id}`)

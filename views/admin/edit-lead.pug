@@ -32,7 +32,15 @@ block content
             //-                 option(value=center._id selected=(center._id.toString() == lead.school_id.toString())) #{center.school_name}
             .card
               .card-header
-                .card-title Child Information
+                .row
+                  .col-md-6.col-lg-4
+                    if(prevlead)
+                      a(href=(`${prevlead._id}`)) Previous Lead #{prevlead.lead_no}
+                  .col-md-6.col-lg-4
+                    .card-title Child Information #{lead.lead_no}
+                  .col-md-6.col-lg-4
+                    if(nextlead)
+                      a(href=(`${nextlead._id}`)) Next Lead #{nextlead.lead_no}
               .card-body
                 .row
                   .col-md-6.col-lg-4
@@ -392,7 +400,7 @@ block content
                       span.enquiry-mark.required-label *
                       input#parent_pincode.form-control(type='text' name='parent_pincode'  placeholder='Enter Parent Pincode' value=lead.parent_pincode)
                   .col-md-6.col-lg-4
-                      .form-group
+                      .form-group.edt_knowus
                         label(for='exampleFormControlSelect1') How did you come to Know about us
                         span.required-label *
                         //- label.form-check-label(style="position:absolute;right:10px;")
@@ -402,7 +410,7 @@ block content
                           option(value='') How did you come to Know about us*
                           each knowus in knowuss
                             //- option(value=knowus.name) #{knowus.name}
-                            option(value=`${knowus.name}` selected=(lead.parent_know_aboutus.includes(knowus.name) == true ? 'selected' : null)) #{knowus.name}
+                            option(value=`${knowus.name}` test=`${lead.parent_know_aboutus}` selected=(lead.parent_know_aboutus.includes(knowus.name) == true ? 'selected' : null) ) #{knowus.name}
                   if lead.type === "enquiry"
                     #landmark.col-md-6.col-lg-3
                       .form-group
@@ -681,7 +689,23 @@ block content
       }
       $('#know_us').select2({
         placeholder: "Select Known us",
-        theme: "bootstrap"
+        theme: "bootstrap",
+        templateResult: function(data) {
+              if((lead.parent_know_aboutus).length){
+                  $("#select2-know_us-results").css("margin-top","-3%");
+                  if($($('#know_us').find(":selected")[0]).text() == data.text){
+                    return '<li style="display:none"></li>';
+                  }else{
+                    return '<li>' + data.text + '</li>';
+                  }
+              }else{
+                return '<li>' + data.text + '</li>';
+              }
+        },
+        escapeMarkup: function(m) {
+            //- console.log($("#select2-know_us-results li:first").length);
+            return m;
+        }
       });
       $("#sel_know_check").click(function(){
         if($("#sel_know_check").is(':checked') ){

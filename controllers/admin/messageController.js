@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Message = mongoose.model('Message');
+const Response = mongoose.model('Response');
 const moment = require('moment');
 const helper = require('../../handlers/helper');
 
@@ -10,7 +11,7 @@ exports.test = async (req, res, next) => {
 exports.getAllMessages = async (req, res, next) => {
   try {
     if (req.session.user.main && req.session.user.main == req.config.admin.main) {
-      const messages = await Message
+      var messages = await Message
         .find()
         .populate({
           path: "createdBy",
@@ -20,6 +21,38 @@ exports.getAllMessages = async (req, res, next) => {
           }
         })
         .sort({ createdAt: req.responseAdmin.DESC });
+
+      const respCnt = await Response.aggregate([
+          {
+            $group: {
+              _id: '$msg_id', // Group by the 'category' field
+              count: { $sum: 1 } // Count the occurrences in each group
+            }
+          }
+        ]);
+        var msgs_fin = [];
+        messages.map((msg, i) => {
+
+          var temp = 0;
+
+          msg["count"] = temp;
+
+          respCnt.map((resp, j) => {
+            if(mongoose.Types.ObjectId(resp._id).toString() == mongoose.Types.ObjectId(msg._id).toString()){
+              temp = resp.count;              
+              // console.log(temp);
+            }
+          });
+          var temp1 = msg.toJSON();
+          temp1.count = temp;
+          // temp1["count"] = "ashdjasd";
+          // console.log( temp1);
+          // JSON.parse
+          // msgs_fin[i] = { ...msg, count: temp };
+          messages[i] = temp1;
+
+      }); 
+
       return res.render('admin/all-messages', {
         title: 'All Messages',
         messages,
