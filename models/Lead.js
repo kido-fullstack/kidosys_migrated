@@ -66,6 +66,9 @@ const leadSchema = new Schema({
   parent_profession:{
     type:String
   },
+  parent_reference:{
+    type:String
+  },
   secondary_parent_name:{
     type:String
   },

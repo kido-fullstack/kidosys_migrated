@@ -9,6 +9,9 @@ const msgSchema = new Schema({
   msg: {
     type: String
   },
+  type: {
+    type: String
+  },
   center_id: [{
     type: Schema.Types.ObjectID,
     ref: 'Center'
@@ -16,7 +19,7 @@ const msgSchema = new Schema({
   attachment: [{
     type: String
   }],
-  viewoption:{
+  viewoption: {
     type: Schema.Types.ObjectID,
     ref: 'ViewOption'
   },
@@ -49,10 +52,11 @@ const msgSchema = new Schema({
 msgSchema.statics.getMessageDetail = function (msg_id) {
   return this.aggregate([
     {
-      '$match':{
-        _id : mongoose.Types.ObjectId(msg_id)
+      '$match': {
+        _id: mongoose.Types.ObjectId(msg_id)
       }
-    },{
+    },
+    {
       '$lookup': {
         from: "responses",
         localField: "_id",
@@ -61,17 +65,18 @@ msgSchema.statics.getMessageDetail = function (msg_id) {
       },
     },
     {
-      '$project':{
-        "_id":1,
-        "title":1,
-        "msg":1,
-        "attachment":1,
-        "sent":{
-          $sum:"$result.sent_count"
+      '$project': {
+        "_id": 1,
+        "title": 1,
+        "msg": 1,
+        "type": 1,
+        "attachment": 1,
+        "sent": {
+          $sum: "$result.sent_count"
         }
       }
     },
-  ])
+  ]);
 };
 
 msgSchema.statics.getAllMessagesAdmin = function (sorting_field, skip, limit) {
@@ -93,13 +98,14 @@ msgSchema.statics.getAllMessagesAdmin = function (sorting_field, skip, limit) {
       '$sort': sorting_field
     },
     {
-      $project:{
-        "_id":1,
-        "title":1,
-        "msg":1,
-        "attachment":1,
-        "sent":{
-          $sum:"$result.sent_count"
+      $project: {
+        "_id": 1,
+        "title": 1,
+        "msg": 1,
+        "type": 1,
+        "attachment": 1,
+        "sent": {
+          $sum: "$result.sent_count"
         }
       }
     },
@@ -109,7 +115,7 @@ msgSchema.statics.getAllMessagesAdmin = function (sorting_field, skip, limit) {
     {
       '$limit': limit
     }
-  ])
+  ]);
 };
 
 msgSchema.statics.getAllMsgsNonAdmin = function (objectIds, sorting_field, skip, limit) {
@@ -117,10 +123,8 @@ msgSchema.statics.getAllMsgsNonAdmin = function (objectIds, sorting_field, skip,
     {
       '$match': {
         status: "active",
-        $or:[
-          { center_id: {
-            $in: objectIds
-          }},
+        $or: [
+          { center_id: { $in: objectIds } },
           { added_by: 1 }
         ]
       }
@@ -155,17 +159,20 @@ msgSchema.statics.getAllMsgsNonAdmin = function (objectIds, sorting_field, skip,
     },
     {
       '$project': {
-        'title':1,
-        "msg":1,
-        "attachment":1,
-        "sent":"$total.sent_count"
+        'title': 1,
+        "msg": 1,
+        "type": 1,
+        "attachment": 1,
+        "sent": "$total.sent_count"
       }
-    },{
+    },
+    {
       '$skip': skip
-    }, {
+    },
+    {
       '$limit': limit
     }
-  ])
-}
+  ]);
+};
 
 module.exports = mongoose.model('Message', msgSchema);

@@ -30,20 +30,12 @@ block content
                       span.required-label *
                     .col-lg-7.col-md-9.col-sm-8
                       textarea.form-control(rows='15', cols='5', id="msg_desc", name="msg_desc") Hi @client_name,
+                      div.pt-2
+                        input(type='radio', name='type', value='message')
+                        label(for='message', class='pr-4') Message
+                        input(type='radio', name='type', value='email') 
+                        label(for='email') Email 
                   .form-group.row
-                    label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='name')
-                      | Upload file
-                      //- span.required-label *
-                    .col-lg-7.col-md-9.col-sm-8
-                      .form-group
-                        //- label(for='Multi Image')
-                        .input-file.input-file-image
-                          .form-group
-                            .row.custom_li
-                          //- img.img-upload-preview.img-circle(width='200' height='200' src='/admin/assets/img/upload.png' alt='preview' id="imgBox")
-                          button.btn.btn-color(type="button" onclick="uploadMultiImages()") Upload File(s)
-
-                  .form-group.form-show-validation.row
                     label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='country_id')
                       | Status
                       span.required-label *

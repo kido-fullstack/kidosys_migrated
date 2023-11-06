@@ -17,6 +17,7 @@ const editLeadSchema = Joi.object({
   parent_email: Joi.string().required(),
   parent_education: Joi.string().optional().allow(''),
   parent_profession: Joi.string().optional().allow(''),
+  parent_reference: Joi.string().optional().allow(''),
   secondary_parent_name: Joi.string().optional().allow(''),
   secondary_parent_type: Joi.string().optional().allow(''),
   secondary_first_contact: Joi.string().optional().allow(''),
