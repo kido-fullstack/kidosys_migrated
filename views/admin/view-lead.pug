@@ -154,14 +154,18 @@ block content
                       .form-group
                         label(for='parent_email') Email Id
                         input#parent_email.form-control(type='text' name='parent_email' placeholder='Enter Email' value=lead.parent_email required='' disabled)
-                    .col-md-6.col-lg-6
+                    .col-md-6.col-lg-4
                       .form-group
                         label(for='parent_education') Education
                         input#parent_education.form-control(type='text' name='parent_education' placeholder='Enter Parent education' value=(lead.parent_education ? lead.parent_education : "") disabled)
-                    .col-md-6.col-lg-6
+                    .col-md-6.col-lg-4
                       .form-group
                         label(for='parent_profession') Profession
                         input#parent_profession.form-control(type='text' name='parent_profession' placeholder='Enter Parent Profession' value=(lead.parent_profession ? lead.parent_profession :"") disabled)
+                    .col-md-6.col-lg-4
+                      .form-group
+                        label(for='parent_reference') Lead Reference
+                        input#parent_reference.form-control(type='text' name='parent_reference' placeholder='Enter Lead Reference' value=(lead.parent_reference ? lead.parent_reference :"") disabled)    
                     #cor_parent.col-md-3.col-lg-3
                       .form-group
                         label.form-label(for='lead_type') Lead type:
