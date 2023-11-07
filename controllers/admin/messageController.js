@@ -104,11 +104,8 @@ exports.postAddMessage = async (req, res, next) => {
     const newMsg = new Message({
       title: req.body.msg_title,
       msg: req.body.msg_desc,
-<<<<<<< HEAD
       when_to_use: req.body.when_to_use,
-=======
       type: req.body.type,
->>>>>>> cb38e58fdaeeae8a7d00fca330baa2d715a1925f
       attachment:fileArr,
       status: req.body.status,
       viewoption: req.session.user.view_option,
