@@ -3702,6 +3702,37 @@ exports.getEditLead = async (req, res, next) => {
   }
 };
 
+exports.markLeadUnread = async (req, res, next) => {
+
+  try {
+      // console.log(req);
+      var oldlead = await Lead.findOne({ _id: req.body.id });
+      // oldlead.is_external = 2;
+      // var updateLead = await Lead.updateOne(oldlead);
+
+      const updateLead = await Lead.updateOne(
+        {
+          _id: req.body.id,
+        },
+        {
+          $set: {
+            is_external: 2,
+          },
+        }
+      ).exec();
+      // var tmp = req;
+      return res.status(200).json({
+        msg: "markLeadUnread",
+        data: updateLead,
+        code: 200,
+      });
+      
+  } catch (error) {
+    
+  }
+
+}
+
 exports.postEditLead = async (req, res, next) => {
   try {
     const oldlead = await Lead.findOne({ _id: req.params.lead_id });
