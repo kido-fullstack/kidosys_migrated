@@ -30,6 +30,11 @@ router.get('/add/followup/:lead_id',
   leadController.getAddFollowUp
 );
 
+router.post('/markUnread',
+  // handlers.requirePermission(permission_name.LEAD_EDIT),
+  leadController.markLeadUnread
+);
+
 router.get('/edit/followup/:follow_id',
   handlers.requirePermission(permission_name.FOLLOWUP_EDIT),
   leadController.getEditFollowUp

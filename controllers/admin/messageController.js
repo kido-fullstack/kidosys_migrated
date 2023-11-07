@@ -104,7 +104,11 @@ exports.postAddMessage = async (req, res, next) => {
     const newMsg = new Message({
       title: req.body.msg_title,
       msg: req.body.msg_desc,
+<<<<<<< HEAD
       when_to_use: req.body.when_to_use,
+=======
+      type: req.body.type,
+>>>>>>> cb38e58fdaeeae8a7d00fca330baa2d715a1925f
       attachment:fileArr,
       status: req.body.status,
       viewoption: req.session.user.view_option,
@@ -150,6 +154,7 @@ exports.postEditMessage = async (req, res, next) => {
         title: req.body.msg_title,
         msg: req.body.msg_desc,
         when_to_use: req.body.when_to_use,
+        type: req.body.type,
         attachment: req.body.pdf_file || [],
         status: req.body.status
       },
@@ -178,11 +183,12 @@ exports.postAddFromDirectMessage = async (req, res, next) => {
     const newMsg = new Message({
       title: req.body.msg_title,
       msg: req.body.msg_desc,
+      type: req.body.type,
       attachment: req.body.pdf_file,
       status: req.body.status,
       viewoption: req.session.user.view_option,
       center_id: req.session.user.center_id,
-      added_by: req.session.user.main && req.session.user.main == req.config.admin.main ? 1 : 0,
+      added_by: req.session.user.mainadd && req.session.user.main == req.config.admin.main ? 1 : 0,
       createdBy: req.session.user._id
     });
     await newMsg.save();

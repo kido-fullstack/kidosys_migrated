@@ -172,17 +172,22 @@ block content
                       span.required-label *
                       input#parent_email.form-control(type='text' required='' name='parent_email' placeholder='Enter Email')
                       p#primary_err(style="display:none;font-size: 13px;color: red;") This email with LD004839 already exist. Use different email address.
-                  .col-md-6.col-lg-6
+                  .col-md-6.col-lg-4
                     .form-group
                       label(for='parent_education') Education
                       //- span.enquiry-mark.required-label *
                       input#parent_education.form-control(type='text' name='parent_education'  placeholder='Enter Parent education')
-                  .col-md-6.col-lg-6
+                  .col-md-6.col-lg-4
                     .form-group
                       label(for='parent_profession') Profession
                       //- span.enquiry-mark.required-label *
                       input#parent_profession.form-control(type='text' name='parent_profession' placeholder='Enter Parent Profession')
-                  #cor_parent.col-md-3.col-lg-3
+                  .col-md-6.col-lg-4
+                    .form-group
+                      label(for='parent_reference') Lead Reference
+                      //- span.enquiry-mark.required-label *
+                      input#parent_reference.form-control(type='text' name='parent_reference' placeholder='Enter Lead Reference')        
+                  #cor_parent.col-md-6.col-lg-6
                     .form-group
                       label.form-label(for='lead_type') Lead type:
                       br

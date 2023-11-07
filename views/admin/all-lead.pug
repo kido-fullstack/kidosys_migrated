@@ -350,7 +350,7 @@ block content
             {
               data: `_id`,
               render: function (data, type, row) {
-                return `${onlyUserEntry || permissionAddFollow ? `<a class="btn btn-link btn-primary tbl-action-btn" data-toggle="tooltip" title="Add Follow Up" data-original-title="Add Follow Up" href="/admin/lead/add/followup/${data}"><i class="fa fa-plus" style="font-size: 17px;"></i></a>` : ''} ${onlyUserEntry || permissionTransfer ? `<button type="button" class="btn btn-link btn-primary tbl-action-btn" data-toggle="tooltip" title="Transfer Lead" data-original-title="Transfer Lead" onclick="openTransferLeadPopup('${data}', '${row.school_id._id}', '${row.school_id.school_display_name}', '${row.lead_no}')"><i class="fas fa-sign-in-alt" style="font-size: 17px;"></i></button>` : ''}`
+                 return `${onlyUserEntry || permissionAddFollow ? `<button type="button" class="btn btn-link btn-primary tbl-action-btn" data-toggle="tooltip" title="Add Follow Up" data-original-title="Add Follow Up" onclick="redirectToEditleed2('${data}')"><i class="fa fa-plus" style="font-size: 17px;"></i></button>` : ''} ${onlyUserEntry || permissionTransfer ? `<button type="button" class="btn btn-link btn-primary tbl-action-btn" data-toggle="tooltip" title="Transfer Lead" data-original-title="Transfer Lead" onclick="openTransferLeadPopup('${data}', '${row.school_id._id}', '${row.school_id.school_display_name}', '${row.lead_no}')"></button>  <button onclick="markUnread('${row._id}')" class="btn btn-link btn-primary tbl-action-btn"><i class="fas fa-regular fa-envelope" style="font-size: 17px;"></i></button>`  : ''}`
               }
             },
             {
@@ -363,13 +363,13 @@ block content
             {
               data: 'lead_date',
               render: function (data, type, row) {
-                return `${data ? moment(data).format("MM/DD/YYYY") : 'Not Provided'}`
+                return `${data ? moment(data).format("MM/DD/YYYY hh:mm") : 'Not Provided'}`
               }
             },
             {
               data: 'updatedAt',
               render: function (data, type, row) {
-                return `${data ? moment(data).format("MM/DD/YYYY") : 'Not Provided'}`
+                return `${data ? moment(data).format("MM/DD/YYYY hh:mm") : 'Not Provided'}`
               }
             },
             {
@@ -766,6 +766,7 @@ block content
         bServerSide: true,
         pagination: true,
         ordering: true,
+        lengthMenu: [ [25, 50, -1], [25, 50, "All"] ],
         autoWidth: true,
         //- dom: 'Bfrtip',
         order: [[1, 'desc']],
@@ -1500,6 +1501,25 @@ block content
     $(document).on('click','#show_filter', function(){
       $('.filter').slideToggle()
     })
+
+    function markUnread(leadId){
+      
+        $.ajax({
+          method: 'POST',
+          url: `/admin/lead/markUnread`,
+          data: {
+            id: leadId
+          },
+          dataType: 'json',
+          success: function (response) {
+            //- console.log(response);
+            window.location.reload();
+          }
+        });
+
+      
+    }
+
     function generateQR() {
       $.ajax({
         type: 'GET',
@@ -1520,6 +1540,7 @@ block content
         }
       })
     }
+
     function openLeadForm(url) {
       //- alert(url);
       window.open(url, '_blank');

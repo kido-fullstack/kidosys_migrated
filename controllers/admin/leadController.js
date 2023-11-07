@@ -885,6 +885,7 @@ exports.postAddLead = async (req, res, next) => {
           parent_email: req.body.parent_email,
           parent_education: req.body.parent_education,
           parent_profession: req.body.parent_profession,
+          parent_reference: req.body.parent_reference,
           secondary_parent_name: secParentName,
           secondary_parent_type: req.body.secondary_parent_type || "",
           secondary_first_contact: req.body.secondary_first_contact || "",
@@ -1110,6 +1111,7 @@ exports.postAddLead = async (req, res, next) => {
           parent_email: req.body.parent_email,
           parent_education: req.body.parent_education,
           parent_profession: req.body.parent_profession,
+          parent_reference: req.body.parent_reference,
           secondary_parent_name: secParentName,
           secondary_parent_type: req.body.secondary_parent_type || "",
           secondary_first_contact: req.body.secondary_first_contact || "",
@@ -1291,6 +1293,7 @@ exports.postAddLead = async (req, res, next) => {
           parent_email: req.body.parent_email,
           parent_education: req.body.parent_education,
           parent_profession: req.body.parent_profession,
+          parent_reference: req.body.parent_reference,
           secondary_parent_name: secParentName,
           updatedBy_name: req.session.user.name,
           createdBy_name:  req.session.user.name,
@@ -1560,6 +1563,7 @@ exports.postAddLead = async (req, res, next) => {
           parent_email: req.body.parent_email,
           parent_education: req.body.parent_education,
           parent_profession: req.body.parent_profession,
+          parent_reference: req.body.parent_reference,
           secondary_parent_name: secParentName,
           secondary_parent_type: req.body.secondary_parent_type || "",
           secondary_first_contact: req.body.secondary_first_contact || "",
@@ -1787,6 +1791,7 @@ exports.postAddSiblingLead = async (req, res, next) => {
         parent_email: req.body.parent_email,
         parent_education: req.body.parent_education,
         parent_profession: req.body.parent_profession,
+        parent_reference: req.body.parent_reference,
         secondary_parent_name: secParentName,
         secondary_parent_type: req.body.secondary_parent_type || "",
         secondary_first_contact: req.body.secondary_first_contact || "",
@@ -1975,6 +1980,7 @@ exports.postAddSiblingLead = async (req, res, next) => {
         parent_email: req.body.parent_email,
         parent_education: req.body.parent_education,
         parent_profession: req.body.parent_profession,
+        parent_reference: req.body.parent_reference,
         secondary_parent_name: secParentName,
         secondary_parent_type: req.body.secondary_parent_type || "",
         secondary_first_contact: req.body.secondary_first_contact || "",
@@ -3696,6 +3702,37 @@ exports.getEditLead = async (req, res, next) => {
   }
 };
 
+exports.markLeadUnread = async (req, res, next) => {
+
+  try {
+      // console.log(req);
+      var oldlead = await Lead.findOne({ _id: req.body.id });
+      // oldlead.is_external = 2;
+      // var updateLead = await Lead.updateOne(oldlead);
+
+      const updateLead = await Lead.updateOne(
+        {
+          _id: req.body.id,
+        },
+        {
+          $set: {
+            is_external: 2,
+          },
+        }
+      ).exec();
+      // var tmp = req;
+      return res.status(200).json({
+        msg: "markLeadUnread",
+        data: updateLead,
+        code: 200,
+      });
+      
+  } catch (error) {
+    
+  }
+
+}
+
 exports.postEditLead = async (req, res, next) => {
   try {
     const oldlead = await Lead.findOne({ _id: req.params.lead_id });
@@ -3772,6 +3809,7 @@ exports.postEditLead = async (req, res, next) => {
           parent_email: req.body.parent_email,
           parent_education: req.body.parent_education,
           parent_profession: req.body.parent_profession,
+          parent_reference: req.body.parent_reference,
           secondary_parent_name: req.body.secondary_parent_name || "",
           secondary_parent_type: req.body.secondary_parent_type,
           secondary_first_contact: req.body.secondary_first_contact,
@@ -7100,13 +7138,14 @@ exports.addMessage = async (req,res,next) => {
     const newMsg = new Message({
       title: req.body.msg_title,
       msg: req.body.msg_desc,
+      type: req.body.mssg,
       status: req.body.status,
       viewoption: req.session.user.view_option,
       center_id: req.session.user.center_id,
       added_by: req.session.user.main && req.session.user.main == req.config.admin.main ? 1 : 0
     });
     await newMsg.save();
-    let message = await Message.findOne({title:req.body.msg_title,msg:req.body.msg_desc})
+    let message = await Message.findOne({title:req.body.msg_title,msg:req.body.msg_desc,type: req.body.mssg})
     // console.log(message,"message7777777")
     res.redirect(`/admin/lead/send/${message._id}|${lead_id}|${check}`)
 
@@ -7750,6 +7789,7 @@ exports.postCreateExistingLeadWithOldLead = async (req, res, next) => {
           parent_email: req.body.parent_email,
           parent_education: req.body.parent_education,
           parent_profession: req.body.parent_profession,
+          parent_reference: req.body.parent_reference,
           secondary_parent_name: secParentName,
           secondary_parent_type: req.body.secondary_parent_type || "",
           secondary_first_contact: req.body.secondary_first_contact || "",
@@ -7906,6 +7946,7 @@ exports.postCreateExistingLeadWithOldLead = async (req, res, next) => {
           parent_email: req.body.parent_email,
           parent_education: req.body.parent_education,
           parent_profession: req.body.parent_profession,
+          parent_reference: req.body.parent_reference,
           secondary_parent_name: secParentName,
           secondary_parent_type: req.body.secondary_parent_type || "",
           secondary_first_contact: req.body.secondary_first_contact || "",
@@ -8201,6 +8242,7 @@ exports.uploadExcelPostOG = async (req, res, next) => {
               parent_email: lead.email ? lead.email : lead.email.trim(),
               parent_education: "",
               parent_profession: "",
+              parent_reference: "",
               secondary_parent_name: "",
               secondary_parent_type: "",
               secondary_first_contact: "",
@@ -8358,6 +8400,7 @@ exports.uploadExcelPost = async (req, res, next) => {
             parent_email: lead.email ? lead.email : lead.email.trim(),
             parent_education: "",
             parent_profession: "",
+            parent_reference: "",
             secondary_parent_name: "",
             secondary_parent_type: "",
             secondary_first_contact: "",
