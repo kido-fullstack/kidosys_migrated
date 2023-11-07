@@ -366,14 +366,14 @@ block content
             },
             {
               data: 'lead_date',
-              render: function (data, type, row) {
-                return `${data ? moment(data).format("MM/DD/YYYY hh:mm") : 'Not Provided'}`
+               render: function (data, type, row) {
+                return data ? moment(data).format("MM/DD/YYYY <br/> hh:mm A") : 'Not Provided';
               }
             },
             {
               data: 'updatedAt',
               render: function (data, type, row) {
-                return `${data ? moment(data).format("MM/DD/YYYY hh:mm") : 'Not Provided'}`
+                return data ? moment(data).format("MM/DD/YYYY <br/> hh:mm A") : 'Not Provided';
               }
             },
             {
