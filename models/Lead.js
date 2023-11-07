@@ -13,6 +13,10 @@ const leadSchema = new Schema({
   lead_date: {
     type: Date
   },
+  substatus_id: {
+    type: mongoose.Types.ObjectId,
+    ref: 'Substatus'
+  },
   lead_no: {
     type: String
   },
