@@ -34,13 +34,14 @@ block content
                       thead
                         tr(role='row')
                           th(style="display:none") Status
-                          th Title
+                                                  th Title
+                          th When to use
                           th Preview
                           th Created on
                           if session.user && session.user.main == "super_admin"
                             th Created by
                           th Status
-                          th Type
+                          th type
                           th Count
                           th Action
                       tbody
