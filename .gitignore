@@ -7,6 +7,8 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 .pnpm-debug.log*
+combined.log*
+errorLogs.log*
 
 # dev config file
 config/config_dev.js
