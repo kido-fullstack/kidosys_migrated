@@ -9,6 +9,9 @@ const msgSchema = new Schema({
   msg: {
     type: String
   },
+  when_to_use: {
+    type: String
+  },
   type: {
     type: String
   },

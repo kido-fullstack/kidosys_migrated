@@ -52,6 +52,7 @@ block content
                                 if message.attachment && message.attachment.length
                                   span#view_attachment.badge.nowrap(onclick=`viewAttachment('${message._id}')`)
                                     i.fa.fa-paperclip(style='float:right;')
+                              td.sorting_1 #{message.when_to_use}
                               td
                                 a.btn.btn-link.btn-primary(onclick=`viewMsg(${JSON.stringify(message.msg)});`)
                                   i.fa.fa-eye

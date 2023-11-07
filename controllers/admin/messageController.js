@@ -104,6 +104,7 @@ exports.postAddMessage = async (req, res, next) => {
     const newMsg = new Message({
       title: req.body.msg_title,
       msg: req.body.msg_desc,
+      when_to_use: req.body.when_to_use,
       type: req.body.type,
       attachment:fileArr,
       status: req.body.status,
@@ -149,6 +150,7 @@ exports.postEditMessage = async (req, res, next) => {
       $set: {
         title: req.body.msg_title,
         msg: req.body.msg_desc,
+        when_to_use: req.body.when_to_use,
         type: req.body.type,
         attachment: req.body.pdf_file || [],
         status: req.body.status
