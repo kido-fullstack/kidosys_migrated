@@ -4596,6 +4596,9 @@ exports.centerFilter = async (req, res, next) => {
 
 exports.datatableFilter = async (req, res, next) => {
   try {
+
+    // console.log('AAAAAAAAAAA');
+
     const timeZone = momentZone.tz.guess();
 
     const currentDate = moment().tz("Asia/Kolkata");
@@ -4635,7 +4638,23 @@ exports.datatableFilter = async (req, res, next) => {
           // 'includeArrayIndex': 'string',
           // 'preserveNullAndEmptyArrays': true
         }
-      }, {
+      },
+      {
+        '$lookup': {
+          'from': 'substatuses',
+          'localField': 'substatus_id',
+          'foreignField': '_id',
+          'as': 'substatus_id'
+        }
+      },
+      {
+        '$unwind': {
+          'path': '$substatus_id',
+          // 'includeArrayIndex': 'string',
+          // 'preserveNullAndEmptyArrays': true
+        }
+      },
+      {
         '$lookup': {
           'from': 'centers',
           'localField': 'school_id',
@@ -4830,6 +4849,17 @@ exports.datatableFilter = async (req, res, next) => {
       aggregateQue.unshift({
         '$match': {
           'country_id': {$in: country}
+        }
+      });
+    }
+    if (req.query.substatus) {
+      // console.log(center,"center")
+      findQue = {
+        substatus_id:  mongoose.Types.ObjectId(req.query.substatus)
+      };
+      aggregateQue.unshift({
+        '$match': {
+          'substatus_id': mongoose.Types.ObjectId(req.query.substatus)
         }
       });
     }
@@ -5909,7 +5939,10 @@ exports.datatableFollowupFilter29May2023 = async (req,res,next) => {
 
 exports.datatableFollowupFilter = async (req, res, next) => {
   try {
+
     // console.log('AAAAAAAAAAA');
+
+
     const timeZone = momentZone.tz.guess();
 
     const currentDate = moment().tz("Asia/Kolkata");
