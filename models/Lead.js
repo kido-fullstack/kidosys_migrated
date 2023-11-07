@@ -7,15 +7,15 @@ const timeZone = momentZone.tz.guess();
 const dateByTimeZone = momentZone.tz(Date.now(), "Asia/Kolkata");
 
 const leadSchema = new Schema({
+  substatus_id: {
+    type: mongoose.Types.ObjectId,
+    ref: 'Substatus'
+  },
   child_first_name:{
     type:String
   },
   lead_date: {
     type: Date
-  },
-  substatus_id: {
-    type: mongoose.Types.ObjectId,
-    ref: 'Substatus'
   },
   lead_no: {
     type: String

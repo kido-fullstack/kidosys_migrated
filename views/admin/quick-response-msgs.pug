@@ -376,6 +376,7 @@ block content
         table1 = $('#basic-client_data').DataTable({
           bProcessing: true,
           bServerSide: true,
+          lengthMenu: [ [25, 50, -1], [25, 50, "All"] ],
           pagination: true,
           ordering: true,
           order: [[1, 'desc']],
@@ -476,6 +477,7 @@ block content
         table2 =  $('#basic-datatables').DataTable({
           bProcessing: true,
           bServerSide: true,
+          lengthMenu: [ [25, 50, -1], [25, 50, "All"] ],
           pagination: true,
           ordering: true,
           order: [[1, 'desc']],
@@ -512,6 +514,7 @@ block content
       var table = $('#basic-datatables-admin').DataTable({
         bProcessing: true,
         bServerSide: true,
+        lengthMenu: [ [25, 50, -1], [25, 50, "All"] ],
         pagination: true,
         ordering: true,
         order: [[1, 'desc']],
