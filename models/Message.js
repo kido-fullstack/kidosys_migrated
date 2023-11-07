@@ -9,6 +9,9 @@ const msgSchema = new Schema({
   msg: {
     type: String
   },
+  when_to_use: {
+    type: String
+  },
   center_id: [{
     type: Schema.Types.ObjectID,
     ref: 'Center'
