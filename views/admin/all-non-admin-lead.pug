@@ -206,6 +206,7 @@ block content
       var table = $('#basic-datatables').DataTable({
         bProcessing: true,
         bServerSide: true,
+        lengthMenu: [ [25, 50, -1], [25, 50, "All"] ],
         pagination: true,
         ordering: false,
         dom: 'Bfrtip',
