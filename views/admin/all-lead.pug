@@ -492,6 +492,12 @@ block content
         // non-admin with multiple centers assigned
         colDT = [
             {
+              data: `_id`,
+              render: function (data, type, row) {
+                return `${onlyUserEntry || permissionAddFollow ? `<a class="btn btn-link btn-primary tbl-action-btn" data-toggle="tooltip" title="Add Follow Up" data-original-title="Add Follow Up" href="/admin/lead/add/followup/${data}"><i class="fa fa-plus" style="font-size: 17px;"></i></a>` : ''} ${onlyUserEntry || permissionTransfer ? `<button type="button" class="btn btn-link btn-primary tbl-action-btn" data-toggle="tooltip" title="Transfer Lead" data-original-title="Transfer Lead" onclick="openTransferLeadPopup('${data}', '${row.school_id._id}', '${row.school_id.school_display_name}', '${row.lead_no}')"><i class="fas fa-sign-in-alt" style="font-size: 17px;"></i></button>` : ''}`
+              }
+            },
+            {
               data: 'lead_no',
               //- bSortable: false,
               render: function (data, type, row) {
@@ -621,16 +627,22 @@ block content
                 return `${data ? data : 'Not Provided'}`
               }
             },
+            //- {
+            //-   data: `_id`,
+            //-   render: function (data, type, row) {
+            //-     return `${onlyUserEntry || permissionAddFollow ? `<a class="btn btn-link btn-primary tbl-action-btn" data-toggle="tooltip" title="Add Follow Up" data-original-title="Add Follow Up" href="/admin/lead/add/followup/${data}"><i class="fa fa-plus" style="font-size: 17px;"></i></a>` : ''} ${onlyUserEntry || permissionTransfer ? `<button type="button" class="btn btn-link btn-primary tbl-action-btn" data-toggle="tooltip" title="Transfer Lead" data-original-title="Transfer Lead" onclick="openTransferLeadPopup('${data}', '${row.school_id._id}', '${row.school_id.school_display_name}', '${row.lead_no}')"><i class="fas fa-sign-in-alt" style="font-size: 17px;"></i></button>` : ''}`
+            //-   }
+            //- }
+        ];
+      } else {
+        // with single center
+        colDT = [
             {
               data: `_id`,
               render: function (data, type, row) {
                 return `${onlyUserEntry || permissionAddFollow ? `<a class="btn btn-link btn-primary tbl-action-btn" data-toggle="tooltip" title="Add Follow Up" data-original-title="Add Follow Up" href="/admin/lead/add/followup/${data}"><i class="fa fa-plus" style="font-size: 17px;"></i></a>` : ''} ${onlyUserEntry || permissionTransfer ? `<button type="button" class="btn btn-link btn-primary tbl-action-btn" data-toggle="tooltip" title="Transfer Lead" data-original-title="Transfer Lead" onclick="openTransferLeadPopup('${data}', '${row.school_id._id}', '${row.school_id.school_display_name}', '${row.lead_no}')"><i class="fas fa-sign-in-alt" style="font-size: 17px;"></i></button>` : ''}`
               }
-            }
-        ];
-      } else {
-        // with single center
-        colDT = [
+            },
             {
               data: 'lead_no',
               //- bSortable: false,
@@ -755,12 +767,12 @@ block content
                 return `${data ? data : 'Not Provided'}`
               }
             },
-            {
-              data: `_id`,
-              render: function (data, type, row) {
-                return `${onlyUserEntry || permissionAddFollow ? `<a class="btn btn-link btn-primary tbl-action-btn" data-toggle="tooltip" title="Add Follow Up" data-original-title="Add Follow Up" href="/admin/lead/add/followup/${data}"><i class="fa fa-plus" style="font-size: 17px;"></i></a>` : ''} ${onlyUserEntry || permissionTransfer ? `<button type="button" class="btn btn-link btn-primary tbl-action-btn" data-toggle="tooltip" title="Transfer Lead" data-original-title="Transfer Lead" onclick="openTransferLeadPopup('${data}', '${row.school_id._id}', '${row.school_id.school_display_name}', '${row.lead_no}')"><i class="fas fa-sign-in-alt" style="font-size: 17px;"></i></button>` : ''}`
-              }
-            }
+            //- {
+            //-   data: `_id`,
+            //-   render: function (data, type, row) {
+            //-     return `${onlyUserEntry || permissionAddFollow ? `<a class="btn btn-link btn-primary tbl-action-btn" data-toggle="tooltip" title="Add Follow Up" data-original-title="Add Follow Up" href="/admin/lead/add/followup/${data}"><i class="fa fa-plus" style="font-size: 17px;"></i></a>` : ''} ${onlyUserEntry || permissionTransfer ? `<button type="button" class="btn btn-link btn-primary tbl-action-btn" data-toggle="tooltip" title="Transfer Lead" data-original-title="Transfer Lead" onclick="openTransferLeadPopup('${data}', '${row.school_id._id}', '${row.school_id.school_display_name}', '${row.lead_no}')"><i class="fas fa-sign-in-alt" style="font-size: 17px;"></i></button>` : ''}`
+            //-   }
+            //- }
         ];
       }
 
@@ -787,8 +799,7 @@ block content
                 page: 'all'
               }
             }
-          }
-        ],
+          }],
         sAjaxSource: "/admin/lead/datatable",
         "rowCallback": function(row, data, index) {
           //- console.log(data);
