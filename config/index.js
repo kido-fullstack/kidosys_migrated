@@ -2,7 +2,7 @@ require('dotenv').config();
 
 module.exports = Object.assign({}, {
     server: {
-        port: process.env.PORT || 49005,
+        port: process.env.PORT || 49006,
         env: process.env.NODE_ENV || "development",
         devenv: process.env.DEVENV || "dev", // dev, uat, prod
         ssl: {

@@ -13,6 +13,7 @@ block content
               a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/message/all') All Message
               a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
       .page-inner
+      
         .row
           .col-md-12
             .card
@@ -132,6 +133,7 @@ block content
     script(src="/admin/assets/js/core/bootstrap.min.js")
     script(src="/admin/assets/js/vue.min.js")
     script(src="/admin/assets/js/upload.js")
+    script(src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js")
 
   script.
     var message = !{JSON.stringify(message)};
@@ -228,3 +230,19 @@ block content
         $('button', this).attr('onclick', `removeEl('file_${index}_column',${index})`);
       })
     }
+
+    CKEDITOR.replace('msg_desc', {
+        toolbar: [
+          { name: 'document', items: ['Source', '-', 'NewPage', 'Preview', '-', 'Templates'] },
+          { name: 'clipboard', items: ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo'] },
+          { name: 'editing', items: ['Find', 'Replace', '-', 'SelectAll', '-', 'Scayt'] },
+          { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat'] },
+          { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'] },
+          { name: 'links', items: ['Link', 'Unlink'] },
+          { name: 'insert', items: ['Image', 'Table', 'HorizontalRule', 'SpecialChar'] },
+          '/',
+          { name: 'styles', items: ['Styles', 'Format', 'Font', 'FontSize'] },
+          { name: 'colors', items: ['TextColor', 'BGColor'] },
+          { name: 'tools', items: ['Maximize', 'ShowBlocks'] }
+        ]
+    });
