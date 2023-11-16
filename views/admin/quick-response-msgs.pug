@@ -31,7 +31,7 @@ block content
                     a.quick-response-lead-name(href=`/admin/responses/send/${message._id}`,style="margin-top:10px;") #{message.title}
                     if message.attachment && message.attachment.length
                       button.btn.pull-right.btn-color.btm-block(type="button" onclick=`viewAttachment('${message._id}')` style="margin-bottom:20px;") View Attachment(s)
-                    textarea.form-control.quick-response-lead-message-box(rows='10', cols='10', id="msg", name="msg" required) #{message.msg}
+                    textarea.form-control.quick-response-lead-message-box(rows='10', cols='10', id="msg", name="msg" width='50' required) #{message.msg}
                     p(style="margin-top: 5px;cursor:pointer;display:inline-block;float:right;" onclick=`editMessageAdd(${JSON.stringify(message.msg)});`) Edit Message Template
                     .clearfix
                     if message.attachment && message.attachment.length
@@ -232,6 +232,8 @@ block content
     link(rel="stylesheet", href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/css/bootstrap-select.min.css")
     script(src="/admin/custom/tinymce/tinymce.min.js")
     script(src='/admin/assets/js/common.js')
+    script(src="https://cdn.ckeditor.com/4.16.2/standard/ckeditor.js")
+
     //- script(src="/admin/assets/js/core/bootstrap.min.js")
 
   script.
@@ -599,6 +601,22 @@ block content
       //- window.location.href = `/admin/responses/whatsapp/${message_id}`;
 
     }
+
+    CKEDITOR.replace('msg', {
+        toolbar: [
+          { name: 'document', items: ['Source', '-', 'NewPage', 'Preview', '-', 'Templates'] },
+          { name: 'clipboard', items: ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo'] },
+          { name: 'editing', items: ['Find', 'Replace', '-', 'SelectAll', '-', 'Scayt'] },
+          { name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat'] },
+          { name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote'] },
+          { name: 'links', items: ['Link', 'Unlink'] },
+          { name: 'insert', items: ['Image', 'Table', 'HorizontalRule', 'SpecialChar'] },
+          '/',
+          { name: 'styles', items: ['Styles', 'Format', 'Font', 'FontSize'] },
+          { name: 'colors', items: ['TextColor', 'BGColor'] },
+          { name: 'tools', items: ['Maximize', 'ShowBlocks'] }
+        ]
+      });
     //- let array = []
     //- function redirectTocheckbox (message_id) {
     //-   //- let id = {message_id};
