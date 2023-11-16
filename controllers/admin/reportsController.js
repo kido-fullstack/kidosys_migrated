@@ -500,12 +500,12 @@ exports.exportLeads = async (req, res, next) => {
           width: 120
         },
         sourceCat: {
-          displayName: "Source Category",
+          displayName: "Primary Category",
           headerStyle: {},
           width: 120
         },
         source: {
-          displayName: "Source",
+          displayName: "Source Others",
           headerStyle: {},
           width: 150
         },
