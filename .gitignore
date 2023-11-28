@@ -11,7 +11,7 @@ lerna-debug.log*
 .pnpm-debug.log*
 # combined.log*
 # errorLogs.log*
-
+*.swp
 # dev config file
 config/config_dev.js
 
