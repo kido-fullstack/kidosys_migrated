@@ -510,7 +510,7 @@ block content
             {
               data: `_id`,
               render: function (data, type, row) {
-                return `${onlyUserEntry || permissionAddFollow ? `<a class="btn btn-link btn-primary tbl-action-btn" data-toggle="tooltip" title="Add Follow Up" data-original-title="Add Follow Up" href="/admin/lead/add/followup/${data}"><i class="fa fa-plus" style="font-size: 17px;"></i></a>` : ''}  `
+                return `${onlyUserEntry || permissionAddFollow ? `<a class="btn btn-link btn-primary tbl-action-btn" data-toggle="tooltip" title="Add Follow Up" data-original-title="Add Follow Up" href="/admin/lead/add/followup/${data}"><i class="fa fa-plus" style="font-size: 17px;"></i></a>  <button onclick="markUnread('${row._id}')" class="btn btn-link btn-primary tbl-action-btn"><i class="fas fa-regular fa-envelope" style="font-size: 17px;"></i></button>`  : ''}  `
               }
             },
             {
@@ -662,7 +662,7 @@ block content
             {
               data: `_id`,
               render: function (data, type, row) {
-                return `${onlyUserEntry || permissionAddFollow ? `<a class="btn btn-link btn-primary tbl-action-btn" data-toggle="tooltip" title="Add Follow Up" data-original-title="Add Follow Up" href="/admin/lead/add/followup/${data}"><i class="fa fa-plus" style="font-size: 17px;"></i></a>` : ''}  `
+                return `${onlyUserEntry || permissionAddFollow ? `<a class="btn btn-link btn-primary tbl-action-btn" data-toggle="tooltip" title="Add Follow Up" data-original-title="Add Follow Up" href="/admin/lead/add/followup/${data}"><i class="fa fa-plus" style="font-size: 17px;"></i></a>  <button onclick="markUnread('${row._id}')" class="btn btn-link btn-primary tbl-action-btn"><i class="fas fa-regular fa-envelope" style="font-size: 17px;"></i></button>  ` : ''}  `
               }
             },
             {
