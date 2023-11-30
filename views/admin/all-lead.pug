@@ -831,7 +831,7 @@ block content
         sAjaxSource: "/admin/lead/datatable",
         "rowCallback": function(row, data, index) {
           //- console.log(data);
-          if (data.is_external === 2) {
+          if (data.is_dup === 1) {
             $(row).addClass('new-mail-leads-dup');
           } else if (data.is_external === 1) {
             $(row).addClass('new-mail-leads');
