@@ -500,9 +500,14 @@ exports.exportLeads = async (req, res, next) => {
           width: 120
         },
         sourceCat: {
-          displayName: "Primary Category",
+          displayName: "Category",
           headerStyle: {},
           width: 120
+        },
+        sourcePrimary: {
+          displayName: "Primary Source",
+          headerStyle: {},
+          width: 150
         },
         source: {
           displayName: "Source Others",
@@ -568,7 +573,8 @@ exports.exportLeads = async (req, res, next) => {
           childFirstName: lead.child_first_name ? lead.child_first_name : "",
           childLastName: lead.child_last_name ? lead.child_last_name : "",
           sourceCat: getSourceCatName(lead.source_category ? lead.source_category.trim() : "" || ""),
-          source: lead.parent_know_aboutus && lead.parent_know_aboutus.length ? lead.parent_know_aboutus.toString() : "",
+          sourcePrimary: lead.parent_know_aboutus && lead.parent_know_aboutus.length ? lead.parent_know_aboutus[0] : "",
+          source: lead.parent_know_aboutus && lead.parent_know_aboutus.length ? lead.parent_know_aboutus.slice(1): "",
           program: lead.program_id && lead.program_id.program_name ? lead.program_id.program_name : "",
           followUpDue: dueDateFormat(lead.follow_due_date ? lead.follow_due_date : "", lead.follow_due_time, lead.lead_date, lead.do_followup, lead.someday_follow),
           stage: getLeadStage(lead.stage || ""),
