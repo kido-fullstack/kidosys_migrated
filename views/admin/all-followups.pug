@@ -50,7 +50,7 @@ block content
                   .col-md-2
                     .form-group
                         label(for='substatus',style="margin-bottom:0px;") Select Sub Status
-                        select#substatus.form-control(name='follow_sub_status', required='')            
+                        select#substatus.form-control(name='follow_sub_status' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1" , required='')
                   .col-md-2
                     .form-group.lead-flex-container
                       button.btn.btn-primary#show_filter(type="button" style='margin-top:20px;margin-left:-40px;')
@@ -861,6 +861,7 @@ block content
                     $("#substatus").append(`<option value='${id}'>${program_name}</option>`);
                   }
                 }
+                $("#substatus").selectpicker();
               }
             });
     }); 
