@@ -266,7 +266,7 @@ block content
             {
               data: 'updatedAt',
               render: function (data, type, row) {
-                return `${data ? moment(data).format("MM/DD/YYYY") : 'Not Provided'}`
+                return `${data ? moment(data).format("DD/MM/YYYY hh:mm A") : 'Not Provided'}`
               }
             },
             //- {
