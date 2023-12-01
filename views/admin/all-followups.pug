@@ -256,9 +256,11 @@ block content
             },
             {
               data: 'lead_no',
-              //- bSortable: false,
               render: function (data, type, row) {
-                return `${onlyUserEntry || permissionEdit ? `<a href="/admin/lead/view/${row._id}">${data}</a>` : data}`
+                  return `${onlyUserEntry || permissionEdit ? `
+                    <div style="display: flex; align-items: center; text-decoration: none;">
+                      <a href="/admin/lead/view/${row._id}" style="margin-bottom: 5px;">${data} <i class="fas fa-edit" ></i></a>
+                    </div>` : data}`;
               },
             },
             {
