@@ -133,7 +133,7 @@ block content
         .row
           .col-md-12
             .card.card-with-nav.filter-div
-              .card-body(style="padding:0px 15px !important")
+              .card-body
                 .row
                   .col-md-2
                     .form-group
@@ -147,6 +147,14 @@ block content
                       input#date.form-control(type='text' name="date_range" value=("01/01/2023-"+(new Date(Date.now()).toLocaleString().split(',')[0])) readonly style="height:40px !important")
                       a#clr_date_range(href="javascript:void(0)" style="margin-top: 3px;float: right;text-decoration: none;z-index:9999")
                         i.fa.fa-times(style="position: absolute;right: 35px;top: 42px;z-index: 99999;")
+                  .col-md-2
+                    .form-group
+                      label(for='source_category',style="margin-bottom:0px;") Source Category
+                      select#source_category(name='source_category' data-container="body" data-live-search="true" ).selectpicker
+                        option(value='') Select Source Category
+                        option(value="direct-walk-in") Direct Walk in
+                        option(value="digital-lead") Digital Lead
+                        option(value="database/events") Database/Events      
                   .col-md-2
                     .form-group
                       label(for='stage',style="margin-bottom:0px;") Lead Stage
@@ -171,7 +179,7 @@ block content
                         select#substatus.form-control(name='follow_sub_status' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1" , required='')        
                   .col-md-2
                     .form-group.lead-flex-container
-                      button.btn.btn-primary#show_filter(type="button" style='margin-top:20px;margin-left:-40px;')
+                      button.btn.btn-primary#show_filter(type="button" style='margin-top:20px;margin-left:10px;')
                        i.fa.fa-filter
                         //- |  Additional Filter
                       button.btn.btn-primary#clear_filter(type="button" style='margin-top:20px;')
@@ -230,14 +238,14 @@ block content
                       select#program(name='program[]' multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
                         each program in programs
                           option(value=program._id) #{program.program_name}
-                  .col-md-3(style="margin-top: -10px;")
-                    .form-group
-                      label(for='source_category',style="margin-bottom:0px;") Source Category
-                      select#source_category(name='source_category' data-container="body" data-live-search="true" ).selectpicker
-                        option(value='') Select Source Category
-                        option(value="direct-walk-in") Direct Walk in
-                        option(value="digital-lead") Digital Lead
-                        option(value="database/events") Database/Events
+                  //- .col-md-3(style="margin-top: -10px;")
+                  //-   .form-group
+                  //-     label(for='source_category',style="margin-bottom:0px;") Source Category
+                  //-     select#source_category(name='source_category' data-container="body" data-live-search="true" ).selectpicker
+                  //-       option(value='') Select Source Category
+                  //-       option(value="direct-walk-in") Direct Walk in
+                  //-       option(value="digital-lead") Digital Lead
+                  //-       option(value="database/events") Database/Events
                   .col-md-3(style="margin-top: -10px;")
                     .form-group
                       label(for='know_us',style="margin-bottom:0px;") Lead Source
