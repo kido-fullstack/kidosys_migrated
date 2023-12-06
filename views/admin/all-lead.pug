@@ -270,6 +270,7 @@ block content
                 .table-responsive
                   .col-sm-12
                     table#all_lead.display.table.table-striped.table-hover.dataTable(role='grid', aria-describedby='basic-datatables_info')
+                      caption.newleads(style="caption-side: top;") 
                       thead
                         tr(role='row')
                           th(data-orderable="false") Actions
@@ -824,7 +825,7 @@ block content
         ];
       }
 
-      var total_records = 0;
+      let newLeadsCount = 0; // Variable to store the count of new leads
       table = $('#all_lead').DataTable({
         bProcessing: true,
         bServerSide: true,
@@ -832,7 +833,8 @@ block content
         ordering: true,
         lengthMenu: [ [25, 50, -1], [25, 50, "All"] ],
         autoWidth: true,
-        dom: 'lifrtp',
+        "info": true, // Show information display
+        "dom": 'lfrtip',
         //- dom: 'Bfrtip',
         order: [[1, 'desc']],
         buttons: [{
@@ -855,6 +857,7 @@ block content
             $(row).addClass('new-mail-leads-dup');
           } else if (data.is_external === 1) {
             $(row).addClass('new-mail-leads');
+            newLeadsCount++;
           }
 
           // duplicate lead
@@ -894,8 +897,14 @@ block content
             }
           }
         },
-        "drawCallback": function( settings, start, end, max, total, pre ) {
-            total_records = this.fnSettings().fnRecordsTotal();
+        "drawCallback": function (settings) {
+          //- newLeadsCount = $('.new-mail-leads').length;
+
+          const totalEntries = settings.fnRecordsTotal();
+          const message = `${newLeadsCount} new leads from ${totalEntries} entries`;
+          $('.newleads').html(message);
+           console.log('From Total Entries:', totalEntries);
+          newLeadsCount = 0; 
         },
         columns: colDT,
         fnServerParams: function (data, osettings) {

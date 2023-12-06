@@ -8,11 +8,51 @@ const moment = require("moment");
 const helper = require("../../handlers/helper");
 const axios = require('axios');
 const mail = require("../../handlers/mail");
-const FACEBOOK_PAGE_ACCESS_TOKEN = 'EAAXPWqCw9K0BAKYzqmISs2vHGVpIsQbuYqrMHINN3k530XHVF3oon0WLg8RYuqmiSpQDewyU93vjaIyb8uadhZBGZCKmPWfaDdyGhLutqVNVunPJQT3K8RkT4ZATn2EpKAf6ZCCLRrLL2gDgBpimoaflePx2XjtntnYeJ7GC1nfW9bRWQ0KWzPDemXdQhdEZD';
+// const FACEBOOK_PAGE_ACCESS_TOKEN = 'EAAXPWqCw9K0BAKYzqmISs2vHGVpIsQbuYqrMHINN3k530XHVF3oon0WLg8RYuqmiSpQDewyU93vjaIyb8uadhZBGZCKmPWfaDdyGhLutqVNVunPJQT3K8RkT4ZATn2EpKAf6ZCCLRrLL2gDgBpimoaflePx2XjtntnYeJ7GC1nfW9bRWQ0KWzPDemXdQhdEZD';
+const FACEBOOK_PAGE_ACCESS_TOKEN = 'EAAMXu6IFVZBYBO6WjS1tCd0Y61JbKvqYWyGMNCLVnAWBYpuZAHpI5y4m9ZBgxf589i72me5f6BxQcTOHCnc554EPQIYDvmdhfnCgUzgSxHhwuIR6sIvnJKaTv3V0rVgAGwxti56cxELuuVe6ZCPpmFr4lJ0Ut6q7RC9t1y6t4yVg9wDyX0YwTaq7UBNZAKgAMcFnqPZBIrr9ftRevowhZCisz6x';
 
 exports.getTest = (req, res, next) => {
   return res.send('working');
 };
+
+
+
+// exports.getLeadIds = async (req, res, next) => {
+//   var response = "";
+//   try {
+//     response = await axios.get(`https://graph.facebook.com/v18.0/412531742274219?fields=leadgen_forms&access_token=EAAMXu6IFVZBYBO7SHoBTStIIjFI6eKfEdGepZCr6x3LHxszhDDBTprEOpY1I4fVGinChvpK4VvNtEhLuZCUX5St2Ji5NLlcL65MNMSO8OBMAbJSbvThk9PZAgoZCbb160iuTPsPyMbYF3rf2eVqoW7lTp9mA7YinAe8QQNtqAdZCFwaADVh4AH2G0XTCH4tYhKJldACEinO5e7CPoYXDHUg1QX`);
+
+//     // if (!response.data || (response.data && (response.data.error || !response.data.field_data))) {
+//     //   return console.warn(`An invalid response was received from the Facebook API: ${response}`);
+//     // }
+//     // console.log(response.data.leadgen_forms);
+    
+//     for(obj of response.data.leadgen_forms.data){
+
+
+//       var formObj = await axios.get(`https://graph.facebook.com/v18.0/${obj.id}/leads?fields=name,id&filtering=[{'field':'time_created','operator':'GREATER_THAN','value':1701780307}]&access_token=EAAMXu6IFVZBYBOZCKZAorugZCeHvRcqNGw1jvL4ffnfkTltfKQlZB7JXygrsMR4e2PabrowhVvS72QvXKq8xz75xbjfGC3LcvYya1DM5thbfgS9IMNmnr3rX1pkVk7WaUN79rZCKhXMGUUUhrVM96xtgHlxNAcjvJmGbZA3f09i3tdiNZAQfWwZA4iyyw`);
+
+//       console.log("--------------------",obj.id,"--------------------");
+//       // console.log(formObj.data);
+
+//       if(formObj.data.data){
+//         if(formObj.data.data.length){
+//           for (obj1 of formObj.data.data){
+//             console.log(obj1.id);
+//           }
+//         }
+//       }
+//     }
+
+//     // return res.send(response);
+
+//   } catch (error) {
+
+//     console.log(error);
+    
+//   }
+//   return res.send("response");
+// };
 
 exports.getFBLeadsWebhook = async (req, res, next) => {
   try {
