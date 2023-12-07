@@ -17,42 +17,42 @@ exports.getTest = (req, res, next) => {
 
 
 
-// exports.getLeadIds = async (req, res, next) => {
-//   var response = "";
-//   try {
-//     response = await axios.get(`https://graph.facebook.com/v18.0/412531742274219?fields=leadgen_forms&access_token=EAAMXu6IFVZBYBO7SHoBTStIIjFI6eKfEdGepZCr6x3LHxszhDDBTprEOpY1I4fVGinChvpK4VvNtEhLuZCUX5St2Ji5NLlcL65MNMSO8OBMAbJSbvThk9PZAgoZCbb160iuTPsPyMbYF3rf2eVqoW7lTp9mA7YinAe8QQNtqAdZCFwaADVh4AH2G0XTCH4tYhKJldACEinO5e7CPoYXDHUg1QX`);
+exports.getLeadIds = async (req, res, next) => {
+  var response = "";
+  try {
+    response = await axios.get(`https://graph.facebook.com/v18.0/412531742274219?fields=leadgen_forms&access_token=EAAMXu6IFVZBYBOZBE7ohzH9u6sUEd7zGDlN9pucujeEEW0MWo2PstPb4T1cNNZBHKjLr9gcA4sJDKPNABsLKgZC1MD9BWkYtRZAHUoaYCKM5NEnCZAo9LzY7AxUKkxQDCMuzzXlAIJLIS0zV0CF9cmtvyzCaSWvxwfiIS1sJtasMW1s1u3ZAALHey6RGgRIJVZAClUXVB2Sv5XdtpJQD5a3nrD64`);
 
-//     // if (!response.data || (response.data && (response.data.error || !response.data.field_data))) {
-//     //   return console.warn(`An invalid response was received from the Facebook API: ${response}`);
-//     // }
-//     // console.log(response.data.leadgen_forms);
+    // if (!response.data || (response.data && (response.data.error || !response.data.field_data))) {
+    //   return console.warn(`An invalid response was received from the Facebook API: ${response}`);
+    // }
+    // console.log(response.data.leadgen_forms);
     
-//     for(obj of response.data.leadgen_forms.data){
+    for(obj of response.data.leadgen_forms.data){
+      filtering=[{'field':'time_created','operator':'GREATER_THAN','value':1701889207}]
 
+      var formObj = await axios.get(`https://graph.facebook.com/v18.0/${obj.id}/leads?fields=name,id&fields=leadgen_forms&filtering=[{'field':'time_created','operator':'GREATER_THAN','value':1701892807},{'field':'time_created','operator':'LESS_THAN','value':1701959407}]&access_token=EAAMXu6IFVZBYBOZCKZAorugZCeHvRcqNGw1jvL4ffnfkTltfKQlZB7JXygrsMR4e2PabrowhVvS72QvXKq8xz75xbjfGC3LcvYya1DM5thbfgS9IMNmnr3rX1pkVk7WaUN79rZCKhXMGUUUhrVM96xtgHlxNAcjvJmGbZA3f09i3tdiNZAQfWwZA4iyyw`);
 
-//       var formObj = await axios.get(`https://graph.facebook.com/v18.0/${obj.id}/leads?fields=name,id&filtering=[{'field':'time_created','operator':'GREATER_THAN','value':1701780307}]&access_token=EAAMXu6IFVZBYBOZCKZAorugZCeHvRcqNGw1jvL4ffnfkTltfKQlZB7JXygrsMR4e2PabrowhVvS72QvXKq8xz75xbjfGC3LcvYya1DM5thbfgS9IMNmnr3rX1pkVk7WaUN79rZCKhXMGUUUhrVM96xtgHlxNAcjvJmGbZA3f09i3tdiNZAQfWwZA4iyyw`);
+      console.log("--------------------",obj.id,"--------------------");
+      // console.log(formObj.data);
 
-//       console.log("--------------------",obj.id,"--------------------");
-//       // console.log(formObj.data);
+      if(formObj.data.data){
+        if(formObj.data.data.length){
+          for (obj1 of formObj.data.data){
+            console.log(obj1.id);
+          }
+        }
+      }
+    }
 
-//       if(formObj.data.data){
-//         if(formObj.data.data.length){
-//           for (obj1 of formObj.data.data){
-//             console.log(obj1.id);
-//           }
-//         }
-//       }
-//     }
+    // return res.send(response);
 
-//     // return res.send(response);
+  } catch (error) {
 
-//   } catch (error) {
-
-//     console.log(error);
+    console.log(error);
     
-//   }
-//   return res.send("response");
-// };
+  }
+  return res.send("response");
+};
 
 exports.getFBLeadsWebhook = async (req, res, next) => {
   try {
