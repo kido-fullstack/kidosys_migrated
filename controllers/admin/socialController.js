@@ -1,3 +1,4 @@
+//CURR-LIVE
 const mongoose = require("mongoose");
 const _ = require('lodash');
 const Center = mongoose.model("Center");
@@ -8,7 +9,9 @@ const moment = require("moment");
 const helper = require("../../handlers/helper");
 const axios = require('axios');
 const mail = require("../../handlers/mail");
-const FACEBOOK_PAGE_ACCESS_TOKEN = 'EAAXPWqCw9K0BAKYzqmISs2vHGVpIsQbuYqrMHINN3k530XHVF3oon0WLg8RYuqmiSpQDewyU93vjaIyb8uadhZBGZCKmPWfaDdyGhLutqVNVunPJQT3K8RkT4ZATn2EpKAf6ZCCLRrLL2gDgBpimoaflePx2XjtntnYeJ7GC1nfW9bRWQ0KWzPDemXdQhdEZD';
+const OLD_FACEBOOK_PAGE_ACCESS_TOKEN = 'EAAXPWqCw9K0BAKYzqmISs2vHGVpIsQbuYqrMHINN3k530XHVF3oon0WLg8RYuqmiSpQDewyU93vjaIyb8uadhZBGZCKmPWfaDdyGhLutqVNVunPJQT3K8RkT4ZATn2EpKAf6ZCCLRrLL2gDgBpimoaflePx2XjtntnYeJ7GC1nfW9bRWQ0KWzPDemXdQhdEZD';
+
+const FACEBOOK_PAGE_ACCESS_TOKEN = 'EAAMXu6IFVZBYBOZCKZAorugZCeHvRcqNGw1jvL4ffnfkTltfKQlZB7JXygrsMR4e2PabrowhVvS72QvXKq8xz75xbjfGC3LcvYya1DM5thbfgS9IMNmnr3rX1pkVk7WaUN79rZCKhXMGUUUhrVM96xtgHlxNAcjvJmGbZA3f09i3tdiNZAQfWwZA4iyyw';
 
 exports.getTest = (req, res, next) => {
   return res.send('working');
@@ -223,7 +226,6 @@ exports.postFBLeadsWebhook = async (req, res, next) => {
         parent_email: finSocialData.email,
         parent_education: "",
         parent_profession: "",
-        parent_reference: "",
         secondary_parent_name: "",
         secondary_parent_type: "",
         secondary_first_contact: "",
