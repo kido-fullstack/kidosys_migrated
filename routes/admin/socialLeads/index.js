@@ -12,6 +12,10 @@ router.get('/webhook',
   socialController.getFBLeadsWebhook
 );
 
+router.get('/getLeadIds',
+  socialController.getLeadIds
+);
+
 router.post('/webhook',
   socialController.postFBLeadsWebhook
 );

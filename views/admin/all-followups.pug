@@ -31,6 +31,14 @@ block content
                         i.fa.fa-times(style="position: absolute;right: 35px;top: 42px;z-index: 99999;")
                   .col-md-2
                     .form-group
+                      label(for='source_category',style="margin-bottom:0px;") Source Category
+                      select#source_category(name='source_category' data-container="body" data-live-search="true" ).selectpicker
+                        option(value='') Select Source Category
+                        option(value="direct-walk-in") Direct Walk in
+                        option(value="digital-lead") Digital Lead
+                        option(value="database/events") Database/Events       
+                  .col-md-2
+                    .form-group
                       label(for='stage',style="margin-bottom:0px;") Lead Stage
                       select#stage(name='stage' data-container="body" data-live-search="true" ).selectpicker
                         option(value='') Select Stage
@@ -53,7 +61,7 @@ block content
                         select#substatus.form-control(name='follow_sub_status' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1" , required='')
                   .col-md-2
                     .form-group.lead-flex-container
-                      button.btn.btn-primary#show_filter(type="button" style='margin-top:20px;margin-left:-40px;')
+                      button.btn.btn-primary#show_filter(type="button" style='margin-top:20px;')
                         i.fa.fa-filter
                         //- |  Additional Filter
                       button.btn.btn-primary#clear_filter(type="button" style='margin-top:20px;')
@@ -86,14 +94,14 @@ block content
                       select#program(name='program[]' multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
                         each program in programs
                           option(value=program._id) #{program.program_name}
-                  .col-md-3(style="margin-top: -10px;")
-                    .form-group
-                      label(for='source_category',style="margin-bottom:0px;") Source Category
-                      select#source_category(name='source_category' data-container="body" data-live-search="true" ).selectpicker
-                        option(value='') Select Source Category
-                        option(value="direct-walk-in") Direct Walk in
-                        option(value="digital-lead") Digital Lead
-                        option(value="database/events") Database/Events
+                  //- .col-md-3(style="margin-top: -10px;")
+                  //-   .form-group
+                  //-     label(for='source_category',style="margin-bottom:0px;") Source Category
+                  //-     select#source_category(name='source_category' data-container="body" data-live-search="true" ).selectpicker
+                  //-       option(value='') Select Source Category
+                  //-       option(value="direct-walk-in") Direct Walk in
+                  //-       option(value="digital-lead") Digital Lead
+                  //-       option(value="database/events") Database/Events
                   .col-md-3(style="margin-top: -10px;")
                     .form-group
                       label(for='know_us',style="margin-bottom:0px;") Lead Source
@@ -128,6 +136,7 @@ block content
                 .table-responsive
                   .col-sm-12
                     table#basic-datatables.display.table.table-striped.table-hover.dataTable(role='grid', aria-describedby='basic-datatables_info')
+                      caption.newleads(style="caption-side: top;") 
                       thead
                         tr(role='row')
                           th Action
@@ -185,266 +194,196 @@ block content
           yy: '%d years'
         }
       });
-      var next = 0;
-      var table = $('#basic-datatables').DataTable({
-        bProcessing: true,
-        bServerSide: true,
-        pagination: true,
-        ordering: true,
-        lengthMenu: [ [25, 50, -1], [25, 50, "All"] ],
-        dom: 'lifrtp',
-        order: [[2, 'desc']],
-        buttons: [{
-            extend: 'excel',
-            text: 'Export to excel',
-            className: 'btn btn-primary exp_btn',
-            title: `followups_${Date.now()}`,
-            exportOptions: {
-              columns: [0, 1, 2, 3, 4, 5, 6]
-            }
-          }
-        ],
-        sAjaxSource: "/admin/lead/datatablefollowup",
-        rowCallback: function (row, data, index) {
-          if (data.is_external === 2) {
+    var next = 0;
+    var newLeadsCount = 0;
+
+    var table = $('#basic-datatables').DataTable({
+      bProcessing: true,
+      bServerSide: true,
+      pagination: true,
+      ordering: true,
+      lengthMenu: [[25, 50, -1], [25, 50, "All"]],
+      "info": true,
+      "dom": 'lfrtip',
+      order: [[2, 'desc']],
+      buttons: [{
+        extend: 'excel',
+        text: 'Export to excel',
+        className: 'btn btn-primary exp_btn',
+        title: `followups_${Date.now()}`,
+        exportOptions: {
+          columns: [0, 1, 2, 3, 4, 5, 6]
+        }
+      }],
+      sAjaxSource: "/admin/lead/datatable",
+        "rowCallback": function(row, data, index) {
+          //- console.log(data);
+          if (data.is_dup === 1) {
             $(row).addClass('new-mail-leads-dup');
+          } else if (data.is_external === 1) {
+            $(row).addClass('new-mail-leads');
+            newLeadsCount++;
           }
-          // duplicate lead
-          if (data.is_dup == 1) {
-            if (data.dup_no == 1) {
-              $(row).addClass('dup-leads-1');
-            } else if (data.dup_no == 2) {
-              $(row).addClass('dup-leads-2');
-            } else if (data.dup_no == 3) {
-              $(row).addClass('dup-leads-3');
-            } else if (data.dup_no == 4) {
-              $(row).addClass('dup-leads-4');
-            } else if (data.dup_no == 5) {
-              $(row).addClass('dup-leads-5');
-            } else if (data.dup_no == 6) {
-              $(row).addClass('dup-leads-6');
-            } else if (data.dup_no == 7) {
-              $(row).addClass('dup-leads-7');
-            } else if (data.dup_no == 8) {
-              $(row).addClass('dup-leads-8');
-            } else if (data.dup_no == 9) {
-              $(row).addClass('dup-leads-9');
-            } else if (data.dup_no == 10) {
-              $(row).addClass('dup-leads-10');
-            } else if (data.dup_no == 11) {
-              $(row).addClass('dup-leads-11');
-            } else if (data.dup_no == 12) {
-              $(row).addClass('dup-leads-12');
-            } else if (data.dup_no == 13) {
-              $(row).addClass('dup-leads-13');
-            } else if (data.dup_no == 14) {
-              $(row).addClass('dup-leads-14');
-            } else if (data.dup_no == 15) {
-              $(row).addClass('dup-leads-15');
+      },
+      columns: [
+        {
+          data: `_id`,
+          bSortable: false,
+          render: function (data, type, row) {
+            return `${onlyUserEntry || permissionAddFollow ? `<a class="btn btn-link btn-primary" data-toggle="tooltip" title="followup" data-original-title="Add Follow Up" href="/admin/lead/add/followup/${data}"><i class="fa fa-plus" style="font-size: 17px;"></i></a>` : ''}`
+          }
+        },
+        {
+          data: 'lead_no',
+          render: function (data, type, row) {
+            return `${onlyUserEntry || permissionEdit ? `
+              <div style="display: flex; align-items: center; text-decoration: none;">
+                <a href="/admin/lead/view/${row._id}" style="margin-bottom: 5px;">${data} <i class="fas fa-edit" ></i></a>
+              </div>` : data}`;
+          },
+        },
+        {
+          data: 'updatedAt',
+          render: function (data, type, row) {
+            return `${data ? moment(data).format("DD/MM/YYYY hh:mm A") : 'Not Provided'}`
+          }
+        },
+        {
+          data: 'follow_due_date',
+          render: function (data, type, row) {
+            var regex = /\ba\b/;
+            let dueDate = moment(data).format("MM/DD/YYYY");
+            if (row.follow_due_date) {
+              if (row.follow_due_time) {
+                var mainData = moment(`${dueDate} ${row.follow_due_time}`).fromNow();
+                if (regex.test(mainData)) {
+                  mainData = mainData.replace("a", 1)
+                }
+                return `${data ? mainData : "Not Provided"}`
+              } else {
+                var mainData = moment(`${data}`).fromNow();
+                if (regex.test(mainData)) {
+                  mainData = mainData.replace("a", 1)
+                }
+                return `${data ? mainData : "Not Provided"}`
+              }
             } else {
-              $(row).addClass('dup-leads-15');
+              return "Not Provided";
             }
           }
         },
-        columns: [
-            {
-              data: `_id`,
-              bSortable: false,
-              render: function (data, type, row) {
-                return `${onlyUserEntry || permissionAddFollow ? `<a class="btn btn-link btn-primary" data-toggle="tooltip" title="followup" data-original-title="Add Follow Up" href="/admin/lead/add/followup/${data}"><i class="fa fa-plus" style="font-size: 17px;"></i></a>` : ''}`
-              }
-            },
-            {
-              data: 'lead_no',
-              render: function (data, type, row) {
-                  return `${onlyUserEntry || permissionEdit ? `
-                    <div style="display: flex; align-items: center; text-decoration: none;">
-                      <a href="/admin/lead/view/${row._id}" style="margin-bottom: 5px;">${data} <i class="fas fa-edit" ></i></a>
-                    </div>` : data}`;
-              },
-            },
-            {
-              data: 'updatedAt',
-              render: function (data, type, row) {
-                return `${data ? moment(data).format("DD/MM/YYYY hh:mm A") : 'Not Provided'}`
-              }
-            },
-            //- {
-            //-   data: 'follow_due_date',
-            //-   render: function (data, type, row) {
-            //-     console.log(data);
-            //-     console.log(moment(data).format("MM/DD/YYYY") === moment().format("MM/DD/YYYY"))
-            //-     let dueDate = moment(data).format("MM/DD/YYYY");
+        {
+          data: 'parent_name',
+          render: function (data, type, row) {
+            return `${data ? data : 'Not Provided'}`
+          }
+        },
+        {
+          data: 'source_category',
+          render: function (data, type, row) {
+            return `${data && data ? data : 'Not Provided'}`
+          }
+        },
+        {
+          data: 'parent_know_aboutus',
+          render: function (data, type, row) {
+            return `${data ? data : 'Not Provided'}`
+          }
+        },
+        {
+          data: 'program_id.program_name',
+          render: function (data, type, row) {
+            return `${data ? data : 'Not Provided'}`
+          }
+        },
+        {
+          data: `${onlyUserEntry ? 'school_id.school_display_name' : 'child_first_name'}`,
+          render: function (data, type, row) {
+            return `${onlyUserEntry ? data : `${data} ${row.child_last_name}`}`
+          }
+        },
+        {
+          data: 'stage',
+          render: function (data, type, row) {
+            if (data == "New Lead") {
+              return `1. New Lead`;
+            } else if (data == "Enquiry Received") {
+              return `2. Enquiry Received`;
+            } else if (data == "Tour Booked") {
+              return `3. Tour Booked`;
+            } else if (data == "Closed-Lead Lost") {
+              return `4. Closed-Lead Lost`;
+            } else if (data == "Post Tour") {
+              return `5. Post Tour`;
+            } else if (data == "Closed-Enquiry Lost") {
+              return `6. Closed-Enquiry Lost`;
+            } else if (data == "Closed - Won") {
+              return `7. Closed - Won`;
+            } else {
+              return data;
+            }
+          }
+        },
+        {
+          data: 'status_id.name',
+          render: function (data, type, row) {
+            return `${data ? data : 'Not Provided'}`
+          }
+        },
+        {
+          data: 'substatus_id.name',
+          render: function (data, type, row) {
+            return `${data ? data : 'Not Provided'}`;
+          }
+        },
+      ],
+      "drawCallback": function (settings) {
+        const totalEntries = settings.fnRecordsTotal();
+        const message = `${newLeadsCount} new leads from ${totalEntries} entries`;
+        $('.newleads').html(message);
+        newLeadsCount = 0; 
+      },
+      fnServerParams: function (data) {
+        var searchCount = 0;
+        $(".searchInput").each(function(){
+          data.push({ "name": "Searchkey_"+searchCount, "value": $(this).is(":checked") });
+          searchCount++;
+        });
+        data.push({
+          "name": "country",
+          "value": $('#country').val()
+        });
+        data.push({
+          "name": "zone",
+          "value": $('#zone').val()
+        });
+        data.push({
+          "name": "center",
+          "value": $('#center').val()
+        });
+        data.push({
+          "name": "status",
+          "value": $('#status').val()
+        });
+        data.push({
+          "name": "program",
+          "value": $('#program').val()
+        });
+        data.push({
+          "name": "know_us",
+          "value": $('#know_us').val()
+        });
+        data.push({
+          "name": "stage",
+          "value": $('#stage').val()
+        });
+        data.push({
+          "name": "substatus",
+          "value": $('#substatus').val()
+        });
+      }
+    });
 
-            //-     if (moment(data).format("MM/DD/YYYY") === moment().format("MM/DD/YYYY")) {
-            //-       // date matched
-            //-       console.log(moment(`${dueDate} ${row.follow_due_time}`).fromNow())
-            //-     } else {
-            //-       // date not matched
-            //-       console.log(moment(`${dueDate} ${row.follow_due_time}`).fromNow())
-            //-     }
-            //-     console.log(row.follow_due_time)
-            //-     var now = moment();
-            //-     var end = moment(data); // another date
-            //-     var duration = moment.duration(end.diff(now));
-            //-     return `${data ? (duration.days() > 0 ?  "In "+ duration.days() + " days & " + duration.hours() + " hours " :  (Math.abs(duration.days()) == 0 ? "" : Math.abs(duration.days()) + " days & ")  + Math.abs(duration.hours()) + " hours ago") : 'Not Provided'}`
-            //-   }
-            //- },
-            {
-              data: 'follow_due_date',
-              render: function (data, type, row) {
-                //- console.log(data);
-                var regex = /\ba\b/;
-                let dueDate = moment(data).format("MM/DD/YYYY");
-                if (row.follow_due_date) {
-                  if (row.follow_due_time) {
-                    var mainData = moment(`${dueDate} ${row.follow_due_time}`).fromNow();
-                    if (regex.test(mainData)) {
-                      mainData = mainData.replace("a", 1)
-                    }
-                    return `${data ? mainData : "Not Provided"}`
-                  } else {
-                    var mainData = moment(`${data}`).fromNow();
-                    if (regex.test(mainData)) {
-                      mainData = mainData.replace("a", 1)
-                    }
-                    return `${data ? mainData : "Not Provided"}`
-                  }
-                } else {
-                  return "Not Provided";
-                }
-              }
-            },
-            {
-              data: 'parent_name',
-              render: function (data, type, row) {
-                return `${data ? data : 'Not Provided'}`
-              }
-            },
-            {
-              data: 'source_category',
-              render: function (data, type, row) {
-                return `${data && data ? data : 'Not Provided'}`
-              }
-            },
-            {
-              data: 'parent_know_aboutus',
-              render: function (data, type, row) {
-                return `${data ? data : 'Not Provided'}`
-              }
-            },
-            {
-              data: 'program_id.program_name',
-              render: function (data, type, row) {
-                return `${data ? data : 'Not Provided'}`
-              }
-            },
-            {
-              data: `${onlyUserEntry ? 'school_id.school_display_name' : 'child_first_name'}`,
-              render: function (data, type, row) {
-                return `${onlyUserEntry ? data : `${data} ${row.child_last_name}`}`
-              }
-            },
-            {
-              data: 'stage',
-              render: function (data, type, row) {
-                if (data == "New Lead") {
-                  return `
-                   1. New Lead
-                  `;
-                } else if (data == "Enquiry Received") {
-                  return `
-                   2. Enquiry Received
-                  `;
-                } else if (data == "Tour Booked") {
-                  return `
-                    3. Tour Booked
-                  `;
-                } else if (data == "Closed-Lead Lost") {
-                  return `
-                    4. Closed-Lead Lost
-                  `;
-                } else if (data == "Post Tour") {
-                  return `
-                    5. Post Tour
-                  `;
-                } else if (data == "Closed-Enquiry Lost") {
-                  return `
-                    6. Closed-Enquiry Lost
-                  `;
-                } else if (data == "Closed - Won") {
-                  return `
-                    7. Closed - Won
-                  `;
-                } else {
-                  return data;
-                }
-              }
-            },
-            {
-              data: 'status_id.name',
-              render: function (data, type, row) {
-                return `${data ? data : 'Not Provided'}`
-              }
-            },
-           {
-              data: 'substatus_id.name',
-              render: function (data, type, row) {
-                return `${data ? data : 'Not Provided'}`;
-              }
-            },
-        ],
-          drawCallback: function (settings) {
-            var pageInfo = table.page.info(); // Use 'table' instead of 'this.api()'
-            var totalEntries = pageInfo.recordsTotal;
-
-            var displayedEntries = pageInfo.end - pageInfo.start;
-            var message = `${displayedEntries} of ${totalEntries} rows displayed`;
-
-            // Update your message element with the dynamically generated message
-            $('#data-info-message').text(message);
-          },
-        fnServerParams: function ( data ) {
-            var searchCount = 0;
-            $(".searchInput").each(function(){
-              //- alert($(this).is(":checked"));
-                data.push( { "name": "Searchkey_"+searchCount, "value": $(this).is(":checked") } );
-                searchCount++;
-            });
-            data.push({
-                "name": "country",
-                "value": $('#country').val()
-            });
-            data.push({
-                "name": "zone",
-                "value": $('#zone').val()
-            });
-            data.push({
-                "name": "center",
-                "value": $('#center').val()
-            });
-            data.push({
-                "name": "status",
-                "value": $('#status').val()
-            });
-            data.push({
-                "name": "program",
-                "value": $('#program').val()
-            });
-            data.push({
-                "name": "know_us",
-                "value": $('#know_us').val()
-            });
-            data.push({
-                "name": "stage",
-                "value": $('#stage').val()
-            });
-            data.push({
-                "name": "substatus",
-                "value": $('#substatus').val()
-            });
-        }
-      });
       if(currentUser.main == "super_admin"){
 
         $(document).on('change', '#country', function () {
