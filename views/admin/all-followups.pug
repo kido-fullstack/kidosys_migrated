@@ -195,7 +195,7 @@ block content
         }
       });
     var next = 0;
-    var newLeadsCount = 0;
+    //- var newLeadsCount = 0;
 
     var table = $('#basic-datatables').DataTable({
       bProcessing: true,
@@ -222,7 +222,7 @@ block content
             $(row).addClass('new-mail-leads-dup');
           } else if (data.is_external === 1) {
             $(row).addClass('new-mail-leads');
-            newLeadsCount++;
+            //- newLeadsCount++;
           }
       },
       columns: [
@@ -338,10 +338,11 @@ block content
         },
       ],
       "drawCallback": function (settings) {
+        console.log(settings);
         const totalEntries = settings.fnRecordsTotal();
-        const message = `${newLeadsCount} new leads from ${totalEntries} entries`;
+        const message = `${settings.json.newLds} new leads from ${totalEntries} entries`;
         $('.newleads').html(message);
-        newLeadsCount = 0; 
+        //- newLeadsCount = 0; 
       },
       fnServerParams: function (data) {
         var searchCount = 0;
