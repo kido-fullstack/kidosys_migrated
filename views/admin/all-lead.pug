@@ -825,7 +825,7 @@ block content
         ];
       }
 
-      let newLeadsCount = 0; // Variable to store the count of new leads
+      //- let newLeadsCount = 0; // Variable to store the count of new leads
       table = $('#all_lead').DataTable({
         bProcessing: true,
         bServerSide: true,
@@ -857,7 +857,7 @@ block content
             $(row).addClass('new-mail-leads-dup');
           } else if (data.is_external === 1) {
             $(row).addClass('new-mail-leads');
-            newLeadsCount++;
+            //- newLeadsCount++;
           }
 
           // duplicate lead
@@ -898,13 +898,12 @@ block content
           }
         },
         "drawCallback": function (settings) {
-          //- newLeadsCount = $('.new-mail-leads').length;
 
           const totalEntries = settings.fnRecordsTotal();
-          const message = `${newLeadsCount} new leads from ${totalEntries} entries`;
+          const message = `${settings.json.newLds} new leads from ${totalEntries} entries`;
           $('.newleads').html(message);
-           console.log('From Total Entries:', totalEntries);
-          newLeadsCount = 0; 
+          //-  console.log('From Total Entries:', totalEntries);
+          //- newLeadsCount = 0; 
         },
         columns: colDT,
         fnServerParams: function (data, osettings) {

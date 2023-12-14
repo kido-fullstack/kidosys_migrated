@@ -4978,11 +4978,16 @@ exports.datatableFilter = async (req, res, next) => {
     aggregateQue.splice(aggregateQue.length - 2, 2);
 
     const totalCount = await Lead.aggregate(aggregateQue);
+    var newLds = 0;
+    totalCount.forEach((ele) => {
+      (ele.is_external == 1) ? newLds++ : false;
+    })
 
     let finObj = {
       sEcho: req.query.sEcho,
       iTotalRecords: totalCount.length,
-      iTotalDisplayRecords: totalCount.length
+      iTotalDisplayRecords: totalCount.length,
+      newLds: newLds
     };
 
     delete aggregateQue;
@@ -6345,10 +6350,15 @@ exports.datatableFollowupFilter = async (req, res, next) => {
 
     const totalCount = await Lead.aggregate(aggregateQue);
 
+    var newLds = 0;
+    totalCount.forEach((ele) => {
+      (ele.is_external == 1) ? newLds++ : false;
+    })
     let finObj = {
       sEcho: req.query.sEcho,
       iTotalRecords: totalCount.length,
-      iTotalDisplayRecords: totalCount.length
+      iTotalDisplayRecords: totalCount.length,
+      newLds: newLds
     };
 
     delete aggregateQue;
