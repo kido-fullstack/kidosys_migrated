@@ -3716,7 +3716,8 @@ exports.markLeadUnread = async (req, res, next) => {
         },
         {
           $set: {
-            is_external: 2,
+            is_external: 1,
+            is_dup: 0,
           },
         }
       ).exec();
