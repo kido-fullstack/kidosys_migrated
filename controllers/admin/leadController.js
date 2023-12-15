@@ -2180,6 +2180,8 @@ exports.getAddFollowUp = async (req, res, next) => {
     //   path: 'child_course_id'
     // });
     // console.log(actions)
+    const nextlead = await Lead.findOne({_id: {$gt: ObjectId(req.params.lead_id) }}).limit(1);
+    const prevlead = await Lead.findOne({ _id: { $lt: ObjectId(req.params.lead_id) } }).sort({ _id: -1 }).limit(1);
     res.render("admin/add-lead-followup", {
       title: "Add Followup",
       lead,
@@ -2189,6 +2191,8 @@ exports.getAddFollowUp = async (req, res, next) => {
       currentUser: req.session.user,
       followups,
       substatuses,
+      nextlead,
+      prevlead,      
       timezone: timeZone || "",
       _
     });

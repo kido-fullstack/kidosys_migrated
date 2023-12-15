@@ -19,9 +19,17 @@ block content
             //- pre= h.dump(followups && followups.length && followups[0].notes)
             .card
               .card-header
-              a(href=`/admin/lead/edit/${lead._id}`)
-                .card-title(style="margin: 20px;") Lead (#{lead.lead_no})
-                 i.edit-icon(class="fa fa-edit" style="padding-left: 10px;")
+                .row
+                  .col-md-6.col-lg-4(style="padding: 1.8%;")
+                      if(prevlead)
+                        a(href=(`${prevlead._id}`)).card-title(style="margin: 10%;") Previous Lead 
+                  .col-md-6.col-lg-4
+                    a(href=`/admin/lead/edit/${lead._id}`)
+                      .card-title(style="margin: 20px;") Lead (#{lead.lead_no})
+                       i.edit-icon(class="fa fa-edit" style="padding-left: 10px;")
+                  .col-md-4.col-lg-4(style="padding: 1.3%;")
+                    if(nextlead)
+                      a(href=(`${nextlead._id}`)).card-title(style="margin: 10%;") Next Lead
               .card-body
                 .row
                   .col-md-6.col-lg-6
@@ -177,7 +185,7 @@ block content
                               | #{lead.remark ? lead.remark : "Not Provided"}
                         li.list-group-item
                           strong Updated on -
-                          | &nbsp;#{moment.utc(lead.updatedAt).tz("Asia/Kolkata").format("DD/MM/YYYY ")}, #{moment.utc(lead.updatedAt).tz("Asia/Kolkata").format("h:mm A")}
+                          | &nbsp;#{moment.utc(lead.updatedAt).tz("Asia/Kolkata").format("MM/DD/YYYY")}, #{moment.utc(lead.updatedAt).tz("Asia/Kolkata").format("h:mm A")}
                         li.list-group-item
                           strong Updated by -
                           | &nbsp;#{lead.updatedBy_name}
@@ -464,10 +472,10 @@ block content
                                           i.far.fa-handshake(style="font-size:22px;")
                                         else
                                           | -
-                                      td #{"Asia/Kolkata" ? moment.utc(followup.createdAt).tz("Asia/Kolkata").format("DD/MM/YYYY  h:mm A") : moment.utc(followup.createdAt).local().format("DD/MM/YYYY  h:mm A")}
+                                      td #{"Asia/Kolkata" ? moment.utc(followup.createdAt).tz("Asia/Kolkata").format("MM/DD/YYYY h:mm A") : moment.utc(followup.createdAt).local().format("MM/DD/YYYY h:mm A")}
                                       td.sorting_1
                                         if followup.no_followup == 0
-                                          | #{moment.utc(followup.follow_up_date).tz("Asia/Kolkata").format("DD/MM/YYYY ")} - #{followup.follow_up_time}
+                                          | #{moment.utc(followup.follow_up_date).tz("Asia/Kolkata").format("MM/DD/YYYY")} - #{followup.follow_up_time}
                                         else
                                           | No followup required
                                       //- td #{lead.center_id.center_name}
@@ -524,14 +532,14 @@ block content
                                     td(style="text-align: center;") -
                                     td
                                       if lead.initial_updated_date
-                                        | #{"Asia/Kolkata" ? moment.utc(lead.initial_updated_date).tz("Asia/Kolkata").format("DD/MM/YYYY  h:mm A") : moment.utc(lead.initial_updated_date).local().format("DD/MM/YYYY  h:mm A")}
+                                        | #{"Asia/Kolkata" ? moment.utc(lead.initial_updated_date).tz("Asia/Kolkata").format("MM/DD/YYYY h:mm A") : moment.utc(lead.initial_updated_date).local().format("MM/DD/YYYY h:mm A")}
                                       else
-                                        | #{"Asia/Kolkata" ? moment.utc(lead.updatedAt).tz("Asia/Kolkata").format("DD/MM/YYYY  h:mm A") : moment.utc(lead.updatedAt).local().format("DD/MM/YYYY  h:mm A")}
+                                        | #{"Asia/Kolkata" ? moment.utc(lead.updatedAt).tz("Asia/Kolkata").format("MM/DD/YYYY h:mm A") : moment.utc(lead.updatedAt).local().format("MM/DD/YYYY h:mm A")}
                                     td.sorting
                                       if lead.initial_updated_date
-                                        | #{"Asia/Kolkata" ? moment.utc(lead.initial_updated_date).tz("Asia/Kolkata").format("DD/MM/YYYY  h:mm A") : moment.utc(lead.initial_updated_date).local().format("DD/MM/YYYY  h:mm A")}
+                                        | #{"Asia/Kolkata" ? moment.utc(lead.initial_updated_date).tz("Asia/Kolkata").format("MM/DD/YYYY h:mm A") : moment.utc(lead.initial_updated_date).local().format("MM/DD/YYYY h:mm A")}
                                       else
-                                        | #{"Asia/Kolkata" ? moment.utc(lead.updatedAt).tz("Asia/Kolkata").format("DD/MM/YYYY  h:mm A") : moment.utc(lead.updatedAt).local().format("DD/MM/YYYY  h:mm A")}
+                                        | #{"Asia/Kolkata" ? moment.utc(lead.updatedAt).tz("Asia/Kolkata").format("MM/DD/YYYY h:mm A") : moment.utc(lead.updatedAt).local().format("MM/DD/YYYY h:mm A")}
                                     td
                                       each status in statuses
                                         if status._id.toString() === lead.initial_status.toString()
@@ -733,7 +741,7 @@ block content
         $("#follow_date").val(start.format('YYYY/MM/DD'))
       });
       $('.follow_date').on('apply.daterangepicker', function(ev, picker) {
-        $(this).val(picker.startDate.format('DD/MM/YYYY '));
+        $(this).val(picker.startDate.format('MM/DD/YYYY'));
       });
       $(`#tour_date`).daterangepicker({
         autoUpdateInput: false,
@@ -747,7 +755,7 @@ block content
         $("#tour_date").val(start.format('YYYY/MM/DD'))
       });
       $('.tour_date').on('apply.daterangepicker', function(ev, picker) {
-        $(this).val(picker.startDate.format('DD/MM/YYYY '));
+        $(this).val(picker.startDate.format('MM/DD/YYYY'));
       });
       $('#follow_up_time').datetimepicker({
         format: 'h:mm A'
