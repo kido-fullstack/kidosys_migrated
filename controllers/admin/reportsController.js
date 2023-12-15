@@ -12,7 +12,7 @@ const helper = require("../../handlers/helper");
 
 const dueDateFormatWithMoment = (data, dueTime) => {
   var regex = /\ba\b/;
-  let dueDate = moment.utc(data).tz("Asia/Kolkata").format("MM/DD/YYYY");
+  let dueDate = moment.utc(data).tz("Asia/Kolkata").format("DD/MM/YYYY ");
   if (data) {
     if (dueTime) {
       var mainData = moment(`${dueDate} ${dueTime}`).fromNow();
@@ -33,7 +33,7 @@ const dueDateFormatWithMoment = (data, dueTime) => {
 }
 
 const dueDateFormat = (data, dueTime, leadDate, doFollow, someDayFollow) => {
-  let dueDate = moment.utc(data).tz("Asia/Kolkata").format("MM/DD/YYYY");
+  let dueDate = moment.utc(data).tz("Asia/Kolkata").format("DD/MM/YYYY ");
   if (data) {
     if (dueTime) {
       return `${dueDate} ${dueTime}`;
@@ -46,7 +46,7 @@ const dueDateFormat = (data, dueTime, leadDate, doFollow, someDayFollow) => {
           return "Someday Followup";
         }
       } else {
-        return `${moment.utc(leadDate).tz("Asia/Kolkata").format("MM/DD/YYYY h:mm A")}`;
+        return `${moment.utc(leadDate).tz("Asia/Kolkata").format("DD/MM/YYYY  h:mm A")}`;
       }
     }
   } else {
@@ -566,8 +566,8 @@ exports.exportLeads = async (req, res, next) => {
           center: lead.school_id.school_display_name,
           walkins: getLeadType(lead.type ? lead.type : ""),
           lead_id: lead.lead_no,
-          leadDate: lead.lead_date ? moment.utc(lead.lead_date).tz("Asia/Kolkata").format("MM/DD/YYYY") : "",
-          leadUpdatedDate: lead.updatedAt ? moment.utc(lead.updatedAt).tz("Asia/Kolkata").format("MM/DD/YYYY h:mm A") : "",
+          leadDate: lead.lead_date ? moment.utc(lead.lead_date).tz("Asia/Kolkata").format("DD/MM/YYYY ") : "",
+          leadUpdatedDate: lead.updatedAt ? moment.utc(lead.updatedAt).tz("Asia/Kolkata").format("DD/MM/YYYY  h:mm A") : "",
           dueIn: dueDateFormatWithMoment(lead.follow_due_date ? lead.follow_due_date : "", lead.follow_due_time),
           leadName: lead.parent_name ? lead.parent_name : "",
           childFirstName: lead.child_first_name ? lead.child_first_name : "",
@@ -724,7 +724,7 @@ exports.exportLeadsWithoutLoop = async (req, res, next) => {
             $function: {
               body: function (data, dueTime) {
                 var regex = /\ba\b/;
-                let dueDate = moment(data).format("MM/DD/YYYY");
+                let dueDate = moment(data).format("DD/MM/YYYY ");
                 if (data) {
                   if (dueTime) {
                     var mainData = moment(`${dueDate} ${dueTime}`).fromNow();
@@ -2308,11 +2308,11 @@ exports.exportDemoTemplate = async (req, res ,next) => {
 
 const getDefaultDate = () => {
   let currMonth = moment().format("M");
-  let startDate = moment().month("Apr").startOf('month').format("MM/DD/YYYY");;
-  let endDate = moment().add(1, 'year').month("Mar").endOf('month').format("MM/DD/YYYY");
+  let startDate = moment().month("Apr").startOf('month').format("DD/MM/YYYY ");;
+  let endDate = moment().add(1, 'year').month("Mar").endOf('month').format("DD/MM/YYYY ");
   if (currMonth == 1 || currMonth == 2 || currMonth == 3) {
-    startDate = moment().subtract(1, 'year').month("Apr").startOf('month').format("MM/DD/YYYY");
-    endDate = moment().month("Mar").endOf('month').format("MM/DD/YYYY");
+    startDate = moment().subtract(1, 'year').month("Apr").startOf('month').format("DD/MM/YYYY ");
+    endDate = moment().month("Mar").endOf('month').format("DD/MM/YYYY ");
   }
   return {
     startDate,

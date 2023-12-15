@@ -622,7 +622,7 @@ block content
         $("#dob").val(start.format('YYYY/MM/DD'))
       });
       $('#dob').on('apply.daterangepicker', function(ev, picker) {
-        $(this).val(picker.startDate.format('MM/DD/YYYY'));
+        $(this).val(picker.startDate.format('DD/MM/YYYY '));
       });
 
       $(`#dob2`).daterangepicker({
@@ -637,7 +637,7 @@ block content
         $("#dob2").val(start.format('YYYY/MM/DD'))
       });
       $('#dob2').on('apply.daterangepicker', function(ev, picker) {
-        $(this).val(picker.startDate.format('MM/DD/YYYY'));
+        $(this).val(picker.startDate.format('DD/MM/YYYY '));
       });
       $('#stage').hide()
       $('#know_us').select2({

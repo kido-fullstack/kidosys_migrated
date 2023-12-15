@@ -1008,7 +1008,7 @@ block content
         autoApply: true
       });
       $('#agreement_term_start').on('apply.daterangepicker', function(ev, picker) {
-        $(this).val(picker.startDate.format('MM/DD/YYYY'));
+        $(this).val(picker.startDate.format('DD/MM/YYYY '));
       });
       //- $(`#agreement_term_end`).daterangepicker({
       //-   singleDatePicker: true,
@@ -1025,7 +1025,7 @@ block content
         autoApply: true
       });
       $('#agreement_term_end').on('apply.daterangepicker', function(ev, picker) {
-        $(this).val(picker.startDate.format('MM/DD/YYYY'));
+        $(this).val(picker.startDate.format('DD/MM/YYYY '));
       });
       $('#mon_to_fri_start_time').datetimepicker({
         format: 'h:mm A',
