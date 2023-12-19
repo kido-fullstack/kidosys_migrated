@@ -34,6 +34,7 @@ exports.allCenter = async (req, res, next) => {
         contact_number: 1,
         email_id: 1,
         cor_spoc: 1,
+        designation: 1,
         mon_to_fri_end_time: 1,
         mon_to_fri_start_time: 1,
         saturday_end_time: 1,
