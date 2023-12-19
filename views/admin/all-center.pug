@@ -34,6 +34,7 @@ block content
                           th Zone
                           th Center Name
                           th SPOC Name
+                          th Role
                           th Center Number
                           th Center Email ID
                           th.w-25 Ops Hours
@@ -48,6 +49,7 @@ block content
                                 if center.status == "inactive"
                                   span.badge.badge-danger.nowrap(style="font-size:10px !important;") In-active
                               td #{center.cor_spoc ? center.cor_spoc : "Not Provided"}
+                              td #{center.designation ? center.designation : "Not Provided"}
                               td #{center.contact_number ? center.contact_number : "Not Provided"}
                               td #{center.email_id ? center.email_id : "Not Provided"}
                               td
