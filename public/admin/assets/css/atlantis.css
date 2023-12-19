@@ -17335,13 +17335,14 @@ table#basic-datatables.dataTable {
   margin-bottom: 15px !important;
   max-width: none !important;
   border-collapse: separate !important;
-  border-spacing: 10px; /* Adjust the spacing as needed */
+  border-spacing: 15px; /* Adjust the spacing as needed */
 }
 
 table#basic-datatables.dataTable td,
 table#basic-datatables.dataTable th {
   -webkit-box-sizing: content-box;
   box-sizing: content-box;
+  padding: 10px;
   white-space: nowrap; /* Prevent text from wrapping */
 }
 
