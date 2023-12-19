@@ -917,7 +917,7 @@ block content
         }
       });
       $('#agreement_term_start').on('apply.daterangepicker', function(ev, picker) {
-        $(this).val(picker.startDate.format('MM/DD/YYYY'));
+        $(this).val(picker.startDate.format('DD/MM/YYYY '));
       });
       $(`#agreement_term_end`).daterangepicker({
         autoUpdateInput: false,
@@ -927,7 +927,7 @@ block content
         autoApply: true
       });
       $('#agreement_term_end').on('apply.daterangepicker', function(ev, picker) {
-        $(this).val(picker.startDate.format('MM/DD/YYYY'));
+        $(this).val(picker.startDate.format('DD/MM/YYYY '));
       });
       //- $(`#sch_timetable_before`).daterangepicker({
       //-   autoUpdateInput: false,
@@ -937,7 +937,7 @@ block content
       //-   autoApply: true
       //- });
       //- $('#sch_timetable_before').on('apply.daterangepicker', function(ev, picker) {
-      //-   $(this).val(picker.startDate.format('MM/DD/YYYY'));
+      //-   $(this).val(picker.startDate.format('DD/MM/YYYY '));
       //- });
       //- $(`#sch_document_before`).daterangepicker({
       //-   autoUpdateInput: false,
@@ -947,7 +947,7 @@ block content
       //-   autoApply: true
       //- });
       //- $('#sch_document_before').on('apply.daterangepicker', function(ev, picker) {
-      //-   $(this).val(picker.startDate.format('MM/DD/YYYY'));
+      //-   $(this).val(picker.startDate.format('DD/MM/YYYY '));
       //- });
       //- $(`#sch_timetable_after`).daterangepicker({
       //-   autoUpdateInput: false,
@@ -957,7 +957,7 @@ block content
       //-   autoApply: true
       //- });
       //- $('#sch_timetable_after').on('apply.daterangepicker', function(ev, picker) {
-      //-   $(this).val(picker.startDate.format('MM/DD/YYYY'));
+      //-   $(this).val(picker.startDate.format('DD/MM/YYYY '));
       //- });
       //- $(`#sch_document_after`).daterangepicker({
       //-   autoUpdateInput: false,
@@ -967,7 +967,7 @@ block content
       //-   autoApply: true
       //- });
       //- $('#sch_document_after').on('apply.daterangepicker', function(ev, picker) {
-      //-   $(this).val(picker.startDate.format('MM/DD/YYYY'));
+      //-   $(this).val(picker.startDate.format('DD/MM/YYYY '));
       //- });
       $('#setup_type').select2({
         placeholder: "Select Type",

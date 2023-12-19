@@ -57,7 +57,7 @@ block content
                               td
                                 a.btn.btn-link.btn-primary(onclick=`viewMsg(${JSON.stringify(message.msg)});`)
                                   i.fa.fa-eye
-                              td #{moment(message.createdAt).format("MM/DD/YYYY")}
+                              td #{moment(message.createdAt).format("DD/MM/YYYY ")}
                               if session.user && session.user.main == "super_admin"
                                 td #{message.createdBy && message.createdBy.first_name ? message.createdBy.first_name : "System"} #{message.createdBy && message.createdBy.last_name ? message.createdBy.last_name : "Admin"}
                               td #{message.status == 'active' ? 'Active' : 'Inactive'}

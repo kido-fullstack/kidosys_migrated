@@ -1406,17 +1406,17 @@ block content
       });
 
       //- function cb (start, end) {
-      //-   $('input[name="date_range"]').val(start.format('MM/DD/YYYY') + ' - ' + end.format('MM/DD/YYYY'));
+      //-   $('input[name="date_range"]').val(start.format('DD/MM/YYYY ') + ' - ' + end.format('DD/MM/YYYY '));
       //- }
       //- cb(moment().startOf('isoWeek'), moment().endOf('isoWeek'));
 
       $('input[name="date_range"]').on('apply.daterangepicker', function(ev, picker) {
-          $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+          $(this).val(picker.startDate.format('DD/MM/YYYY ') + ' - ' + picker.endDate.format('DD/MM/YYYY '));
           table
             .columns(4) // for start date
-            .search(picker.startDate.format('MM/DD/YYYY')) // for start date
+            .search(picker.startDate.format('DD/MM/YYYY ')) // for start date
             .columns(5) // for end date
-            .search(picker.endDate.format('MM/DD/YYYY')) // for end date
+            .search(picker.endDate.format('DD/MM/YYYY ')) // for end date
             .draw();
           $("#clr_date_range").css('visibility', 'visible');
       });
@@ -1645,8 +1645,8 @@ block content
           },
           dataType: 'json',
           success: function (response) {
-            //- console.log(response);
-            window.location.reload();
+            console.log(response);
+            //- window.location.reload();
           }
         });
 

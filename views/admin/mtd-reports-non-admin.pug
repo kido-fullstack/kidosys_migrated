@@ -246,12 +246,12 @@ block content
       });
 
       $('input[name="date_range"]').on('apply.daterangepicker', function(ev, picker) {
-        $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+        $(this).val(picker.startDate.format('DD/MM/YYYY ') + ' - ' + picker.endDate.format('DD/MM/YYYY '));
         table
           .columns(3) // for start date
-          .search(picker.startDate.format('MM/DD/YYYY')) // for start date
+          .search(picker.startDate.format('DD/MM/YYYY ')) // for start date
           .columns(4) // for end date
-          .search(picker.endDate.format('MM/DD/YYYY')) // for end date
+          .search(picker.endDate.format('DD/MM/YYYY ')) // for end date
           .draw();
         $("#clr_date_range").css('visibility', 'visible');
       });

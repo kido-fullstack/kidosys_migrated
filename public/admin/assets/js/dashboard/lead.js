@@ -44,12 +44,12 @@ $(document).ready(function () {
   var currMonth = moment().format("M");
   $("#clr_date_range").css('visibility', 'hidden');
 
-  var startDate = moment().month("Apr").startOf('month').format("MM/DD/YYYY");
-  var endDate = moment().add(1, 'year').month("Mar").endOf('month').format("MM/DD/YYYY");
+  var startDate = moment().month("Apr").startOf('month').format("DD/MM/YYYY ");
+  var endDate = moment().add(1, 'year').month("Mar").endOf('month').format("DD/MM/YYYY ");
 
   if (currMonth == 1 || currMonth == 2 || currMonth == 3) {
-    startDate = moment().subtract(1, 'year').month("Apr").startOf('month').format("MM/DD/YYYY");
-    endDate = moment().month("Mar").endOf('month').format("MM/DD/YYYY");
+    startDate = moment().subtract(1, 'year').month("Apr").startOf('month').format("DD/MM/YYYY ");
+    endDate = moment().month("Mar").endOf('month').format("DD/MM/YYYY ");
   }
 
   $('#date').daterangepicker({
@@ -70,17 +70,17 @@ $(document).ready(function () {
   }, dateCallBack);
 
   function dateCallBack (start, end) {
-    $('#date').val(start.format('MM/DD/YYYY') + ' - ' + end.format('MM/DD/YYYY'));
+    $('#date').val(start.format('DD/MM/YYYY ') + ' - ' + end.format('DD/MM/YYYY '));
   }
   dateCallBack(moment().month("Jan").startOf('month'), moment().month("Dec").endOf('month'));
 
   // WHEN DATE RANGE IS SELECTED
   $('#date').on('apply.daterangepicker', function(ev, picker) {
-    $(this).val(picker.startDate.format('MM/DD/YYYY') + ' - ' + picker.endDate.format('MM/DD/YYYY'));
+    $(this).val(picker.startDate.format('DD/MM/YYYY ') + ' - ' + picker.endDate.format('DD/MM/YYYY '));
     $("#clr_date_range").css('visibility', 'visible');
 
-    startDate = picker.startDate.format('MM/DD/YYYY');
-    endDate = picker.endDate.format('MM/DD/YYYY');
+    startDate = picker.startDate.format('DD/MM/YYYY ');
+    endDate = picker.endDate.format('DD/MM/YYYY ');
     startAjaxAgain();
     sall("Please wait...", 3500);
   });
@@ -91,12 +91,12 @@ $(document).ready(function () {
     //- $('#date').val('')
     dateCallBack(moment().month("Apr").startOf('month'), moment().add(1, 'year').month("Mar").endOf('month'));
 
-    startDate = moment().month("Apr").startOf('month').format("MM/DD/YYYY");
-    endDate = moment().add(1, 'year').month("Mar").endOf('month').format("MM/DD/YYYY");
+    startDate = moment().month("Apr").startOf('month').format("DD/MM/YYYY ");
+    endDate = moment().add(1, 'year').month("Mar").endOf('month').format("DD/MM/YYYY ");
 
     if (currMonth == 1 || currMonth == 2 || currMonth == 3) {
-      startDate = moment().subtract(1, 'year').month("Apr").startOf('month').format("MM/DD/YYYY");
-      endDate = moment().month("Mar").endOf('month').format("MM/DD/YYYY");
+      startDate = moment().subtract(1, 'year').month("Apr").startOf('month').format("DD/MM/YYYY ");
+      endDate = moment().month("Mar").endOf('month').format("DD/MM/YYYY ");
     }
 
     startAjaxAgain();

@@ -34,8 +34,8 @@ block content
                           a(href="#")
                             tr.odd(role='row')
                               td.sorting_1 #{academicYear.name}
-                              td #{moment(academicYear.start_date).format("MM/DD/YYYY")}
-                              td #{moment(academicYear.end_date).format("MM/DD/YYYY")}
+                              td #{moment(academicYear.start_date).format("DD/MM/YYYY ")}
+                              td #{moment(academicYear.end_date).format("DD/MM/YYYY ")}
                               td #{academicYear.status == 'active' ? 'Active' : 'Inactive'}
                               td
                                 if h.checkPermission(session.user, permissionCacheData, "AcademicYearEdit") || checkSuperAdmin
