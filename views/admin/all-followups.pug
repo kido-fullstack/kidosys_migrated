@@ -245,7 +245,7 @@ block content
         {
           data: 'updatedAt',
           render: function (data, type, row) {
-            return `${data ? moment(data).format("DD/MM/YYYY hh:mm A") : 'Not Provided'}`
+            return `${data ? moment(data).format("DD/MM/YYYY <br> hh:mm A") : 'Not Provided'}`
           }
         },
         {
@@ -284,11 +284,15 @@ block content
             return `${data && data ? data : 'Not Provided'}`
           }
         },
-        {
+       {
           data: 'parent_know_aboutus',
-          render: function (data, type, row) {
-            return `${data ? data : 'Not Provided'}`
-          }
+            render: function (data, type, row) {
+              return data && data.length
+                ? data.length > 1
+                  ? data.join('<br>')
+                  : data[0]
+                : 'Not Provided';
+              }
         },
         {
           data: 'program_id.program_name',

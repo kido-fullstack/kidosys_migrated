@@ -639,7 +639,11 @@ block content
             {
               data: 'parent_know_aboutus',
               render: function (data, type, row) {
-                return `${data && data.length ? data : 'Not Provided'}`
+                return data && data.length
+                  ? data.length > 1
+                    ? data.join('<br>')
+                    : data[0]
+                  : 'Not Provided';
               }
             },
             //- {
@@ -787,7 +791,11 @@ block content
             {
               data: 'parent_know_aboutus',
               render: function (data, type, row) {
-                return `${data && data.length ? data : 'Not Provided'}`
+                return data && data.length
+                  ? data.length > 1
+                    ? data.join('<br>')
+                    : data[0]
+                  : 'Not Provided';
               }
             },
             //- {
