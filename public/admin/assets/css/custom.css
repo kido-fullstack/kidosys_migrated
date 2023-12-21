@@ -1135,3 +1135,13 @@ input[type=checkbox]:checked:before {
 .edt_knowus ul li:first-child .select2-selection__choice__remove {
   display: none;
 }
+
+div.dataTables_length,div.dataTables_info,div.DTTT {
+  float: left;
+}
+div.dataTables_filter,div.dataTables_paginate {
+  float: right;
+}
+div.buttons {
+  clear: both;
+}
