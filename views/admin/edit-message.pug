@@ -32,7 +32,7 @@ block content
                     .col-lg-7.col-md-9.col-sm-8
                       textarea.form-control(rows='15', cols='5', id="msg_desc", name="msg_desc") #{message.msg}
                       div.pt-2
-                        input(type='radio', name='type', value='message', id='message', checked=(message.type === 'message'))
+                        input(type='radio', name='type', value='message', id='message', checked=(message.type === 'message')) 
                         label(for='message', class='pr-4') Message
                         input(type='radio', name='type', value='email', id='email', checked=(message.type === 'email'))
                         label(for='email') Email

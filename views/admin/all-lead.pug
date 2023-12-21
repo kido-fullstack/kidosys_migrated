@@ -850,6 +850,9 @@ block content
         "dom": 'lfrtip',
         //- dom: 'Bfrtip',
         order: [[1, 'desc']],
+        language: {
+          searchPlaceholder: "By ID, Name, Number, Email.."
+        },
         buttons: [{
             extend: 'excel',
             text: 'Export to excel',
@@ -1399,7 +1402,7 @@ block content
         column.visible(!column.visible());
       });
 
-      $('.dataTables_filter ').css('display', 'none')
+      //- $('.dataTables_filter ').css('display', 'none')
 
       table.buttons().container().appendTo($('.excelexport'));
 
