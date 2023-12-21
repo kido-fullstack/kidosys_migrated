@@ -135,12 +135,12 @@ block content
             .card.card-with-nav.filter-div
               .card-body
                 .row
-                  .col-md-2
-                    .form-group
-                      label(for='type',style="margin-bottom:0px;") Search
-                      input.form-control#searchbox(type='text' placeholder='By ID, Name, Number, Email..' name='search' style='height: 38px;')
-                      a#clr_search(href="javascript:void(0)" style="margin-top: 3px;float: right;text-decoration: none;z-index:9999")
-                        i.fa.fa-times(style="position: absolute;right: 35px;top: 45px;z-index: 99999;")
+                  //- .col-md-2
+                  //-   .form-group
+                  //-     label(for='type',style="margin-bottom:0px;") Search
+                  //-     input.form-control#searchbox(type='text' placeholder='By ID, Name, Number, Email..' name='search' style='height: 38px;')
+                  //-     a#clr_search(href="javascript:void(0)" style="margin-top: 3px;float: right;text-decoration: none;z-index:9999")
+                  //-       i.fa.fa-times(style="position: absolute;right: 35px;top: 45px;z-index: 99999;")
                   .col-md-2
                     .form-group
                       label(for='type' style="width: 100%;margin-bottom:0px;") Date Range
@@ -850,6 +850,9 @@ block content
         "dom": 'lfrtip',
         //- dom: 'Bfrtip',
         order: [[1, 'desc']],
+        language: {
+          searchPlaceholder: "By ID, Name, Number, Email.."
+        },
         buttons: [{
             extend: 'excel',
             text: 'Export to excel',
@@ -1399,7 +1402,7 @@ block content
         column.visible(!column.visible());
       });
 
-      $('.dataTables_filter ').css('display', 'none')
+      //- $('.dataTables_filter ').css('display', 'none')
 
       table.buttons().container().appendTo($('.excelexport'));
 
@@ -1660,7 +1663,7 @@ block content
           dataType: 'json',
           success: function (response) {
             console.log(response);
-            //- window.location.reload();
+            window.location.reload();
           }
         });
 

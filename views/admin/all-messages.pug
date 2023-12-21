@@ -71,7 +71,7 @@ block content
     script(src='/admin/assets/js/common.js')
 
     script.
-      $(document).ready(function() {
+      $(document).ready(function)() {
         $("#dropdown1").select2();
         var table = $('#basic-datatables').DataTable({
           ordering: true,
@@ -104,6 +104,7 @@ block content
             </form>
           `)
         }
+      }
 
       //-   $('#mssg').on('change', function() {
       //-     if ($(this).is(":checked")) {
