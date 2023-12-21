@@ -19,17 +19,22 @@ block content
             //- pre= h.dump(followups && followups.length && followups[0].notes)
             .card
               .card-header
-                .row
-                  .col-md-6.col-lg-4(style="padding: 1.8%;")
-                      if(prevlead)
-                        a(href=(`${prevlead._id}`)).card-title(style="margin: 10%;") Previous Lead 
-                  .col-md-6.col-lg-4
-                    a(href=`/admin/lead/edit/${lead._id}`)
-                      .card-title(style="margin: 20px;") Lead (#{lead.lead_no})
-                       i.edit-icon(class="fa fa-edit" style="padding-left: 10px;")
-                  .col-md-4.col-lg-4(style="padding: 1.3%;")
-                    if(nextlead)
-                      a(href=(`${nextlead._id}`)).card-title(style="margin: 10%;") Next Lead
+              .row
+                .col-md-6.col-lg-4(style="padding: 1.4%; display: flex; align-items: center;")
+                  if(prevlead)
+                    a(href=(`${prevlead._id}`)).card-title(style="margin: 10%;")
+                      i.fas.fa-arrow-left 
+                      |  Previous 
+                .col-md-6.col-lg-4(style="display: flex; align-items: center; justify-content: center;")
+                  a(href=`/admin/lead/edit/${lead._id}`)
+                    .card-title(style="margin: 20px;")
+                      | Lead (#{lead.lead_no})
+                      i.edit-icon(class="fa fa-edit" style="padding-left: 10px;")
+                .col-md-4.col-lg-4(style="padding: 1.4%; display: flex; align-items: center; justify-content: flex-end;")
+                  if(nextlead)
+                    a(href=(`${nextlead._id}`)).card-title(style="margin: 10%; text-align: right;")
+                      | Next
+                      i.fas.fa-arrow-right
               .card-body
                 .row
                   .col-md-6.col-lg-6
@@ -47,7 +52,7 @@ block content
                             | &nbsp;#{lead.type.toUpperCase()}
                         li.list-group-item
                           strong LD Date -
-                          | &nbsp;#{moment(lead.createdAt).format('MMM Do YYYY').toString().toUpperCase()}
+                          | &nbsp;#{moment(lead.createdAt).format('Do MMM YYYY').toString().toUpperCase()}
                         //- li.list-group-item
                           strong Lead No -
                           | &nbsp;#{lead.lead_no}
