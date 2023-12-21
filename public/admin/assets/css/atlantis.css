@@ -17310,36 +17310,18 @@ be a descendant of the grid when it is being dragged.
   margin-bottom: 20px !important;
 }
 
-/*      Datatable     */
 /* Datatable */
-table#all_lead.dataTable {
+table#all_lead.dataTable,#basic-datatables.dataTable {
   clear: both;
   margin-top: 15px !important;
   margin-bottom: 15px !important;
   max-width: none !important;
-  border-collapse: separate !important;
+  /* border-collapse: separate !important; */
   border-spacing: 10px; /* Adjust the spacing as needed */
 }
 
-table#all_lead.dataTable td,
-table#all_lead.dataTable th {
-  -webkit-box-sizing: content-box;
-  box-sizing: content-box;
-  white-space: nowrap; /* Prevent text from wrapping */
-}
-
-/* Datatable */
-table#basic-datatables.dataTable {
-  clear: both;
-  margin-top: 15px !important;
-  margin-bottom: 15px !important;
-  max-width: none !important;
-  border-collapse: separate !important;
-  border-spacing: 10px; /* Adjust the spacing as needed */
-}
-
-table#basic-datatables.dataTable td,
-table#basic-datatables.dataTable th {
+table#all_lead,#basic-datatables.dataTable td,
+table#all_lead,#basic-datatables.dataTable th {
   -webkit-box-sizing: content-box;
   box-sizing: content-box;
   white-space: nowrap; /* Prevent text from wrapping */

@@ -175,7 +175,7 @@ block content
                           option(value=statuses._id) #{statuses.name}  
                   .col-md-2
                     .form-group
-                        label(for='substatus',style="margin-bottom:0px;") Select Sub Status
+                        label(for='substatus',style="margin-bottom:0px;") Sub Status
                         select#substatus.form-control(name='follow_sub_status' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1" , required='')        
                   .col-md-2
                     .form-group.lead-flex-container
@@ -395,13 +395,13 @@ block content
             {
                 data: 'lead_date',
                 render: function (data, type, row) {
-                    return data ? moment(data).format("DD/MM/YYYY hh:mm A") : 'Not Provided';
+                    return data ? moment(data).format("DD/MM/YYYY <br> hh:mm A") : 'Not Provided';
                 }
             },
             {
                 data: 'updatedAt',
                 render: function (data, type, row) {
-                    return data ? moment(data).format("DD/MM/YYYY hh:mm A") : 'Not Provided';
+                    return data ? moment(data).format("DD/MM/YYYY <br> hh:mm A") : 'Not Provided';
                 }
             },
             {
@@ -494,7 +494,11 @@ block content
             {
               data: 'parent_know_aboutus',
               render: function (data, type, row) {
-                return `${data && data.length ? data : 'Not Provided'}`
+                return data && data.length
+                  ? data.length > 1
+                    ? data.join('<br>')
+                    : data[0]
+                  : 'Not Provided';
               }
             },
             {
@@ -543,13 +547,13 @@ block content
             {
                 data: 'lead_date',
                 render: function (data, type, row) {
-                    return data ? moment(data).format("DD/MM/YYYY hh:mm A") : 'Not Provided';
+                    return data ? moment(data).format("DD/MM/YYYY <br> hh:mm A") : 'Not Provided';
                 }
             },
             {
                 data: 'updatedAt',
                 render: function (data, type, row) {
-                    return data ? moment(data).format("DD/MM/YYYY hh:mm A") : 'Not Provided';
+                    return data ? moment(data).format("DD/MM/YYYY <br> hh:mm A") : 'Not Provided';
                 }
             },
             {
@@ -636,7 +640,11 @@ block content
             {
               data: 'parent_know_aboutus',
               render: function (data, type, row) {
-                return `${data && data.length ? data : 'Not Provided'}`
+                return data && data.length
+                  ? data.length > 1
+                    ? data.join('<br>')
+                    : data[0]
+                  : 'Not Provided';
               }
             },
             //- {
@@ -697,13 +705,13 @@ block content
             {
                 data: 'lead_date',
                 render: function (data, type, row) {
-                    return data ? moment(data).format("DD/MM/YYYY hh:mm A") : 'Not Provided';
+                    return data ? moment(data).format("DD/MM/YYYY <br> hh:mm A") : 'Not Provided';
                 }
             },
             {
                 data: 'updatedAt',
                 render: function (data, type, row) {
-                    return data ? moment(data).format("DD/MM/YYYY hh:mm A") : 'Not Provided';
+                    return data ? moment(data).format("DD/MM/YYYY <br> hh:mm A") : 'Not Provided';
                 }
             },
             {
@@ -784,7 +792,11 @@ block content
             {
               data: 'parent_know_aboutus',
               render: function (data, type, row) {
-                return `${data && data.length ? data : 'Not Provided'}`
+                return data && data.length
+                  ? data.length > 1
+                    ? data.join('<br>')
+                    : data[0]
+                  : 'Not Provided';
               }
             },
             //- {
