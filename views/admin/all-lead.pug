@@ -307,6 +307,7 @@ block content
     var table;
     var col = [];
     var colDT = [];
+    var total_records = 0;
     $('.filter').css('display', 'none');
     var currentUser = !{JSON.stringify(session.user)};
     var onlyUserEntry = !{JSON.stringify(user_type)};
@@ -900,6 +901,7 @@ block content
         "drawCallback": function (settings) {
 
           const totalEntries = settings.fnRecordsTotal();
+          total_records = totalEntries;
           const message = `${settings.json.newLds} new leads from ${totalEntries} entries`;
           $('.newleads').html(message);
           //-  console.log('From Total Entries:', totalEntries);
