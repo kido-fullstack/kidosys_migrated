@@ -468,7 +468,8 @@ block content
             {
               data: 'school_id.school_display_name',
               render: function (data, type, row) {
-                return `${data ? data : 'Not Provided'}`
+                //- return `${data ? data : 'Not Provided'}`
+                return `<button type="button" class="btn btn-link btn-primary tbl-action-btn" data-toggle="tooltip" title="Transfer Lead" data-original-title="Transfer Lead" onclick="openTransferLeadPopup('${row._id}', '${row.school_id._id}', '${row.school_id.school_display_name}', '${row.lead_no}')">${data}</button>`
               }
             },
             {
