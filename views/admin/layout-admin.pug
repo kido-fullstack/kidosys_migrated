@@ -98,21 +98,36 @@ html(lang='en')
 							- var acaYrMaster = h.checkPermission(session.user, permissionCacheData, "AcademicYearViewMaster");
 							- var msgMaster = h.checkPermission(session.user, permissionCacheData, "MessageViewMaster");
 							- var userMaster = h.checkPermission(session.user, permissionCacheData, "UserViewMaster");
-							if acaYrMaster || msgMaster || userMaster || checkSuperAdmin
-								li.nav-item
-									a.collapsed(href='/admin/masters')
-										i.fa.fa-archive
-										p Setups
-							if h.checkPermission(session.user, permissionCacheData, "LeadListing") || checkSuperAdmin
-								li.nav-item
-									a.collapsed(href='/admin/lead/all')
-										i.fa.fa-paw
-										p Leads
 							if h.checkPermission(session.user, permissionCacheData, "FollowUpListing") || checkSuperAdmin
 								li.nav-item
 									a.collapsed(href='/admin/lead/follow/all')
 										i.fa.fa-history
 										p Follow-Ups
+							if h.checkPermission(session.user, permissionCacheData, "LeadListing") || checkSuperAdmin
+								li.nav-item
+									a.collapsed(href='/admin/lead/all')
+										i.fa.fa-paw
+										p Leads			
+							if h.checkPermission(session.user, permissionCacheData, "ContentViewListing") || checkSuperAdmin
+								li.nav-item
+									a.collapsed(href='/admin/responses/all')
+										i.fas.fa-paper-plane
+										p Quick Response			
+							if acaYrMaster || msgMaster || userMaster || checkSuperAdmin
+								li.nav-item
+									a.collapsed(href='/admin/masters')
+										i.fa.fa-archive
+										p Setups
+							//- if h.checkPermission(session.user, permissionCacheData, "LeadListing") || checkSuperAdmin
+							//- 	li.nav-item
+							//- 		a.collapsed(href='/admin/lead/all')
+							//- 			i.fa.fa-paw
+							//- 			p Leads
+							//- if h.checkPermission(session.user, permissionCacheData, "FollowUpListing") || checkSuperAdmin
+							//- 	li.nav-item
+							//- 		a.collapsed(href='/admin/lead/follow/all')
+							//- 			i.fa.fa-history
+							//- 			p Follow-Ups
 							//- if checkSuperAdmin
 							//- 	li.nav-item
 							//- 		a.collapsed(data-toggle='collapse', href='#uac-nav', aria-expanded='false')
@@ -130,11 +145,11 @@ html(lang='en')
 											//- li
 											//- 	a(href='/admin/employee/all')
 											//- 		span.sub-item User Setup
-							if h.checkPermission(session.user, permissionCacheData, "ContentViewListing") || checkSuperAdmin
-								li.nav-item
-									a.collapsed(href='/admin/responses/all')
-										i.fas.fa-paper-plane
-										p Quick Response
+							//- if h.checkPermission(session.user, permissionCacheData, "ContentViewListing") || checkSuperAdmin
+							//- 	li.nav-item
+							//- 		a.collapsed(href='/admin/responses/all')
+							//- 			i.fas.fa-paper-plane
+							//- 			p Quick Response
 										//- li
 											a(href='#')
 												span.sub-item Assign User(s)
