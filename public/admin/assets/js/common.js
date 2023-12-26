@@ -1,5 +1,6 @@
 // vewAttachment
 function viewAttachment(msg_id) {
+  console.log(msg_id);
   sall("Please wait...", 12000);
   $.ajax({
     url:'/admin/message/view/attachments',

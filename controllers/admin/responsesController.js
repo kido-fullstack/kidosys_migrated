@@ -1087,6 +1087,7 @@ exports.datatableFilter = async (req, res, next) => {
               "msg":1,
               "when_to_use":1,
               "attachment":1,
+              "type":1,
               "employee": 1,
               "result":{
                 $sum:"$result.sent_count"
@@ -1160,13 +1161,13 @@ exports.datatableFilter = async (req, res, next) => {
             if(message.attachment && message.attachment.length){
               newArr.push([
                 `<a href="javascript:void(0)" onclick="redirectToresponse('${message._id}')">${message.title ? message.title : "Not Provided"
-                }</a> <span onclick="viewAttachment('${message._id}')" id = "span_download" class="badge nowrap"><i class="fa fa-paperclip" style="float:right;"></i></span>`, `<a class="btn btn-link btn-primary" onclick="viewMsg('${message._id}');"><i class="fa fa-eye"></i></a>`,  `${message.createdAt ? moment(message.createdAt).format("DD/MM/YYYY") : "Not Provided"}`,`${message.employee && message.employee.length ? `${message.employee[0].first_name} ${message.employee[0].last_name}` : "Not Provided"}`, `${message.result ? `${message.result} times`: "Not Yet Sent"}`
+                }</a> <span onclick="viewAttachment('${message._id}')" id = "span_download" class="badge nowrap"><i class="fa fa-paperclip" style="float:right;"></i></span>`, `<a class="btn btn-link btn-primary" onclick="viewMsg('${message._id}');"><i class="fa fa-eye"></i></a>`,  `${message.createdAt ? moment(message.createdAt).format("DD/MM/YYYY <br> hh:mm A") : "Not Provided"}`,`${message.employee && message.employee.length ? `${message.employee[0].first_name} ${message.employee[0].last_name}` : "Not Provided"}`, `${message.result ? `${message.result} times`: "Not Yet Sent"}`
                 ,message.when_to_use
               ]);
             }else{
               newArr.push([
                 `<a href="javascript:void(0)" onclick="redirectToresponse('${message._id}')">${message.title ? message.title : "Not Provided"
-                }</a> `, `<a class="btn btn-link btn-primary" onclick="viewMsg('${message._id}');"><i class="fa fa-eye"></i></a>`, `${message.createdAt ? moment(message.createdAt).format("DD/MM/YYYY") : "Not Provided"}`,`${message.employee && message.employee.length ? `${message.employee[0].first_name} ${message.employee[0].last_name}` : "Not Provided"}`,`${message.result ? `${message.result} times`: "Not Yet Sent"}`
+                }</a> `, `<a class="btn btn-link btn-primary" onclick="viewMsg('${message._id}');"><i class="fa fa-eye"></i></a>`, `${message.createdAt ? moment(message.createdAt).format("DD/MM/YYYY <br> hh:mm A") : "Not Provided"}`,`${message.employee && message.employee.length ? `${message.employee[0].first_name} ${message.employee[0].last_name}` : "Not Provided"}`,`${message.result ? `${message.result} times`: "Not Yet Sent"}`
                 ,message.when_to_use
               ]);
             }
@@ -1210,6 +1211,7 @@ exports.datatableFilter = async (req, res, next) => {
               "title":1,
               "msg":1,
               "when_to_use":1,
+              "type":1,
               "employee": 1,
               "attachment":1,
               "result":{
@@ -1252,14 +1254,14 @@ exports.datatableFilter = async (req, res, next) => {
               // console.log(message.attachment,"message.attachment" ,)
               newArr.push([
                 `<a href="javascript:void(0)" onclick="redirectToresponse('${message._id}')">${message.title ? message.title : "Not Provided"
-                }</a> <span onclick="viewAttachment('${message._id}')" id="span_download" class="badge nowrap"><i class="fa fa-paperclip" style="float:right;"></i></span>`, `<a class="btn btn-link btn-primary" onclick="viewMsg('${message._id}');"><i class="fa fa-eye"></i></a>`, `${message.createdAt ? moment(message.createdAt).format("DD/MM/YYYY") : "Not Provided"}`, `${message.employee && message.employee.length ? `${message.employee[0].first_name} ${message.employee[0].last_name}` : "Not Provided"}`, `${message.result ? `${message.result} times`: "Not Yet Sent"}`
-                ,message.when_to_use
+                }</a> <span onclick="viewAttachment('${message._id}')" id="span_download" class="badge nowrap"><i class="fa fa-paperclip" style="float:right;"></i></span>`, `<a class="btn btn-link btn-primary" onclick="viewMsg('${message._id}');"><i class="fa fa-eye"></i></a>`, `${message.createdAt ? moment(message.createdAt).format("DD/MM/YYYY <br> hh:mm A") : "Not Provided"}`, `${message.employee && message.employee.length ? `${message.employee[0].first_name} ${message.employee[0].last_name}` : "Not Provided"}`, `${message.result ? `${message.result} times`: "Not Yet Sent"}`
+                ,message.when_to_use,message.type
               ]);
             } else {
               newArr.push([
                 `<a href="javascript:void(0)" onclick="redirectToresponse('${message._id}')">${message.title ? message.title : "Not Provided"
-                }</a>`, `<a class="btn btn-link btn-primary" onclick="viewMsg('${message._id}');"><i class="fa fa-eye"></i></a>`, `${message.createdAt ? moment(message.createdAt).format("DD/MM/YYYY") : "Not Provided"}`, `${message.employee && message.employee.length ? `${message.employee[0].first_name} ${message.employee[0].last_name}` : "Not Provided"}`, `${message.result ? `${message.result} times`: "Not Yet Sent"}`
-                ,message.when_to_use
+                }</a>`, `<a class="btn btn-link btn-primary" onclick="viewMsg('${message._id}');"><i class="fa fa-eye"></i></a>`, `${message.createdAt ? moment(message.createdAt).format("DD/MM/YYYY <br> hh:mm A") : "Not Provided"}`, `${message.employee && message.employee.length ? `${message.employee[0].first_name} ${message.employee[0].last_name}` : "Not Provided"}`, `${message.result ? `${message.result} times`: "Not Yet Sent"}`
+                ,message.when_to_use,message.type
               ]);
             }
           });
@@ -1393,13 +1395,13 @@ exports.datatableFilter = async (req, res, next) => {
             if(message.attachment && message.attachment.length){
               newArr.push([
                 `<a href="javascript:void(0)" onclick="redirectToresponse('${message._id}')">${message.title ? message.title : "Not Provided"
-                }</a><span onclick="viewAttachment('${message._id}')" id = "span_download" class="badge nowrap"><i class="fa fa-paperclip" style="float:right;"></i></span>`, `<a class="btn btn-link btn-primary" onclick="viewMsg('${message._id}');"><i class="fa fa-eye"></i></a>`, `${message.createdAt ? moment(message.createdAt).format("DD/MM/YYYY") : "Not Provided"}`, `${message.employee && message.employee.length ? `${message.employee[0].first_name} ${message.employee[0].last_name}` : "Not Provided"}`, `${message.total ? `${message.total.sent_count} times` : "Not yet sent"} `,`${message.total ? moment(message.total.last_sent).format("MMM DD - HH:mm A") : "Not Yet Send"}`
+                }</a><span onclick="viewAttachment('${message._id}')" id = "span_download" class="badge nowrap"><i class="fa fa-paperclip" style="float:right;"></i></span>`, `<a class="btn btn-link btn-primary" onclick="viewMsg('${message._id}');"><i class="fa fa-eye"></i></a>`, `${message.createdAt ? moment(message.createdAt).format("DD/MM/YYYY <br> hh:mm A") : "Not Provided"}`, `${message.employee && message.employee.length ? `${message.employee[0].first_name} ${message.employee[0].last_name}` : "Not Provided"}`, `${message.total ? `${message.total.sent_count} times` : "Not yet sent"} `,`${message.total ? moment(message.total.last_sent).format("MMM DD - HH:mm A") : "Not Yet Send"}`
                 ,message.when_to_use
               ]);
             }else{
               newArr.push([
                 `<a href="javascript:void(0)" onclick="redirectToresponse('${message._id}')">${message.title ? message.title : "Not Provided"
-                }</a>`, `<a class="btn btn-link btn-primary" onclick="viewMsg('${message._id}');"><i class="fa fa-eye"></i></a>`, `${message.createdAt ? moment(message.createdAt).format("DD/MM/YYYY") : "Not Provided"}`, `${message.employee && message.employee.length ? `${message.employee[0].first_name} ${message.employee[0].last_name}` : "Not Provided"}`, `${message.total ? `${message.total.sent_count} times` : "Not yet sent"} `, `${message.total ? moment(message.total.last_sent).format("MMM DD - HH:mm A") : "Not Yet Send"}`
+                }</a>`, `<a class="btn btn-link btn-primary" onclick="viewMsg('${message._id}');"><i class="fa fa-eye"></i></a>`, `${message.createdAt ? moment(message.createdAt).format("DD/MM/YYYY <br> hh:mm A") : "Not Provided"}`, `${message.employee && message.employee.length ? `${message.employee[0].first_name} ${message.employee[0].last_name}` : "Not Provided"}`, `${message.total ? `${message.total.sent_count} times` : "Not yet sent"} `, `${message.total ? moment(message.total.last_sent).format("MMM DD - HH:mm A") : "Not Yet Send"}`
                 ,message.when_to_use
               ]);
             }
@@ -1500,13 +1502,13 @@ exports.datatableFilter = async (req, res, next) => {
             if(message.attachment && message.attachment.length){
               newArr.push([
                 `<a href="javascript:void(0)" onclick="redirectToresponse('${message._id}')">${message.title ? message.title : "Not Provided"
-                }</a><span onclick="viewAttachment('${message._id}')" id="span_download" class="badge nowrap"><i class="fa fa-paperclip" style="float:right;"></i></span>`, `<a class="btn btn-link btn-primary" onclick="viewMsg('${message._id}');"><i class="fa fa-eye"></i></a>`, `${message.createdAt ? moment(message.createdAt).format("DD/MM/YYYY") : "Not Provided"}`, `${message.employee && message.employee.length ? `${message.employee[0].first_name} ${message.employee[0].last_name}` : "Not Provided"}`, `${message.total ? `${message.total.sent_count} times` : "Not yet sent"} `,`${message.total ? moment(message.total.last_sent).format("MMM DD - HH:mm A") : "Not Yet Send"}`
+                }</a><span onclick="viewAttachment('${message._id}')" id="span_download" class="badge nowrap"><i class="fa fa-paperclip" style="float:right;"></i></span>`, `<a class="btn btn-link btn-primary" onclick="viewMsg('${message._id}');"><i class="fa fa-eye"></i></a>`, `${message.createdAt ? moment(message.createdAt).format("DD/MM/YYYY <br> hh:mm A") : "Not Provided"}`, `${message.employee && message.employee.length ? `${message.employee[0].first_name} ${message.employee[0].last_name}` : "Not Provided"}`, `${message.total ? `${message.total.sent_count} times` : "Not yet sent"} `,`${message.total ? moment(message.total.last_sent).format("MMM DD - HH:mm A") : "Not Yet Send"}`
                 ,message.when_to_use
               ]);
             } else {
               newArr.push([
                 `<a href="javascript:void(0)" onclick="redirectToresponse('${message._id}')">${message.title ? message.title : "Not Provided"
-                }</a>`, `<a class="btn btn-link btn-primary" onclick="viewMsg('${message._id}');"><i class="fa fa-eye"></i></a>`, `${message.createdAt ? moment(message.createdAt).format("DD/MM/YYYY") : "Not Provided"}`, `${message.employee && message.employee.length ? `${message.employee[0].first_name} ${message.employee[0].last_name}` : "Not Provided"}`, `${message.total ? `${message.total.sent_count} times` : "Not yet sent"} `, `${message.total ? moment(message.total.last_sent).format("MMM DD- HH:mm A") : "Not Yet Send"}`
+                }</a>`, `<a class="btn btn-link btn-primary" onclick="viewMsg('${message._id}');"><i class="fa fa-eye"></i></a>`, `${message.createdAt ? moment(message.createdAt).format("DD/MM/YYYY <br> hh:mm A") : "Not Provided"}`, `${message.employee && message.employee.length ? `${message.employee[0].first_name} ${message.employee[0].last_name}` : "Not Provided"}`, `${message.total ? `${message.total.sent_count} times` : "Not yet sent"} `, `${message.total ? moment(message.total.last_sent).format("MMM DD- HH:mm A") : "Not Yet Send"}`
                 ,message.when_to_use
               ]);
             }

@@ -1,6 +1,9 @@
 extends layout-admin
 
 block content
+  block script
+    script(src='/admin/assets/js/common.js')
+
   .main-panel
     .container
       .panel-header.bg-primary-gradient
@@ -38,6 +41,13 @@ block content
               a.nav-link.active.show(data-toggle='tab' href='#tab1')
                 | Messages
                 span.count.ml-1 (#{messages.length})
+              a.nav-link.show(data-toggle='tab' href='#tab2')
+                | Emails
+                span.count.ml-1 (#{messages.length})
+              a.nav-link.show(data-toggle='tab' href='#tab3')
+                | No Provided
+                span.count.ml-1 (#{messages.length})
+
               //- a.nav-link(data-toggle='tab' href='#tab2') Files
         //- pre= h.dump(messages)
         //- each message in messages
@@ -79,8 +89,8 @@ block content
                     a.dropdown-item(href='#') Mark as unread
                     a.dropdown-item(href='#') Toggle star
                     a.dropdown-item(href='#') Trash
-        .row
-          .col-md-12
+        .row.tab-content
+          .col-md-12.tab-pane.fade.show.active#tab1
             .card.card-with-nav
               .card-body#truncate(style="padding:20px 0px !important")
                 .table-responsive
@@ -95,6 +105,7 @@ block content
                           //- th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 30%;")) Type
                           th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 20%;")) Sent
                           th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 30%;")) When to use
+                          th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 30%;")) Type
                           if admin_check == "non_admin"
                             th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 20%;")) Last Sent
                       tbody
@@ -104,12 +115,54 @@ block content
 
                         //-       th #{message.title}
 
+          .col-md-12.tab-pane.fade#tab2
+            .card.card-with-nav
+              .card-body#truncate(style="padding:20px 0px !important")
+                .table-responsive
+                  .col-sm-12
+                    table.display.table.table-striped.table-hover.dataTable.quick-response-msg-table(role='grid', aria-describedby='basic-datatables_info',style="width:100%;")
+                      thead
+                        tr(role='row')
+                          th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 20%;")) Title
+                          th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 10%;")) Preview
+                          th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 20%;")) Created On
+                          th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 30%;")) Created By
+                          //- th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 30%;")) Type
+                          th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 20%;")) Sent
+                          th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 30%;")) When to use
+                          th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 30%;")) Type
+                          if admin_check == "non_admin"
+                            th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 20%;")) Last Sent
+                      tbody
+                        each message in messages
+                          tr(role='row')
+                            td
+                              a(href='javascript:void(0)' onclick='redirectToresponse("'+message._id+'")') #{message.title}
+                              b &emsp;
+                              a(href='javascript:void(0)' onclick='viewAttachment("'+message._id+'")')
+                                i.fa.fa-paperclip
+                            td 
+                              a.btn.btn-link.btn-primary(href='javascript:void(0)' onclick="viewMsg('"+message._id+"')")
+                                i.fa.fa-eye
+                            td #{moment(new Date()).format("DD/MM/YYYY")}
+                            td
+                            //- td Type
+                            td Sent
+                            td When to use
+                            td Type
+                            if admin_check == "non_admin"
+                              td Last Sent
+
+          .col-md-12.tab-pane.fade#tab3
+            .card.card-with-nav
+              .card-body#truncate(style="padding:20px 0px !important")
+                .table-responsive
+                  .col-sm-12
+                    p #{JSON.stringify(messages)}
 
 
-                .row
 
-  block script
-    script(src='/admin/assets/js/common.js')
+
 
   script.
     $(document).ready(function() {
