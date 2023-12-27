@@ -38,15 +38,14 @@ block content
         .page-navs.bg-white
           .nav-scroller
             .nav.nav-tabs.nav-line.nav-color-secondary
-              a.nav-link.active.show(data-toggle='tab' href='#tab1')
-                | Messages
-                span.count.ml-1 (#{messages.length})
-              a.nav-link.show(data-toggle='tab' href='#tab2')
+              a.nav-link.show.tabs_switch.active(data-toggle='tab' srchDt='all')
+                | All
+              a.nav-link.show.tabs_switch(data-toggle='tab' srchDt='email')
                 | Emails
-                span.count.ml-1 (#{messages.length})
-              a.nav-link.show(data-toggle='tab' href='#tab3')
-                | No Provided
-                span.count.ml-1 (#{messages.length})
+              a.nav-link.show.tabs_switch(data-toggle='tab' srchDt='message')
+                | Messages
+              a.nav-link.show.tabs_switch(data-toggle='tab' srchDt='empty')
+                | Type Not Provided
 
               //- a.nav-link(data-toggle='tab' href='#tab2') Files
         //- pre= h.dump(messages)
@@ -115,58 +114,19 @@ block content
 
                         //-       th #{message.title}
 
-          .col-md-12.tab-pane.fade#tab2
-            .card.card-with-nav
-              .card-body#truncate(style="padding:20px 0px !important")
-                .table-responsive
-                  .col-sm-12
-                    table.display.table.table-striped.table-hover.dataTable.quick-response-msg-table(role='grid', aria-describedby='basic-datatables_info',style="width:100%;")
-                      thead
-                        tr(role='row')
-                          th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 20%;")) Title
-                          th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 10%;")) Preview
-                          th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 20%;")) Created On
-                          th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 30%;")) Created By
-                          //- th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 30%;")) Type
-                          th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 20%;")) Sent
-                          th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 30%;")) When to use
-                          th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 30%;")) Type
-                          if admin_check == "non_admin"
-                            th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 20%;")) Last Sent
-                      tbody
-                        each message in messages
-                          tr(role='row')
-                            td
-                              a(href='javascript:void(0)' onclick='redirectToresponse("'+message._id+'")') #{message.title}
-                              b &emsp;
-                              a(href='javascript:void(0)' onclick='viewAttachment("'+message._id+'")')
-                                i.fa.fa-paperclip
-                            td 
-                              a.btn.btn-link.btn-primary(href='javascript:void(0)' onclick="viewMsg('"+message._id+"')")
-                                i.fa.fa-eye
-                            td #{moment(new Date()).format("DD/MM/YYYY")}
-                            td
-                            //- td Type
-                            td Sent
-                            td When to use
-                            td Type
-                            if admin_check == "non_admin"
-                              td Last Sent
-
-          .col-md-12.tab-pane.fade#tab3
-            .card.card-with-nav
-              .card-body#truncate(style="padding:20px 0px !important")
-                .table-responsive
-                  .col-sm-12
-                    p #{JSON.stringify(messages)}
-
-
-
-
-
   script.
     $(document).ready(function() {
-      $('#basic-datatables').DataTable({
+        //- table
+        //-   .columns(1)
+        //-   .search(this.value)
+        //-   .draw();
+
+        //- function emails_only(){
+        //-   console.log("asdja");
+        //- }
+
+
+      var table = $('#basic-datatables').DataTable({
         bProcessing: true,
         bServerSide: true,
         ordering: true,
@@ -190,6 +150,19 @@ block content
           //- }
         }
       });
+
+      $('.tabs_switch').on('click', function(e) {
+        
+        $(this).attr("srchDt") == "all" ? table.columns(0).search("all").draw() : false;
+        $(this).attr("srchDt") == "email" ? table.columns(0).search("email").draw() : false;
+        $(this).attr("srchDt") == "message" ? table.columns(0).search("message").draw() : false;
+        $(this).attr("srchDt") == "empty" ? table.columns(0).search("empty").draw() : false;
+
+        //- console.log(table);
+
+
+      });
+
 
 
     });

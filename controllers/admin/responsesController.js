@@ -24,33 +24,97 @@ exports.allResponses = async (req, res, next) => {
   try {
     let messages;
     let admin_check;
+    let centers = await Center.find({_id: {$in: req.session.user.center_id}, status: "active"}).distinct('_id');
     if (req.session.user.main && req.session.user.main == req.config.admin.main) {
-      messages = await Message.aggregate([
-        {
-          $match: {
-            status: "active",
+      messages = await Message.aggregate(
+        [
+          {
+            $match: {
+              status: "active",
+            },
           },
-        },
-        // {
-        //   $lookup: {
-        //     from: "responses",
-        //     localField: "_id",
-        //     foreignField: "msg_id",
-        //     as: "total",
-        //   },
-        // },
-        // {
-        //   $unwind: {
-        //     path: "$total",
-        //     preserveNullAndEmptyArrays: true,
-        //   },
-        // },
-        // {
-        //   $sort: {
-        //     "total.sent_count": -1,
-        //   },
-        // },
-      ]);
+          {
+            '$match': {
+              $or: [
+                {
+                  title: {
+                    $regex: req.query.sSearch || "",
+                    $options: 'i'
+                  }
+                },
+                {
+                  msg: {
+                    $regex: req.query.sSearch || "",
+                    $options: 'i'
+                  }
+                }
+              ]
+            }
+          },
+          {
+            $lookup: {
+              from: "employees",
+              localField: "createdBy",
+              foreignField: "_id",
+              as: "employee",
+            }
+          },
+          {
+            $lookup: {
+              from: "responses",
+              localField: "_id",
+              foreignField: "msg_id",
+              as: "result",
+            },
+          },
+          {
+            $project:{
+              "_id":1,
+              "title":1,
+              "msg":1,
+              "when_to_use":1,
+              "attachment":1,
+              "type":1,
+              "employee": 1,
+              "result":{
+                $sum:"$result.sent_count"
+              },
+              "createdAt": 1
+            }
+          },
+          {
+            $lookup: {
+              from: "responses",
+              // localField: "_id",
+              // foreignField: "msg_id",
+              let: { id: '$_id' },
+              pipeline: [
+                  // { $match: { condition: { $exists: true },code:{$exists: true},category: { $exists: true },percentage:{$exists: true} } },
+                  {
+
+                      $match: {
+                          $expr: {
+                              $and: [
+                                  { $eq: ['$msg_id', '$$id'] },
+                              ]
+                          }
+                      }
+                  }
+              ],
+              as: "total",
+            },
+          },
+
+          {
+            '$sort': {
+              "createdAt": -1
+            }
+          },
+
+
+        ]        
+
+      );
       admin_check = "super_admin"
     } else {
       // let objectIdArray = req.session.user.center_id.map(s => mongoose.Types.ObjectId(s));
@@ -1034,6 +1098,13 @@ exports.datatableFilter = async (req, res, next) => {
     let aggregateQue = [];
     // console.log(req.body.adminCheck, "req.body");
     // console.log(req.query, "req.queryquery");
+
+    var srchFiltr = {status: "active"};
+
+    req.query.sSearch_0 == "email" ? srchFiltr["type"] = "email" : false ;
+    req.query.sSearch_0 == "message" ? srchFiltr["type"] = "message" : false ;
+    req.query.sSearch_0 == "empty" ? srchFiltr["type"] = null : false ;
+
     if (req.session.user.main && req.session.user.main == req.config.admin.main) {
 
       const sortingArr = ["title", "createdAt", "employee", "result"];
@@ -1042,9 +1113,7 @@ exports.datatableFilter = async (req, res, next) => {
       if(req.query.sSearch){
         aggregateQue = [
           {
-            $match: {
-              status: "active",
-            },
+            $match: srchFiltr,
           },
           {
             '$match': {
@@ -1162,13 +1231,13 @@ exports.datatableFilter = async (req, res, next) => {
               newArr.push([
                 `<a href="javascript:void(0)" onclick="redirectToresponse('${message._id}')">${message.title ? message.title : "Not Provided"
                 }</a> <span onclick="viewAttachment('${message._id}')" id = "span_download" class="badge nowrap"><i class="fa fa-paperclip" style="float:right;"></i></span>`, `<a class="btn btn-link btn-primary" onclick="viewMsg('${message._id}');"><i class="fa fa-eye"></i></a>`,  `${message.createdAt ? moment(message.createdAt).format("DD/MM/YYYY <br> hh:mm A") : "Not Provided"}`,`${message.employee && message.employee.length ? `${message.employee[0].first_name} ${message.employee[0].last_name}` : "Not Provided"}`, `${message.result ? `${message.result} times`: "Not Yet Sent"}`
-                ,message.when_to_use
+                ,message.when_to_use,message.type
               ]);
             }else{
               newArr.push([
                 `<a href="javascript:void(0)" onclick="redirectToresponse('${message._id}')">${message.title ? message.title : "Not Provided"
                 }</a> `, `<a class="btn btn-link btn-primary" onclick="viewMsg('${message._id}');"><i class="fa fa-eye"></i></a>`, `${message.createdAt ? moment(message.createdAt).format("DD/MM/YYYY <br> hh:mm A") : "Not Provided"}`,`${message.employee && message.employee.length ? `${message.employee[0].first_name} ${message.employee[0].last_name}` : "Not Provided"}`,`${message.result ? `${message.result} times`: "Not Yet Sent"}`
-                ,message.when_to_use
+                ,message.when_to_use,message.type
               ]);
             }
           });
@@ -1182,9 +1251,7 @@ exports.datatableFilter = async (req, res, next) => {
       } else {
         const messages = await Message.aggregate([
           {
-            $match: {
-              status: "active",
-            },
+            $match: srchFiltr
           },
           {
             $sort:{createdAt:-1}
@@ -1276,13 +1343,14 @@ exports.datatableFilter = async (req, res, next) => {
     } else {
       const sortingArr = ["title", "createdAt", "employee", "total.sent_count", "total.last_sent"];
 
-      // console.log("no admin");
+      // console.log(srchFiltr);
       // let objectIdArray = req.session.user.center_id.map(s => mongoose.Types.ObjectId(s));
       let centers = await Center.find({_id: {$in: req.session.user.center_id}, status: "active"}).distinct('_id');
+
       if(req.query.sSearch){
         aggregateQue = [{
             $match: {
-              status: "active",
+              srchFiltr,
               $or:[
                 {center_id: {$in: centers}},
                 {added_by:1}
@@ -1345,16 +1413,16 @@ exports.datatableFilter = async (req, res, next) => {
               preserveNullAndEmptyArrays: true,
             },
           },
-          // {
-          //   $sort: {
-          //     "total.sent_count": -1,
-          //   },
-          // },
           {
-            '$sort': {
-              [sortingArr[req.query.iSortCol_0 ? req.query.iSortCol_0 : 1]]: req.query.sSortDir_0 == 'asc' ? 1 : -1
-            }
+            $sort: {
+              "createdAt": -1,
+            },
           },
+          // {
+          //   '$sort': {
+          //     [sortingArr[req.query.iSortCol_0 ? req.query.iSortCol_0 : 1]]: req.query.sSortDir_0 == 'asc' ? 1 : -1
+          //   }
+          // },
           {
             '$skip': parseInt(req.query.iDisplayStart)
           }, {
@@ -1396,13 +1464,13 @@ exports.datatableFilter = async (req, res, next) => {
               newArr.push([
                 `<a href="javascript:void(0)" onclick="redirectToresponse('${message._id}')">${message.title ? message.title : "Not Provided"
                 }</a><span onclick="viewAttachment('${message._id}')" id = "span_download" class="badge nowrap"><i class="fa fa-paperclip" style="float:right;"></i></span>`, `<a class="btn btn-link btn-primary" onclick="viewMsg('${message._id}');"><i class="fa fa-eye"></i></a>`, `${message.createdAt ? moment(message.createdAt).format("DD/MM/YYYY <br> hh:mm A") : "Not Provided"}`, `${message.employee && message.employee.length ? `${message.employee[0].first_name} ${message.employee[0].last_name}` : "Not Provided"}`, `${message.total ? `${message.total.sent_count} times` : "Not yet sent"} `,`${message.total ? moment(message.total.last_sent).format("MMM DD - HH:mm A") : "Not Yet Send"}`
-                ,message.when_to_use
+                ,message.when_to_use,message.type
               ]);
             }else{
               newArr.push([
                 `<a href="javascript:void(0)" onclick="redirectToresponse('${message._id}')">${message.title ? message.title : "Not Provided"
                 }</a>`, `<a class="btn btn-link btn-primary" onclick="viewMsg('${message._id}');"><i class="fa fa-eye"></i></a>`, `${message.createdAt ? moment(message.createdAt).format("DD/MM/YYYY <br> hh:mm A") : "Not Provided"}`, `${message.employee && message.employee.length ? `${message.employee[0].first_name} ${message.employee[0].last_name}` : "Not Provided"}`, `${message.total ? `${message.total.sent_count} times` : "Not yet sent"} `, `${message.total ? moment(message.total.last_sent).format("MMM DD - HH:mm A") : "Not Yet Send"}`
-                ,message.when_to_use
+                ,message.when_to_use,message.type
               ]);
             }
           });
@@ -1413,23 +1481,30 @@ exports.datatableFilter = async (req, res, next) => {
           res.json(finObj);
         }
       }else{
-        // console.log(objectIdArray,"objectIdArray")
-        const messages = await Message.aggregate([
+        console.log(centers,"objectIdArray")
+
+        var aggrArr = [
           {
-            $match: {
-              status: "active",
-              $or:[
-                {center_id: {$in: centers}},
-                {added_by:1}
+            $match: srchFiltr,
+          },
+          {
+            '$match': {
+              $or: [
+                {
+                  title: {
+                    $regex: req.query.sSearch,
+                    $options: 'i'
+                  }
+                },
+                {
+                  msg: {
+                    $regex: req.query.sSearch,
+                    $options: 'i'
+                  }
+                }
               ]
-              // center_id: ObjectId(req.session.user.center_id),
             }
           },
-          // {
-
-          //   $sort:{createdAt:-1}
-
-          // },
           {
             $lookup: {
               from: "employees",
@@ -1441,50 +1516,59 @@ exports.datatableFilter = async (req, res, next) => {
           {
             $lookup: {
               from: "responses",
-              // localField: "_id",
-              // foreignField: "msg_id",
-              let: { id: '$_id' },
-              pipeline: [
-                  // { $match: { condition: { $exists: true },code:{$exists: true},category: { $exists: true },percentage:{$exists: true} } },
-                  {
-
-                      $match: {
-                          $expr: {
-                              $and: [
-                                  { $eq: ['$msg_id', '$$id'] },
-                                  // { $in: ['$center_id', objectIdArray] }
-                                  { $eq: ['$center_id', centers] }
-                              ]
-                          }
-                      }
-                  },
-
-
-              ],
-              as: "total",
+              localField: "_id",
+              foreignField: "msg_id",
+              as: "result",
+            },
+          },
+          {
+            $project:{
+              "_id":1,
+              "title":1,
+              "msg":1,
+              "when_to_use":1,
+              "attachment":1,
+              "type":1,
+              "employee": 1,
+              "result":{
+                $sum:"$result.sent_count"
+              },
+              "createdAt": 1
             }
           },
           {
-            $unwind: {
-              path: "$total",
-              preserveNullAndEmptyArrays: true,
+            $sort: {
+              "createdAt": -1,
             },
           },
+          // {
+          //   $lookup: {
+          //     from: "responses",
+          //     localField: "_id",
+          //     foreignField: "msg_id",
+          //     as: "total",
+          //   },
+          // },
+          // {
+          //   $unwind: {
+          //     path: "$total",
+          //     preserveNullAndEmptyArrays: true,
+          //   },
+          // },
           // {
           //   $sort: {
           //     "total.sent_count": -1,
           //   },
-          // },
-          {
-            '$sort': {
-              [sortingArr[req.query.iSortCol_0 ? req.query.iSortCol_0 : 1]]: req.query.sSortDir_0 == 'asc' ? 1 : -1
-            }
-          }
-        ])
-          .skip(parseInt(req.query.iDisplayStart))
-          .limit(parseInt(req.query.iDisplayLength));
-        // console.log("messages--------",messages)
-        let totalCountDoc = await Message.countDocuments({$or:[{center_id: {$in: centers}},{added_by:1}]});
+          // },          
+          {'$skip': parseInt(req.query.iDisplayStart)}
+        ];
+
+        // const messages = await Message.aggregate([{'$skip': parseInt(req.query.iDisplayStart)}, {'$limit': parseInt(req.query.iDisplayLength)}].concat(aggrArr));
+        const messages = await Message.aggregate(aggrArr);
+        // let totalCountDoc = await Message.countDocuments({$or:[{center_id: {$in: centers}},{added_by:1}]},{$match: srchFiltr});
+        let totalCountDoc = messages.length;
+        console.log("messages--------",req.query.iDisplayStart)
+
         let finObj = {
           sEcho: req.query.sEcho,
           iTotalRecords: totalCountDoc,
@@ -1502,14 +1586,16 @@ exports.datatableFilter = async (req, res, next) => {
             if(message.attachment && message.attachment.length){
               newArr.push([
                 `<a href="javascript:void(0)" onclick="redirectToresponse('${message._id}')">${message.title ? message.title : "Not Provided"
-                }</a><span onclick="viewAttachment('${message._id}')" id="span_download" class="badge nowrap"><i class="fa fa-paperclip" style="float:right;"></i></span>`, `<a class="btn btn-link btn-primary" onclick="viewMsg('${message._id}');"><i class="fa fa-eye"></i></a>`, `${message.createdAt ? moment(message.createdAt).format("DD/MM/YYYY <br> hh:mm A") : "Not Provided"}`, `${message.employee && message.employee.length ? `${message.employee[0].first_name} ${message.employee[0].last_name}` : "Not Provided"}`, `${message.total ? `${message.total.sent_count} times` : "Not yet sent"} `,`${message.total ? moment(message.total.last_sent).format("MMM DD - HH:mm A") : "Not Yet Send"}`
-                ,message.when_to_use
+                }</a><span onclick="viewAttachment('${message._id}')" id="span_download" class="badge nowrap"><i class="fa fa-paperclip" style="float:right;"></i></span>`, `<a class="btn btn-link btn-primary" onclick="viewMsg('${message._id}');"><i class="fa fa-eye"></i></a>`, `${message.createdAt ? moment(message.createdAt).format("DD/MM/YYYY <br> hh:mm A") : "Not Provided"}`, `${message.employee && message.employee.length ? `${message.employee[0].first_name} ${message.employee[0].last_name}` : "Not Provided"}`, `${message.total ? `${message.total.sent_count} times` : "Not yet sent"} `,
+                message.when_to_use,message.type,
+                `${message.total ? moment(message.total.last_sent).format("MMM DD - HH:mm A") : "Not Yet Send"}`,
               ]);
             } else {
               newArr.push([
                 `<a href="javascript:void(0)" onclick="redirectToresponse('${message._id}')">${message.title ? message.title : "Not Provided"
-                }</a>`, `<a class="btn btn-link btn-primary" onclick="viewMsg('${message._id}');"><i class="fa fa-eye"></i></a>`, `${message.createdAt ? moment(message.createdAt).format("DD/MM/YYYY <br> hh:mm A") : "Not Provided"}`, `${message.employee && message.employee.length ? `${message.employee[0].first_name} ${message.employee[0].last_name}` : "Not Provided"}`, `${message.total ? `${message.total.sent_count} times` : "Not yet sent"} `, `${message.total ? moment(message.total.last_sent).format("MMM DD- HH:mm A") : "Not Yet Send"}`
-                ,message.when_to_use
+                }</a>`, `<a class="btn btn-link btn-primary" onclick="viewMsg('${message._id}');"><i class="fa fa-eye"></i></a>`, `${message.createdAt ? moment(message.createdAt).format("DD/MM/YYYY <br> hh:mm A") : "Not Provided"}`, `${message.employee && message.employee.length ? `${message.employee[0].first_name} ${message.employee[0].last_name}` : "Not Provided"}`, `${message.total ? `${message.total.sent_count} times` : "Not yet sent"} `,
+                message.when_to_use,message.type,
+                `${message.total ? moment(message.total.last_sent).format("MMM DD- HH:mm A") : "Not Yet Send"}`,
               ]);
             }
           });
