@@ -38,15 +38,14 @@ block content
         .page-navs.bg-white
           .nav-scroller
             .nav.nav-tabs.nav-line.nav-color-secondary
-              a.nav-link.active.show(data-toggle='tab' href='#tab1')
-                | Messages
-                span.count.ml-1 (#{messages.length})
-              a.nav-link.show(data-toggle='tab' href='#tab2')
+              a.nav-link.show.tabs_switch.active(data-toggle='tab' srchDt='all')
+                | All
+              a.nav-link.show.tabs_switch(data-toggle='tab' srchDt='email')
                 | Emails
-                span.count.ml-1 (#{messages.length})
-              a.nav-link.show(data-toggle='tab' href='#tab3')
-                | No Provided
-                span.count.ml-1 (#{messages.length})
+              a.nav-link.show.tabs_switch(data-toggle='tab' srchDt='message')
+                | Messages
+              a.nav-link.show.tabs_switch(data-toggle='tab' srchDt='empty')
+                | Type Not Provided
 
               //- a.nav-link(data-toggle='tab' href='#tab2') Files
         //- pre= h.dump(messages)
@@ -115,6 +114,7 @@ block content
 
                         //-       th #{message.title}
 
+<<<<<<< HEAD
           .col-md-12.tab-pane.fade#tab2
             .card.card-with-nav
               .card-body#truncate(style="padding:20px 0px !important")
@@ -164,9 +164,21 @@ block content
 
 
 
+=======
+>>>>>>> 19b7843112a6519d0e3d6e3dcf08fb149ccce2de
   script.
     $(document).ready(function() {
-      $('#basic-datatables').DataTable({
+        //- table
+        //-   .columns(1)
+        //-   .search(this.value)
+        //-   .draw();
+
+        //- function emails_only(){
+        //-   console.log("asdja");
+        //- }
+
+
+      var table = $('#basic-datatables').DataTable({
         bProcessing: true,
         bServerSide: true,
         ordering: true,
@@ -190,6 +202,19 @@ block content
           //- }
         }
       });
+
+      $('.tabs_switch').on('click', function(e) {
+        
+        $(this).attr("srchDt") == "all" ? table.columns(0).search("all").draw() : false;
+        $(this).attr("srchDt") == "email" ? table.columns(0).search("email").draw() : false;
+        $(this).attr("srchDt") == "message" ? table.columns(0).search("message").draw() : false;
+        $(this).attr("srchDt") == "empty" ? table.columns(0).search("empty").draw() : false;
+
+        //- console.log(table);
+
+
+      });
+
 
 
     });
