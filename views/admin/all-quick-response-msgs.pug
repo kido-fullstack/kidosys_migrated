@@ -114,58 +114,6 @@ block content
 
                         //-       th #{message.title}
 
-<<<<<<< HEAD
-          .col-md-12.tab-pane.fade#tab2
-            .card.card-with-nav
-              .card-body#truncate(style="padding:20px 0px !important")
-                .table-responsive
-                  .col-sm-12
-                    table.display.table.table-striped.table-hover.dataTable.quick-response-msg-table(role='grid', aria-describedby='basic-datatables_info',style="width:100%;")
-                      thead
-                        tr(role='row')
-                          th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 20%;")) Title
-                          th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 10%;")) Preview
-                          th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 20%;")) Created On
-                          th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 30%;")) Created By
-                          //- th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 30%;")) Type
-                          th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 20%;")) Sent
-                          th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 30%;")) When to use
-                          th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 30%;")) Type
-                          if admin_check == "non_admin"
-                            th(style=((admin_check != "non_admin") ? "width: 25%;" : "width: 20%;")) Last Sent
-                      tbody
-                        each message in messages
-                          tr(role='row')
-                            td
-                              a(href='javascript:void(0)' onclick='redirectToresponse("'+message._id+'")') #{message.title}
-                              b &emsp;
-                              a(href='javascript:void(0)' onclick='viewAttachment("'+message._id+'")')
-                                i.fa.fa-paperclip
-                            td 
-                              a.btn.btn-link.btn-primary(href='javascript:void(0)' onclick="viewMsg('"+message._id+"')")
-                                i.fa.fa-eye
-                            //- td #{moment(new Date()).format("DD/MM/YYYY")}
-                            td
-                            //- td Type
-                            td Sent
-                            td When to use
-                            td Type
-                            if admin_check == "non_admin"
-                              td Last Sent
-
-          .col-md-12.tab-pane.fade#tab3
-            .card.card-with-nav
-              .card-body#truncate(style="padding:20px 0px !important")
-                .table-responsive
-                  .col-sm-12
-                    p #{JSON.stringify(messages)}
-
-
-
-
-
-=======
->>>>>>> 19b7843112a6519d0e3d6e3dcf08fb149ccce2de
   script.
     $(document).ready(function() {
         //- table
