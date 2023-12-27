@@ -41,6 +41,8 @@ block content
                   .col-md-6.col-lg-4
                     if(nextlead)
                       a(href=(`${nextlead._id}`)) Next Lead
+                  .col-md-10
+                    .card-title.text-center Lead Date #{lead.lead_date.toLocaleDateString("en-GB")}
               .card-body
                 .row
                   .col-md-6.col-lg-4
