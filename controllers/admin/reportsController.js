@@ -614,6 +614,612 @@ exports.exportLeads = async (req, res, next) => {
   }
 };
 
+exports.exportFollowups = async (req, res, next) => {
+  try {
+    const timeZone = momentZone.tz.guess();
+    let currentDateTZ = moment.tz(moment(), "Asia/Kolkata");
+    let currentDate = currentDateTZ.clone().tz("Asia/Kolkata");
+    const sortingArr = ["lead_no", "lead_date", "updatedAt", "parent_name", "child_first_name", "child_last_name", "stage", "type", `${req.session.user.main && req.session.user.main == req.config.admin.main ? 'school_id.school_display_name' : 'child_first_name'}`, "parent_know_aboutus", "source_category", "programcategory_id.title", "program_id.program_name", "status_id.name", "lead_no"];
+    let zoneCount = 0;
+    let newArr = [];
+    let findQue = {};
+    const endOfWeek = currentDate.clone().endOf('isoWeek');
+    const endDate = endOfWeek.toDate();
+    const dtBgin = new Date("2023-01-01");
+    // console.log('AAAAAAAAAAA');
+    const startOfWeek = currentDate.clone().startOf('isoWeek');
+    // console.log('Start of the week:', startOfWeek.format('YYYY-MM-DD'));
+    // console.log('End of the week:', endOfWeek.format('YYYY-MM-DD'));
+    const startDate = startOfWeek.toDate();
+    // console.log("startDate-------", startDate);
+    // console.log("endDate-------", endDate);
+    // console.log("req.body", req.body);
+      let aggregateQue = [
+        {
+          '$match': {
+            'do_followup': 1
+          }
+        },
+        {
+          '$match': {
+            'follow_due_date': {
+              '$gte': dtBgin,
+              '$lte': endDate
+            }
+          }
+        },
+        {
+          '$lookup': {
+            'from': 'statuses',
+            'localField': 'status_id',
+            'foreignField': '_id',
+            'as': 'status_id'
+          }
+        }, 
+        {
+          '$lookup': {
+            'from': 'substatuses',
+            'localField': 'substatus_id',
+            'foreignField': '_id',
+            'as': 'substatus_id'
+          }
+        },
+        {
+          '$unwind': {
+            'path': '$substatus_id',
+            // 'includeArrayIndex': 'string',
+            // 'preserveNullAndEmptyArrays': true
+          }
+        },
+        {
+          '$unwind': {
+            'path': '$status_id',
+            // 'includeArrayIndex': 'string',
+            // 'preserveNullAndEmptyArrays': true
+          }
+        }, {
+          '$lookup': {
+            'from': 'centers',
+            'localField': 'school_id',
+            'foreignField': '_id',
+            'as': 'school_id'
+          }
+        }, {
+          '$unwind': {
+            'path': '$school_id'
+          }
+        }, {
+          '$lookup': {
+            'from': 'programcategories',
+            'localField': 'programcategory_id',
+            'foreignField': '_id',
+            'as': 'programcategory_id'
+          }
+        }, {
+          '$unwind': {
+            'path': '$programcategory_id'
+          }
+        }, {
+          '$lookup': {
+            'from': 'programs',
+            'localField': 'program_id',
+            'foreignField': '_id',
+            'as': 'program_id'
+          }
+        }, {
+          '$unwind': {
+            'path': '$program_id',
+            'preserveNullAndEmptyArrays': true
+          }
+        }, {
+          '$addFields': {
+            'lead_no_val': {
+              '$toInt': {
+                '$substr': ["$lead_no", 2, -1]
+              }
+            }
+          }
+        }, {
+          '$project': {
+            'lead_no': 1,
+            'lead_date': 1,
+            'createdAt': 1,
+            'updatedAt': 1,
+            'parent_name': 1,
+            'child_first_name': 1,
+            'child_last_name': 1,
+            'stage': 1,
+            'type': 1,
+            'school_id._id': 1,
+            'school_id.school_display_name': 1,
+            'school_id.zone_id': 1,
+            'zone_id': 1,
+            'source_category': 1,
+            'parent_know_aboutus': 1,
+            'programcategory_id.title': 1,
+            'program_id.program_name': 1,
+            'status_id.name': 1,
+            'substatus_id.name':1,
+            'follow_due_date': 1,
+            'follow_due_time': 1,
+            'is_external': 1,
+            'is_dup': 1,
+            'dup_no': 1,
+            'lead_no_val': 1
+          }
+        }, {
+          '$sort': {
+            [sortingArr[req.query.iSortCol_0 ? req.query.iSortCol_0 : 1]]: req.query.sSortDir_0 == 'asc' ? 1 : -1
+          }
+        }, 
+        // {
+        //   '$skip': parseInt(req.query.iDisplayStart)
+        // }, {
+        //   '$limit': parseInt(req.query.iDisplayLength)
+        // }
+      ];
+  
+      // console.log(aggregateQue, "aggregateQue")
+      // const currentDateByTimeZone = momentZone.tz(Date.now(), timeZone);
+  
+      if (req.session.user.main && req.session.user.main == req.config.admin.main) {
+        // ADMIN
+        // console.log('ADMINNNNNN___')
+        let centers = await Center.find({status: "active"}).distinct('_id');
+        findQue = {
+          school_id: {$in: centers}
+        };
+        aggregateQue.unshift({
+          '$match': {
+            'school_id': {"$in": centers}
+          }
+        });
+      } else {
+        // NON ADMIN
+        // console.log('NON ADMINNNNNN___')
+        // console.log(req.session.user.center_id,'req.session.user.center_id')
+        // let objectIdArray = req.session.user.center_id.map(s => mongoose.Types.ObjectId(s));
+        let centers = await Center.find({_id: {$in: req.session.user.center_id}, status: "active"}).distinct('_id');
+        // console.log(centers,"------------objectIdArray")
+        findQue = {
+          school_id: {$in: centers}
+        };
+        aggregateQue.unshift({
+          '$match': {
+            'school_id': {"$in": centers}
+          }
+        });
+      }
+      // console.log(req.query,"req.queryryryryyr")
+      if (req.query.zone) {
+        // console.log(req.query.sSearch_1,"req.query.sSearch_1")
+        let zone = req.query.zone.map(s => mongoose.Types.ObjectId(s));
+        // console.log(zone,"zone")
+        findQue = {
+          zone_id: {$in:zone}
+        };
+        aggregateQue.unshift({
+          '$match': {
+            'zone_id': {$in:zone}
+          }
+        });
+      }
+  
+      if (req.query.program) {
+        // console.log(req.query.program,"req.program.program")
+        let program = req.query.program.map(s => mongoose.Types.ObjectId(s));
+        // console.log(zone,"zone")
+        findQue = {
+          program_id: {$in:program}
+        };
+        aggregateQue.unshift({
+          '$match': {
+            'program_id': {$in:program}
+          }
+        });
+        // console.log(JSON.stringify(aggregateQue));
+      }
+      // console.log(aggregateQue,"aggregateQue")
+      if (req.query.know_us) {
+        // console.log(req.query.know_us,"req.know_us.know_us")
+        let know_us = req.query.know_us
+        findQue = {
+          parent_know_aboutus: {$in:know_us}
+        };
+        aggregateQue.unshift({
+          '$match': {
+            'parent_know_aboutus': {$in:know_us}
+          }
+        });
+      }
+  
+      if (req.query.sSearch_4) {
+        // console.log('DATE GIVEN---');
+        // console.log('DATE GIVEN---');
+        let start = momentZone.tz(`${req.query.sSearch_4}`,"Asia/Kolkata").startOf('day').toDate();
+        let end = momentZone.tz(`${req.query.sSearch_5}`, "Asia/Kolkata").endOf('day').toDate();
+        // console.log("start---", req.query.sSearch_4);
+        // console.log("end---", req.query.sSearch_5);
+        findQue = {
+          follow_due_date: {
+            '$gte': start,
+            '$lte': end
+          }
+        }
+        _.remove(aggregateQue, '$match.follow_due_date');
+        // console.log(aggregateQue)
+        aggregateQue.unshift({
+          '$match': {
+            'follow_due_date': {
+              '$gte': start,
+              '$lte': end
+            }
+          }
+        });
+        // _.reject(aggregateQue, '$match.lead_date');
+        // console.log("DATATATTAATATAAT")
+        // console.log(JSON.stringify(aggregateQue))
+      }
+  
+      if (req.query.Searchkey_0 == 'true') { // no followup
+        findQue = {
+          do_followup: 0
+        };
+        // console.log(aggregateQue)
+        _.remove(aggregateQue, '$match.do_followup');
+        _.remove(aggregateQue, '$match.follow_due_date');
+        aggregateQue.unshift({
+          '$match': {
+            'do_followup': 0
+          }
+        });
+      }
+  
+      if (req.query.Searchkey_1 == "true") {
+        findQue = {
+          someday_follow: 0
+        };
+        // console.log(aggregateQue)
+        _.remove(aggregateQue, '$match.do_followup');
+        _.remove(aggregateQue, '$match.follow_due_date');
+        aggregateQue.unshift({
+          '$match': {
+            'someday_follow': 0
+          }
+        });
+      }
+  
+      if (req.query.country) {
+        // console.log(req.query.sSearch_0,"req.query.sSearch_0")
+        // console.log(req.query.country,"req.query.country")
+        // return;
+        let country = req.query.country.map(s => mongoose.Types.ObjectId(s));
+        // console.log(country,"country")
+  
+        findQue = {
+          country_id: {$in: country}
+        };
+        aggregateQue.unshift({
+          '$match': {
+            'country_id': {$in: country}
+          }
+        });
+      }
+  
+      if (req.query.center) {
+        let center = req.query.center.map(s => mongoose.Types.ObjectId(s));
+        // console.log(center,"center")
+        findQue = {
+          school_id: {$in:center}
+        };
+        aggregateQue.unshift({
+          '$match': {
+            'school_id': {$in:center}
+          }
+        });
+      }
+      if (req.query.status) {
+        let status = req.query.status.map(s => mongoose.Types.ObjectId(s));
+        // console.log(center,"center")
+        findQue = {
+          status_id: {$in:status}
+        };
+        aggregateQue.unshift({
+          '$match': {
+            'status_id': {$in:status}
+          }
+        });
+      }
+      if (req.query.substatus) {
+        // console.log(center,"center")
+        findQue = {
+          substatus_id:  mongoose.Types.ObjectId(req.query.substatus)
+        };
+        aggregateQue.unshift({
+          '$match': {
+            'substatus_id': mongoose.Types.ObjectId(req.query.substatus)
+          }
+        });
+      }
+      if (req.query.sSearch_3) {
+        findQue = {
+          source_category: req.query.sSearch_3
+        };
+        aggregateQue.unshift({
+          '$match': {
+            'source_category': req.query.sSearch_3
+          }
+        });
+      }
+      if (req.query.sSearch_6) {
+        // console.log(req.query.sSearch_6,"req.query.sSearch_6req.query.sSearch_6")
+        findQue = {
+          stage: req.query.sSearch_6
+        };
+        aggregateQue.unshift({
+          '$match': {
+            'stage': req.query.sSearch_6
+          }
+        });
+      }
+  
+      if (req.query.sSearch) { // parent_name, // child_first_name, // lead_no
+        // findQue = {
+        //   source_category: req.query.sSearch_4
+        // };
+        // console.log(req.query.sSearch,"sSearcfg")
+        aggregateQue.unshift({
+          '$match': {
+            $or: [
+              {
+                parent_name: {
+                  $regex: req.query.sSearch,
+                  $options: 'i'
+                }
+              },
+              {
+                child_first_name: {
+                  $regex: req.query.sSearch,
+                  $options: 'i'
+                }
+              },
+              {
+                lead_no: {
+                  $regex: req.query.sSearch,
+                  $options: 'i'
+                }
+              },
+              {
+                child_last_name: {
+                  $regex: req.query.sSearch,
+                  $options: 'i'
+                }
+              },
+              {
+                parent_first_contact: {
+                  $regex: req.query.sSearch,
+                  $options: 'i'
+                }
+              },
+              {
+                parent_email: {
+                  $regex: req.query.sSearch,
+                  $options: 'i'
+                }
+              }
+            ]
+          }
+        });
+      }
+  
+      const leads = await Lead.aggregate(aggregateQue);
+  
+      aggregateQue.splice(aggregateQue.length - 2, 2);
+  
+      const totalCount = await Lead.aggregate(aggregateQue);
+  
+      var newLds = 0;
+      totalCount.forEach((ele) => {
+        (ele.is_external == 1) ? newLds++ : false;
+      })
+      let finObj = {
+        sEcho: req.query.sEcho,
+        iTotalRecords: totalCount.length,
+        iTotalDisplayRecords: totalCount.length,
+        newLds: newLds
+      };
+  
+      delete aggregateQue;
+  
+      // if (leads.length) {
+      //   finObj.data = leads;
+      //   return res.json(finObj);
+      // } else {
+      //   finObj.data = newArr;
+      //   return res.json(finObj);
+      // }
+      // all data
+      const dataset = [];
+      leads.map((lead, i) => {
+        dataset.push({
+          sr_no: parseInt(`${i + 1}`),
+          country: lead.country_name && lead.country_name.length ? lead.country_name[0].country_name : "",
+          zone: lead.zone_name && lead.zone_name.length ? lead.zone_name[0].name : "",
+          center: lead.school_id.school_display_name,
+          walkins: getLeadType(lead.type ? lead.type : ""),
+          lead_id: lead.lead_no,
+          leadDate: lead.lead_date ? moment.utc(lead.lead_date).tz("Asia/Kolkata").format("DD/MM/YYYY ") : "",
+          leadUpdatedDate: lead.updatedAt ? moment.utc(lead.updatedAt).tz("Asia/Kolkata").format("DD/MM/YYYY  h:mm A") : "",
+          // dueIn: dueDateFormatWithMoment(lead.follow_due_date ? lead.follow_due_date : "", lead.follow_due_time),
+          dueIn:lead.follow_due_date ? moment.utc(lead.follow_due_date).tz("Asia/Kolkata").format("DD/MM/YYYY  h:mm A") : "",
+          leadName: lead.parent_name ? lead.parent_name : "",
+          childFirstName: lead.child_first_name ? lead.child_first_name : "",
+          childLastName: lead.child_last_name ? lead.child_last_name : "",
+          sourceCat: getSourceCatName(lead.source_category ? lead.source_category.trim() : "" || ""),
+          sourcePrimary: lead.parent_know_aboutus && lead.parent_know_aboutus.length ? lead.parent_know_aboutus[0] : "",
+          source: lead.parent_know_aboutus && lead.parent_know_aboutus.length ? lead.parent_know_aboutus.slice(1): "",
+          program: lead.program_id && lead.program_id.program_name ? lead.program_id.program_name : "",
+          followUpDue: dueDateFormat(lead.follow_due_date ? lead.follow_due_date : "", lead.follow_due_time, lead.lead_date, lead.do_followup, lead.someday_follow),
+          stage: getLeadStage(lead.stage || ""),
+          status: lead.status_id && lead.status_id.name ? lead.status_id.name : "",
+          subStatus: lead.substatus_name && lead.substatus_name.name ? lead.substatus_name.name : "",
+          actionTaken: lead.action_taken && lead.action_taken.length ? lead.action_taken.toString() : "",
+          notes: getProperNotes(lead),
+          updatedBy: lead.updatedBy_name
+        });
+      });
+
+      const specification = {
+        sr_no: {
+          displayName: "Sr No.",
+          headerStyle: {},
+          width: 50
+        },
+        country: {
+          displayName: "Country",
+          headerStyle: {},
+          width: 100
+        },
+        zone: {
+          displayName: "Zone",
+          headerStyle: {},
+          width: 100
+        },
+        center: {
+          displayName: "Centre",
+          headerStyle: {},
+          width: 170
+        },
+        walkins: {
+          displayName: "Lead/Walk-ins",
+          headerStyle: {},
+          width: 120
+        },
+        lead_id: {
+          displayName: "Lead Id",
+          headerStyle: {},
+          width: 120
+        },
+        leadDate: {
+          displayName: "Lead Date",
+          headerStyle: {},
+          width: 80
+        },
+        leadUpdatedDate: {
+          displayName: "Updated Date",
+          headerStyle: {},
+          width: 90
+        },
+        dueIn: {
+          displayName: "Due in",
+          headerStyle: {},
+          width: 110
+        },
+        leadName: {
+          displayName: "Lead Name",
+          headerStyle: {},
+          width: 210
+        },
+        childFirstName: {
+          displayName: "Child First Name",
+          headerStyle: {},
+          width: 120
+        },
+        childLastName: {
+          displayName: "Child Last Name",
+          headerStyle: {},
+          width: 120
+        },
+        sourceCat: {
+          displayName: "Category",
+          headerStyle: {},
+          width: 120
+        },
+        sourcePrimary: {
+          displayName: "Primary Source",
+          headerStyle: {},
+          width: 150
+        },
+        source: {
+          displayName: "Source Others",
+          headerStyle: {},
+          width: 150
+        },
+        program: {
+          displayName: "Program",
+          headerStyle: {},
+          width: 100
+        },
+        followUpDue: {
+          displayName: "Follow-up due on",
+          headerStyle: {},
+          width: 160
+        },
+        stage: {
+          displayName: "Stage",
+          headerStyle: {},
+          width: 120
+        },
+        status: {
+          displayName: "Status",
+          headerStyle: {},
+          width: 140
+        },
+        subStatus: {
+          displayName: "Substatus",
+          headerStyle: {},
+          width: 140
+        },
+        actionTaken: {
+          displayName: "Action Planned",
+          headerStyle: {},
+          width: 170
+        },
+        notes: {
+          displayName: "Notes",
+          headerStyle: {},
+          width: 170
+        },
+        updatedBy: {
+          displayName: "Updated by",
+          headerStyle: {},
+          width: 130
+        },
+      }
+
+      Promise.all(dataset)
+        .then(result => {
+          // Create the excel report. this is an array. Pass multiple sheets to create multi sheet report--
+          // return;
+          const report = excel.buildExport([
+            {
+              name: 'Report', // <- Specify sheet name (optional)
+              merges: [], // <- Merge cell ranges
+              specification: specification, // <- Report specification
+              data: dataset // <-- Report data
+            }
+          ]);
+
+          res.attachment(`Lead Export__${currentDate.format("DD-MMMM-YYYY hh:mm")}.xlsx`);
+          return res.send(report);
+        })
+    } 
+    // else {
+    //   req.flash('error', 'No leads found');
+    //   res.redirect('back');
+    //   return;
+    // }
+  // }
+   catch (err) {
+    helper.errorDetailsForControllers(err, "exportLeads not working - get request", req.originalUrl, req.body, {}, "redirect", __filename);
+    next(err);
+    return;
+  }
+};
+
+
+
+
 exports.exportLeadsWithoutLoop = async (req, res, next) => {
   try {
     const timeZone = momentZone.tz.guess();
