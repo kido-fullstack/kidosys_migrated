@@ -11,6 +11,11 @@ router.get('/export',
   reportsController.exportLeads
 );
 
+router.get('/exportFollowups',
+  handlers.requirePermission(permission_name.LEAD_EXPORT),
+  reportsController.exportFollowups
+);
+
 router.get('/export/demo/template',
   handlers.requirePermission(permission_name.LEAD_EXPORT),
   reportsController.exportDemoTemplate
