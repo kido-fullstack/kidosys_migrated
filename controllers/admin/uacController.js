@@ -3,6 +3,7 @@ const _ = require('lodash');
 const Role = mongoose.model('Role');
 const RoleAssign = mongoose.model('RoleAssign');
 const Permission = mongoose.model('Permission');
+const Employee = mongoose.model("Employee");
 const cacher = require('../../services/redis/cacher');
 const helper = require('../../handlers/helper');
 
@@ -12,10 +13,43 @@ exports.test = (req, res, next) => {
 
 exports.getAllRoles = async (req, res, next) => {
   try {
-    const roles = await Role.find().sort({ createdAt: req.responseAdmin.DESC});
+    var roles = await Role.find().sort({ createdAt: req.responseAdmin.DESC});
+
+    const roleCount = await Employee.aggregate(
+      [
+        {
+          $lookup: {
+            from: 'roles',
+            localField: 'role_id',
+            foreignField: '_id',
+            as: 'role'
+          }
+        },
+        { $unwind: '$role' },
+        {
+          $group: {
+            _id: '$role.name',
+            count: { $sum: 1 }
+          }
+        }
+      ],
+      { maxTimeMS: 60000, allowDiskUse: true }
+    );
+
+    roles.forEach((role,ind) => {
+      roleCount.forEach((roleC) => {
+
+        roleC._id == role.name ? roles[ind]['count'] = roleC.count : false;
+
+      })
+    })
+
+
+
     return res.render('admin/all-roles', {
       title: 'All Roles',
-      roles
+      roles,
+      roleCount
     });
   } catch (err) {
     helper.errorDetailsForControllers(err, "getAllRoles not working - get request", req.originalUrl, req.body, {}, "redirect", __filename);
