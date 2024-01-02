@@ -1328,6 +1328,7 @@ block content
           }
 
           $("#substatus").empty();
+          $("#substatus").append(`<option value=''>Select Substatus</option>`);
           $("#substatus").selectpicker('refresh');
 
           $.each(id, function (k, v) {
@@ -1340,7 +1341,6 @@ block content
               },
               dataType: 'json',
               success: function (response) {
-                $("#substatus").append(`<option value=''>Select Substatus</option>`);
                 //- var len = response.data.length;
                 $.each(response.data, function (k, v) {
                   var program_name = v['name'];
