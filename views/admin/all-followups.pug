@@ -931,6 +931,7 @@ block content
           }
 
           $("#substatus").empty();
+          $("#substatus").selectpicker('refresh');
 
           $.each(id, function (k, v) {
 
@@ -943,27 +944,31 @@ block content
               dataType: 'json',
               success: function (response) {
                 $("#substatus").append(`<option value=''>Select Substatus</option>`);
-                var len = response.data.length;
-                if(len == 1){
-                  for (var i = 0; i < len; i++) {
-                  var id = response.data[i]['_id'];
-                  var program_name = response.data[i]['name'];
-                  var stage = response.data[i]['stage']
-                    $("#substatus").append(`<option value='${id}' selected>${program_name}</option>`);
-                  }
-                }else{
-                  for (var i = 0; i < len; i++) {
-                    var id = response.data[i]['_id'];
-                    var program_name = response.data[i]['name'];
-                    var stage = response.data[i]['stage']
+                //- var len = response.data.length;
+                $.each(response.data, function (k, v) {
+                  var program_name = v['name'];
+                  console.log(program_name);
+                  var stage = v['stage']
+                    $("#substatus").append(`<option value='${v["_id"]}'>${program_name}</option>`);
+                });
+                //- if(len == 1){
+                //-   for (var i = 0; i < len; i++) {
+                //-   var id = response.data[i]['_id'];
+                //-   }
+                //- }else{
+                //-   for (var i = 0; i < len; i++) {
+                //-     var id = response.data[i]['_id'];
+                //-     var program_name = response.data[i]['name'];
+                //-     var stage = response.data[i]['stage']
 
-                    $("#substatus").append(`<option value='${id}'>${program_name}</option>`);
-                  }
-                }
-                $("#substatus").selectpicker();
+                //-     $("#substatus").append(`<option value='${id}'>${program_name}</option>`);
+                //-   }
+                //- }
+                $("#substatus").selectpicker('refresh');
               }
             });
-    }); 
+        }); 
+        //- $("#substatus").selectpicker();
       })
       $(document).on('change', '#program', function () {
           var id = $(this).val();
