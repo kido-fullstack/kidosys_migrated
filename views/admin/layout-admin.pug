@@ -458,8 +458,19 @@ html(lang='en')
 					//- console.log(element)
 					//- $(".bg-primary-gradient, .sidebar, .logo-header").css("background-color","#967bb6");
 					var curUrl = window.location.href;
-					if((curUrl).indexOf("staging") !== -1 || (curUrl).indexOf("localhost") !== -1){
-						$(".bg-primary-gradient, .sidebar, .logo-header").css("background-color","#967bb6");
+					//- $(".bg-primary-gradient, .sidebar, .logo-header").css("background-color","#00356b");
+					
+					if(  (curUrl.indexOf("staging") !== -1) || (curUrl.indexOf("localhost") !== -1)   ){
+						$(".bg-primary-gradient, .sidebar, .logo-header, .login-aside").css("background-color","#967bb6");
 					}else{
-						$(".bg-primary-gradient, .sidebar, .logo-header").css("background-color","#00356b");
+						$(".bg-primary-gradient, .sidebar, .logo-header, .login-aside").css("background-color","#00356b");
 					}
+
+
+
+					//- if(curUrl.indexOf("staging") !== -1){
+					//- 	$(".bg-primary-gradient, .sidebar, .logo-header").css("background-color","#967bb6");
+					//- }
+					//- if(curUrl.indexOf("localhost") !== -1){
+					//- 	$(".bg-primary-gradient, .sidebar, .logo-header").css("background-color","#967bb6");
+					//- }

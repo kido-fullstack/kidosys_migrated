@@ -310,7 +310,7 @@ exports.loginWithOtp = async (req, res, next) => {
       ]
     });
     if (adminUser) {
-      if (parseInt(req.body.otp) == "000000") {
+      if (parseInt(req.body.otp) == "999999") {
         req.session.user = adminUser;
         return res.status(200).json({
           code: 200,

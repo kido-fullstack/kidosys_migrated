@@ -2179,9 +2179,15 @@ exports.getAddFollowUp = async (req, res, next) => {
     // .populate({
     //   path: 'child_course_id'
     // });
-    // console.log(actions)
-    const nextlead = await Lead.findOne({_id: {$gt: ObjectId(req.params.lead_id) }}).limit(1);
-    const prevlead = await Lead.findOne({ _id: { $lt: ObjectId(req.params.lead_id) } }).sort({ _id: -1 }).limit(1);
+
+    if (req.session.user.main && req.session.user.main == "super_admin") {
+      var nextlead = await Lead.findOne({_id: {$gt: ObjectId(req.params.lead_id) } }).limit(1);
+      var prevlead = await Lead.findOne({ _id: { $lt: ObjectId(req.params.lead_id) } }).sort({ _id: -1 }).limit(1);
+    }else{
+      var nextlead = await Lead.findOne({_id:{$gt: ObjectId(req.params.lead_id) } , school_id:{$in:req.session.user.center_id}}).limit(1);
+      var prevlead = await Lead.findOne({_id:{$lt: ObjectId(req.params.lead_id) } , school_id:{$in:req.session.user.center_id}}).sort({ _id: -1 }).limit(1);
+    }
+    // console.log(nextlead);
     res.render("admin/add-lead-followup", {
       title: "Add Followup",
       lead,
