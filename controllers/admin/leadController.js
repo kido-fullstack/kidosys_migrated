@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+  const mongoose = require("mongoose");
 const momentZone = require('moment-timezone');
 const multer = require('multer');
 const XLSX = require('xlsx');
@@ -4608,6 +4608,7 @@ exports.centerFilter = async (req, res, next) => {
 exports.datatableFilter = async (req, res, next) => {
   try {
 
+    // ----------------------------LEAD PAGE datatable-----------------;
     // console.log('AAAAAAAAAAA');
 
     const timeZone = momentZone.tz.guess();
@@ -4823,8 +4824,12 @@ exports.datatableFilter = async (req, res, next) => {
     if (req.query.sSearch_4) {
       // console.log('DATE GIVEN---');
       // console.log('DATE GIVEN---');
-      let start = momentZone.tz(`${req.query.sSearch_4}`,"Asia/Kolkata").startOf('day').toDate();
-      let end = momentZone.tz(`${req.query.sSearch_5}`, "Asia/Kolkata").endOf('day').toDate();
+      // let start = momentZone.tz(`${req.query.sSearch_4}`,"Asia/Kolkata").startOf('day').toDate();
+      // let end = momentZone.tz(`${req.query.sSearch_5}`, "Asia/Kolkata").endOf('day').toDate();
+      let start = moment(req.query.sSearch_4, 'DD/MM/YYYY').toDate();
+      let end = moment(req.query.sSearch_5, 'DD/MM/YYYY').endOf('day').toDate();
+      // let start = req.query.sSearch_4;
+      // let end = req.query.sSearch_5;
       // console.log("start---", req.query.sSearch_4);
       // console.log("end---", req.query.sSearch_5);
       findQue = {
@@ -4835,11 +4840,19 @@ exports.datatableFilter = async (req, res, next) => {
       }
       // _.remove(aggregateQue, '$match.lead_date');
       // console.log(aggregateQue)
+      // aggregateQue.unshift({
+      //   '$match': {
+      //     'lead_date': {
+      //       '$gte': start,
+      //       '$lte': end
+      //     }
+      //   }
+      // });
       aggregateQue.unshift({
-        '$match': {
-          'lead_date': {
-            '$gte': start,
-            '$lte': end
+        "$match": {
+        "lead_date": {
+          '$gte': start,
+          '$lte': end
           }
         }
       });
