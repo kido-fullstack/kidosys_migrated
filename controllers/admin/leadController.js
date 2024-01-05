@@ -5667,8 +5667,10 @@ exports.datatableFollowupFilter29May2023 = async (req,res,next) => {
     // console.log(req.query,"req.queryryryryyr")
     if (req.query.sSearch_4) {
       // console.log('DATE GIVEN---');
-      let start = momentZone.tz(`${req.query.sSearch_4}`,"Asia/Kolkata").startOf('day').toDate();
-      let end = momentZone.tz(`${req.query.sSearch_5}`, "Asia/Kolkata").endOf('day').toDate();
+      // let start = momentZone.tz(`${req.query.sSearch_4}`,"Asia/Kolkata").startOf('day').toDate();
+      // let end = momentZone.tz(`${req.query.sSearch_5}`, "Asia/Kolkata").endOf('day').toDate();
+      let start = moment(req.query.sSearch_4, 'DD/MM/YYYY').toDate();
+      let end = moment(req.query.sSearch_5, 'DD/MM/YYYY').endOf('day').toDate();
       // console.log("start---", req.query.sSearch_4);
       // console.log("end---", req.query.sSearch_5);
 
@@ -6196,8 +6198,10 @@ exports.datatableFollowupFilter = async (req, res, next) => {
     if (req.query.sSearch_4) {
       // console.log('DATE GIVEN---');
       // console.log('DATE GIVEN---');
-      let start = momentZone.tz(`${req.query.sSearch_4}`,"Asia/Kolkata").startOf('day').toDate();
-      let end = momentZone.tz(`${req.query.sSearch_5}`, "Asia/Kolkata").endOf('day').toDate();
+      // let start = momentZone.tz(`${req.query.sSearch_4}`,"Asia/Kolkata").startOf('day').toDate();
+      // let end = momentZone.tz(`${req.query.sSearch_5}`, "Asia/Kolkata").endOf('day').toDate();
+      let start = moment(req.query.sSearch_4, 'YYYY/MM/DD').toDate();
+      let end = moment(req.query.sSearch_5, 'YYYY/MM/DD').endOf('day').toDate();
       // console.log("start---", req.query.sSearch_4);
       // console.log("end---", req.query.sSearch_5);
       findQue = {
@@ -6371,6 +6375,8 @@ exports.datatableFollowupFilter = async (req, res, next) => {
         }
       });
     }
+
+    // console.log(aggregateQue,"aggregateQue");
 
     const leads = await Lead.aggregate(aggregateQue);
 
