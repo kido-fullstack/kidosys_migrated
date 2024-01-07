@@ -12,16 +12,16 @@ const helper = require("../../handlers/helper");
 
 const dueDateFormatWithMoment = (data, dueTime) => {
   var regex = /\ba\b/;
-  let dueDate = moment.utc(data).tz("Asia/Kolkata").format("DD/MM/YYYY ");
   if (data) {
     if (dueTime) {
-      var mainData = moment(`${dueDate} ${dueTime}`).fromNow();
+      let dueDate = moment(new Date(data), 'DD/MM/YYYY').toDate();
+      var mainData = moment(dueDate+" "+dueTime).fromNow();
       if (regex.test(mainData)) {
         mainData = mainData.replace("a", 1)
       }
       return `${data ? mainData : ""}`
     } else {
-      var mainData = moment(`${data}`).fromNow();
+      var mainData = moment(data).fromNow();
       if (regex.test(mainData)) {
         mainData = mainData.replace("a", 1)
       }
@@ -314,8 +314,11 @@ exports.exportLeads = async (req, res, next) => {
     }
 
     if (req.query.stardate) {
-      let start = momentZone.tz(`${req.query.stardate}`, "Asia/Kolkata").startOf('day').toDate();
-      let end = momentZone.tz(`${req.query.enddate}`, "Asia/Kolkata").endOf('day').toDate();
+      // let start = momentZone.tz(`${req.query.stardate}`, "Asia/Kolkata").startOf('day').toDate();
+      // let end = momentZone.tz(`${req.query.enddate}`, "Asia/Kolkata").endOf('day').toDate();
+      let start = moment(req.query.stardate, 'DD/MM/YYYY').toDate();
+      let end = moment(req.query.enddate, 'DD/MM/YYYY').endOf('day').toDate();
+
       findQue = {
         lead_date: {
           '$gte': start,
@@ -390,7 +393,8 @@ exports.exportLeads = async (req, res, next) => {
       });
     }
 
-    // parent_name, // child_first_name, // lead_no
+    // // parent_name, // child_first_name, // lead_no
+    console.log(req.query.search_key);
     if (req.query.search_key) {
       aggregateQue.unshift({
         '$match': {

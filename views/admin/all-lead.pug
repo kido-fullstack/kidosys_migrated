@@ -969,7 +969,8 @@ block content
         //- table.button('.buttons-excel').trigger();
         if(total_records > 0) {
           //- table.button('.buttons-excel').trigger();
-          var search_key = $("#searchbox").val();
+          
+          var search_key = $("#all_lead").parent().find(`[type='search']`).val();
           var stardate = "";
           var enddate = "";
           if($("#date").val() != ""){
