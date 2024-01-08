@@ -553,8 +553,13 @@ block content
       }
       $(`.${dim_id}`).prop("onclick", null).off("click");
       let msg = $('#msg').val()
+
+      var tempDivElement = document.createElement("div");
+      tempDivElement.innerHTML = msg;
+      var prsdMsg = tempDivElement.textContent || tempDivElement.innerText || "";
+      console.log(prsdMsg);
       let attachment = (message.attachment && message.attachment.length) ? message.attachment : []
-      let messageData = {"msg" : msg, "attachment" :attachment, "subject": $(".quick-response-lead-name").text()}
+      let messageData = {"msg" : prsdMsg, "attachment" :attachment, "subject": $(".quick-response-lead-name").text()}
       //- console.log(messageData,"dataa")
       //- console.log(message_id,"datmessage_idaa")
       //- $('#cover-spin').show(0);
