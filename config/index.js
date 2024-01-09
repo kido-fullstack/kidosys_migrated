@@ -12,12 +12,12 @@ module.exports = Object.assign({}, {
     },
     db: {
       devDb: {
-        server: process.env.DB_SERVER_NAME || "localhost",
+        server: process.env.DB_SERVER_NAME || "65.0.69.203",
         port: process.env.DB_PORT || 27017,
-        username: process.env.DB_USERNAME || "",
-        password: process.env.DB_PASSWORD || "",
+        username: process.env.DB_USERNAME || "kidosys",
+        password: process.env.DB_PASSWORD || "kidoYwOyv4lzsys",
         dbName: "test",
-        uri: "mongodb+srv://kido_admin:q8HeYTvfYwOyv4lz@kido.flmyjkt.mongodb.net/?retryWrites=true&w=majority",
+        uri: "mongodb://kidosys:kidoYwOyv4lzsys@65.0.69.203:27017/kidoProduction?authMechanism=DEFAULT&authSource=admin",
         type: process.env.DB_TYPE || "mongodb"
       },
       serverDb: {
