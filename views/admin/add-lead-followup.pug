@@ -681,6 +681,9 @@ block content
     })
     function viewMsg (notes) {
       //- alert('hey');
+      var tempDivElement = document.createElement("div");
+      tempDivElement.innerHTML = notes;
+      var prsdMsg = tempDivElement.textContent || tempDivElement.innerText || "";
       $.fancybox.open(`
         <form method="POST" style="display: inline-block; width: 100%; max-width: 660px;" class="fancybox-content">
           <h2 class="mb-3">View Message</strong></h2>
@@ -692,7 +695,7 @@ block content
             <div class="col-md-12">
               <div class="form-group form-group-default">
                 <label>Message:</label>
-                <textarea class="form-control" id="comment" rows="10" disabled>${notes}</textarea>
+                <textarea class="form-control" id="comment" rows="10" disabled>${prsdMsg}</textarea>
               </div>
             </div>
           </p>

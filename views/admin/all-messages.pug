@@ -1,6 +1,34 @@
 extends layout-admin
 
 block content
+  script.
+    function viewMsg (msg) {
+
+      var tempDivElement = document.createElement("div");
+      tempDivElement.innerHTML = msg;
+      var prsdMsg = tempDivElement.textContent || tempDivElement.innerText || "";
+      tempDivElement.innerHTML = prsdMsg;
+      prsdMsg = tempDivElement.textContent || tempDivElement.innerText || "";
+
+        $.fancybox.open(`
+          <form method="POST" style="display: inline-block; width: 100%; max-width: 660px;" class="fancybox-content">
+            <h2 class="mb-3">View Message</strong></h2>
+            <p style="display: none">
+              <input type='hidden' name="employee_id" class="form-control"></input>
+            </p>
+            <input type='hidden' name="old_center_name" id="old_center_name" class="form-control" value=""></input>
+            <p>
+              <div class="col-md-12">
+                <div class="form-group form-group-default">
+                  <label>Message:</label>
+                  <textarea class="form-control" id="comment" rows="10" disabled>${prsdMsg}</textarea>
+                </div>
+              </div>
+            </p>
+          </form>
+        `)
+      }
+
   .main-panel
     .container
       .panel-header.bg-primary-gradient
@@ -69,10 +97,10 @@ block content
                                     i.fa.fa-edit
   block script
     script(src='/admin/assets/js/common.js')
+  script.
+    $(document).ready(function () {
 
-    script.
-      $(document).ready(function)() {
-        $("#dropdown1").select2();
+         $("#dropdown1").select2();
         var table = $('#basic-datatables').DataTable({
           ordering: true,
           order: [[3, 'desc']],
@@ -84,27 +112,9 @@ block content
             .search(this.value)
             .draw();
         });
+     
 
-        function viewMsg (msg) {
-          $.fancybox.open(`
-            <form method="POST" style="display: inline-block; width: 100%; max-width: 660px;" class="fancybox-content">
-              <h2 class="mb-3">View Message</strong></h2>
-              <p style="display: none">
-                <input type='hidden' name="employee_id" class="form-control"></input>
-              </p>
-              <input type='hidden' name="old_center_name" id="old_center_name" class="form-control" value=""></input>
-              <p>
-                <div class="col-md-12">
-                  <div class="form-group form-group-default">
-                    <label>Message:</label>
-                    <textarea class="form-control" id="comment" rows="10" disabled>${msg}</textarea>
-                  </div>
-                </div>
-              </p>
-            </form>
-          `)
-        }
-      }
+    })
 
       //-   $('#mssg').on('change', function() {
       //-     if ($(this).is(":checked")) {
