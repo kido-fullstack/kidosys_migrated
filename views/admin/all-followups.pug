@@ -394,7 +394,7 @@ block content
           data: 'follow_due_date',
           render: function (data, type, row) {
             var regex = /\ba\b/;
-            let dueDate = moment(data).format("DD/MM/YYYY ");
+            let dueDate = moment(data).format("YYYY-MM-DD");
             if (row.follow_due_date) {
               if (row.follow_due_time) {
                 var mainData = moment(`${dueDate} ${row.follow_due_time}`).fromNow();
