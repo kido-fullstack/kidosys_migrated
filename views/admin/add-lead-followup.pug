@@ -193,7 +193,11 @@ block content
                           | &nbsp;#{moment.utc(lead.updatedAt).tz("Asia/Kolkata").format("MM/DD/YYYY")}, #{moment.utc(lead.updatedAt).tz("Asia/Kolkata").format("h:mm A")}
                         li.list-group-item
                           strong Updated by -
-                          | &nbsp;#{lead.updatedBy_name}
+                          if followups.length
+                            | &nbsp;#{followups[0].updatedBy_name}
+                          else 
+                            | &nbsp;#{lead.updatedBy_name}
+                            
                       //-div.cta-buttons-wrapper
                         button.btn.btn-color.btm-block(type="button" onclick="redirectToallmessagewhatsapp()") Send Whatsapp
                         button.btn.btn-color.btm-block(type="button" onclick="redirectToallmessageemail()") Send Email
