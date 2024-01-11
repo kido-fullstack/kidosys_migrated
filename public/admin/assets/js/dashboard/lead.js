@@ -374,12 +374,12 @@ $(document).ready(function () {
       $(".waiting-loader-multiplelinechart-1").css("display", "block");
       $(".after-loading-multiplelinechart-1").css("display", "none");
       if (myMultipleLineChart) myMultipleLineChart.destroy();
-      ajaxApiCall("GET", `/admin/reports/chart/multipleLinebarchart/1?startMonth=${startMonth}&endMonth=${endMonth}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcID}`, {}, cb);
+      ajaxApiCall("GET", `/admin/reports/chart/multipleLinebarchart/1?startMonth=${dtFormater(startMonth)}&endMonth=${dtFormater(endMonth)}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcID}`, {}, cb);
 
       $(".waiting-loader-multiplebarchart-1").css("display", "block");
       $(".after-loading-multiplebarchart-1").css("display", "none");
       if (myMultipleBarChart) myMultipleBarChart.destroy();
-      ajaxApiCall("GET", `/admin/reports/chart/multiplebarchart/1?startMonth=${startMonth}&endMonth=${endMonth}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcID}`, {}, cb);
+      ajaxApiCall("GET", `/admin/reports/chart/multiplebarchart/1?startMonth=${dtFormater(startMonth)}&endMonth=${dtFormater(endMonth)}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcID}`, {}, cb);
     }
   })
 
@@ -400,12 +400,12 @@ $(document).ready(function () {
       $(".waiting-loader-multiplelinechart-1").css("display", "block");
       $(".after-loading-multiplelinechart-1").css("display", "none");
       if (myMultipleLineChart) myMultipleLineChart.destroy();
-      ajaxApiCall("GET", `/admin/reports/chart/multipleLinebarchart/1?startMonth=${startMonth}&endMonth=${endMonth}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcID}`, {}, cb);
+      ajaxApiCall("GET", `/admin/reports/chart/multipleLinebarchart/1?startMonth=${dtFormater(startMonth)}&endMonth=${dtFormater(endMonth)}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcID}`, {}, cb);
 
       $(".waiting-loader-multiplebarchart-1").css("display", "block");
       $(".after-loading-multiplebarchart-1").css("display", "none");
       if (myMultipleBarChart) myMultipleBarChart.destroy();
-      ajaxApiCall("GET", `/admin/reports/chart/multiplebarchart/1?startMonth=${startMonth}&endMonth=${endMonth}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcID}`, {}, cb);
+      ajaxApiCall("GET", `/admin/reports/chart/multiplebarchart/1?startMonth=${dtFormater(startMonth)}&endMonth=${dtFormater(endMonth)}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcID}`, {}, cb);
     }
   })
 
@@ -591,13 +591,26 @@ var multipleLineChart = document.getElementById('multipleLineChart').getContext(
 
 var multipleBarChart = document.getElementById('multipleBarChart').getContext('2d');
 
+
+function dtFormater(str) {
+ return (moment(str, 'DD/MM/YYYY').toDate()).toISOString().substring(0, 10); 
+}
+
 $(document).ready(function () {
   // console.log($('#date').val());
   var dateVal = $('#date').val()
   var startDateFront = dateVal ? dateVal.split(" - ")[0] : "";
   var endDateFront = dateVal ? dateVal.split(" - ")[1] : "";
-  // console.log(startDateFront)
-  // console.log(endDateFront)
+
+  // console.log(startDateFront);
+  // console.log((moment(startDateFront, 'DD/MM/YYYY').toDate()).toISOString().substring(0, 10));
+  // console.log((moment(endDateFront, 'DD/MM/YYYY').toDate()).toISOString().substring(0, 10));
+
+  startDateFront = dtFormater(startDateFront);
+  endDateFront = dtFormater(endDateFront);
+
+  // console.log( (new Date(startDateFront)).toISOString()  )
+  // console.log( (new Date(endDateFront)).toISOString()  )
   $(".after-loading-barchart-1").hide(0);
   $(".after-loading-barchart-2").hide(0);
 
