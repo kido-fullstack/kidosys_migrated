@@ -3713,36 +3713,46 @@ exports.getEditLead = async (req, res, next) => {
 };
 
 exports.markLeadUnread = async (req, res, next) => {
-
   try {
-      // console.log(req);
-      var oldlead = await Lead.findOne({ _id: req.body.id });
-      // oldlead.is_external = 2;
-      // var updateLead = await Lead.updateOne(oldlead);
+    const { id } = req.body;
+
+    const oldLead = await Lead.findOne({ _id: id });
+
+    if (oldLead) {
+      const newIsExternalValue = oldLead.is_external === 1 ? 0 : 1;
 
       const updateLead = await Lead.updateOne(
         {
-          _id: req.body.id,
+          _id: id,
         },
         {
           $set: {
-            is_external: 1,
+            is_external: newIsExternalValue,
             is_dup: 0,
           },
         }
       ).exec();
-      // var tmp = req;
+
       return res.status(200).json({
         msg: "markLeadUnread",
         data: updateLead,
         code: 200,
       });
-      
+    } else {
+      return res.status(404).json({
+        msg: "Lead not found",
+        code: 404,
+      });
+    }
   } catch (error) {
-    
+    console.error(error);
+    return res.status(500).json({
+      msg: "Internal Server Error",
+      code: 500,
+    });
   }
+};
 
-}
 
 exports.postEditLead = async (req, res, next) => {
   try {
@@ -4624,7 +4634,7 @@ exports.datatableFilter = async (req, res, next) => {
     // console.log("startDate-------", startDate);
     // console.log("endDate-------", endDate);
     // console.log("req.body", req.body);
-    const sortingArr = ["lead_no_val", "lead_date", "updatedAt", "parent_name", "child_first_name", "child_last_name", "stage", "type", `${req.session.user.main && req.session.user.main == req.config.admin.main ? 'school_id.school_display_name' : 'child_first_name'}`, "parent_know_aboutus", "source_category", "programcategory_id.title", "program_id.program_name", "status_id.name","substatus_id.name", "lead_no"];
+    const sortingArr = [" ","lead_no_val", "lead_date", "updatedAt", "parent_name", "child_first_name", "child_last_name", "stage", "type", `${req.session.user.main && req.session.user.main == req.config.admin.main ? 'school_id.school_display_name' : 'child_first_name'}`, "source_category", "parent_know_aboutus",  "program_id.program_name",  "status_id.name","substatus_id.name", "programcategory_id.title",  "lead_no"];
     // const sortingArr = ["","lead_no","lead_date", "updatedAt", "parent_name","","","stage","","source_category","parent_know_aboutus","","","","source_category","" ,"type", `${req.session.user.main && req.session.user.main == req.config.admin.main ? 'school_id.school_display_name' : 'child_first_name'}`, "parent_know_aboutus", "programcategory_id.title", "program_id.program_name", "status_id.name","substatus_id.name"];
     let zoneCount = 0;
     let newArr = [];
@@ -5978,7 +5988,7 @@ exports.datatableFollowupFilter29May2023 = async (req,res,next) => {
 exports.datatableFollowupFilter = async (req, res, next) => {
   try {
 
-    // -------------------------FOLLOWU PAGE ----------------------------;
+    // -------------------------FOLLOWUP PAGE ----------------------------;
     // console.log('AAAAAAAAAAA');
     const timeZone = momentZone.tz.guess();
 
@@ -5994,7 +6004,7 @@ exports.datatableFollowupFilter = async (req, res, next) => {
     // console.log("startDate-------", startDate);
     // console.log("endDate-------", endDate);
     // console.log("req.body", req.body);
-    const sortingArr = ["lead_no_val", "lead_date", "updatedAt", "parent_name", "child_first_name", "child_last_name", "stage", "type", `${req.session.user.main && req.session.user.main == req.config.admin.main ? 'school_id.school_display_name' : 'child_first_name'}`, "parent_know_aboutus", "source_category", "programcategory_id.title", "program_id.program_name", "status_id.name","substatus_id.name","lead_no"];
+    const sortingArr = [" ", "lead_no_val", "lead_date", "updatedAt", "parent_name", "child_first_name", "child_last_name", "stage", "type", `${req.session.user.main && req.session.user.main == req.config.admin.main ? 'school_id.school_display_name' : 'child_first_name'}`, "parent_know_aboutus", "source_category", "programcategory_id.title", "program_id.program_name", "status_id.name","substatus_id.name","lead_no"];
     let zoneCount = 0;
     let newArr = [];
     let findQue = {};
