@@ -99,6 +99,20 @@ exports.allCenter = async (req, res, next) => {
       let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
       centers = await Center.find({ _id: {$in: objectIdArray} }, { school_name: 1, school_display_name: 1 });
     }
+    centers.sort((a, b) => a.school_name < b.school_name ? -1 : 1)
+    var indexOfHO = -1;
+    var HOposbls = ["HEAD OFFICE", "head office", "Others", "Other","HO Centre"];
+    centers.forEach((ele,key) => {
+      if( HOposbls.indexOf(ele.school_name)   !== -1){
+        indexOfHO = key;
+      }
+    })
+    if (indexOfHO !== -1) {
+      var thirdItem = centers.splice(indexOfHO, 1)[0];
+      centers.push(thirdItem);
+    }
+    // console.log(indexOfHO);
+    // console.log(centers);
     if (centers.length) {
       return res.status(200).json(response.responseSuccess("All centers.", centers, 200));
     } else {

@@ -18,11 +18,10 @@ block content
           .col-md-12
             //- pre= h.dump(followups && followups.length && followups[0].notes)
             .card
-              .card-header
               .row
-                .col-md-6.col-lg-4(style="padding: 1.4%; display: flex; align-items: center;")
+                .col-md-6.col-lg-4(style="padding: 0.4% 2.5%; display: flex; align-items: center;")
                   if(prevlead)
-                    a(href=(`${prevlead._id}`)).card-title(style="margin: 10%;")
+                    a(href=(`${prevlead._id}`)).card-title(style="margin: 1%;")
                       i.fas.fa-arrow-left 
                       |  Previous 
                 .col-md-6.col-lg-4(style="display: flex; align-items: center; justify-content: center;")
@@ -30,399 +29,402 @@ block content
                     .card-title(style="margin: 20px;")
                       | Lead (#{lead.lead_no})
                       i.edit-icon(class="fa fa-edit" style="padding-left: 10px;")
-                .col-md-4.col-lg-4(style="padding: 1.4%; display: flex; align-items: center; justify-content: flex-end;")
+                .col-md-4.col-lg-4(style="padding: 0.4% 2.5%; display: flex; align-items: center; justify-content: flex-end;")
                   if(nextlead)
-                    a(href=(`${nextlead._id}`)).card-title(style="margin: 10%; text-align: right;")
+                    a(href=(`${nextlead._id}`)).card-title(style="margin: 1%; text-align: right;")
                       | Next
                       i.fas.fa-arrow-right
-              .card-body
-                .row
-                  .col-md-6.col-lg-6
-                    .form-group(style="margin-top: -18px;")
-                      ul.list-group.list-group-noborder
+              .row
+                .col-md-6.col-lg-6
+                  .form-group(style="margin-top: -18px;")
+                    ul.list-group.list-group-noborder
+                      li.list-group-item
+                        h2(style="font-size: 20px !important;font-weight: 600;") Lead Detail →
+                      if lead.enrolled == 1
                         li.list-group-item
-                          h2(style="font-size: 20px !important;font-weight: 600;") Lead Detail →
-                        if lead.enrolled == 1
-                          li.list-group-item
-                            strong Type -
-                            | &nbsp;ENROLLED
-                        else
-                          li.list-group-item
-                            strong Type -
-                            | &nbsp;#{lead.type.toUpperCase()}
+                          strong Type -
+                          | &nbsp;ENROLLED
+                      else
                         li.list-group-item
-                          strong LD Date -
-                          | &nbsp;#{moment(lead.createdAt).format('Do MMM YYYY').toString().toUpperCase()}
-                        //- li.list-group-item
-                          strong Lead No -
-                          | &nbsp;#{lead.lead_no}
+                          strong Type -
+                          | &nbsp;#{lead.type.toUpperCase()}
+                      li.list-group-item
+                        strong LD Date -
+                        | &nbsp;#{moment(lead.createdAt).format('Do MMM YYYY').toString().toUpperCase()}
+                      //- li.list-group-item
+                        strong Lead No -
+                        | &nbsp;#{lead.lead_no}
+                      li.list-group-item
+                        strong Lead Name -
+                        | &nbsp;#{lead.parent_name}
+                      li.list-group-item
+                        strong Child Name -
+                        | &nbsp;#{lead.child_first_name ? lead.child_first_name : "Not Provided"} #{lead.child_last_name ? lead.child_last_name : ""}
+                      if lead.parent_first_contact
                         li.list-group-item
-                          strong Lead Name -
-                          | &nbsp;#{lead.parent_name}
+                          strong Primary Parent Number 1 -
+                          | &nbsp;#{lead.parent_first_contact ? lead.parent_first_contact : "Not provided"}
+                          if lead.parent_first_contact && lead.parent_first_whatsapp
+                            | &nbsp;&nbsp;
+                            a(href="javascript:void(0);" onclick=`redirectToallmessagewhatsapp(${lead.parent_first_contact })`)
+                              i.fab.fa-whatsapp(style="font-size: 20px;color: #128C7E;")
+                      if lead.parent_second_contact
                         li.list-group-item
-                          strong Child Name -
-                          | &nbsp;#{lead.child_first_name ? lead.child_first_name : "Not Provided"} #{lead.child_last_name ? lead.child_last_name : ""}
-                        if lead.parent_first_contact
-                          li.list-group-item
-                            strong Primary Parent Number 1 -
-                            | &nbsp;#{lead.parent_first_contact ? lead.parent_first_contact : "Not provided"}
-                            if lead.parent_first_contact && lead.parent_first_whatsapp
-                              | &nbsp;&nbsp;
-                              a(href="javascript:void(0);" onclick=`redirectToallmessagewhatsapp(${lead.parent_first_contact })`)
-                                i.fab.fa-whatsapp(style="font-size: 20px;color: #128C7E;")
-                        if lead.parent_second_contact
-                          li.list-group-item
-                            strong Primary Parent Number 2 -
-                            | &nbsp;#{lead.parent_second_contact ? lead.parent_second_contact : "Not provided"}
-                            if lead.parent_second_contact && lead.parent_second_whatsapp
-                              | &nbsp;&nbsp;
-                              a(href="javascript:void(0);" onclick=`redirectToallmessagewhatsapp(${lead.parent_second_contact})`)
-                                i.fab.fa-whatsapp(style="font-size: 20px;color: #128C7E;")
-                        if lead.secondary_first_contact
-                          li.list-group-item
-                            strong Secondary Parent Number 1 -
-                            | &nbsp;#{lead.secondary_first_contact ? lead.secondary_first_contact : "Not provided"}
-                            if lead.secondary_first_contact && lead.secondary_first_whatsapp
-                              | &nbsp;&nbsp;
-                              a(href="javascript:void(0);" onclick=`redirectToallmessagewhatsapp(${lead.secondary_first_contact})`)
-                                i.fab.fa-whatsapp(style="font-size: 20px;color: #128C7E;")
-                        if lead.secondary_Second_contact
-                          li.list-group-item
-                            strong Secondary Parent Number 2 -
-                            | &nbsp;#{lead.secondary_Second_contact ? lead.secondary_Second_contact : "Not provided" }
-                            if lead.secondary_Second_contact && lead.secondary_second_whatsapp
-                              | &nbsp;&nbsp;
-                              a(href="javascript:void(0);" onclick=`redirectToallmessagewhatsapp(${lead.secondary_Second_contact})`)
-                                i.fab.fa-whatsapp(style="font-size: 20px;color: #128C7E;")
-                        if lead.parent_email
-                          li.list-group-item
-                            strong Primary Parent Email -
-                            | &nbsp;#{lead.parent_email}
-                            if lead.parent_email && lead.parent_email
-                              | &nbsp;&nbsp;
-                              a(href="javascript:void(0);" onclick=`redirectToallmessageemail('${lead.parent_email}')`)
-                                i.far.fa-envelope(style="font-size: 20px;color: #DB4437;")
-                        if lead.secondary_email
-                          li.list-group-item
-                            strong Secondary Parent Email -
-                            | &nbsp;#{lead.secondary_email ? lead.secondary_email : "Not Provided"}
-                            if lead.secondary_email
-                              | &nbsp;&nbsp;
-                              a(href="javascript:void(0);" onclick=`redirectToallmessageemail('${lead.secondary_email}')`)
-                                i.far.fa-envelope(style="font-size: 20px;color: #DB4437;")
-                        if lead.parent_know_aboutus && lead.parent_know_aboutus.length || lead.source_category
-                          li.list-group-item
-                            strong Source Category / Lead Source -
-                            | &nbsp;#{lead.source_category && lead.source_category.length ? `${lead.source_category.toString()} / ` : ""} #{lead.parent_know_aboutus && lead.parent_know_aboutus.length ? `${lead.parent_know_aboutus.toString()}` : ""}
-                        if lead.school_id && Object.keys(lead.school_id).length
-                          li.list-group-item
-                            strong School Name -
-                            | &nbsp;#{lead.school_id.school_display_name} / #{lead.zone_id.name} / #{lead.country_id.country_name}
+                          strong Primary Parent Number 2 -
+                          | &nbsp;#{lead.parent_second_contact ? lead.parent_second_contact : "Not provided"}
+                          if lead.parent_second_contact && lead.parent_second_whatsapp
+                            | &nbsp;&nbsp;
+                            a(href="javascript:void(0);" onclick=`redirectToallmessagewhatsapp(${lead.parent_second_contact})`)
+                              i.fab.fa-whatsapp(style="font-size: 20px;color: #128C7E;")
+                      if lead.secondary_first_contact
                         li.list-group-item
-                          strong Program -
-                          | &nbsp;#{lead.program_id && lead.program_id.program_name ? lead.program_id.program_name : "Not provided"}
-                        li.list-group-item(style="margin-top: 50px;")
-                          strong(style="font-size: 20px;") Last Updated Status →
+                          strong Secondary Parent Number 1 -
+                          | &nbsp;#{lead.secondary_first_contact ? lead.secondary_first_contact : "Not provided"}
+                          if lead.secondary_first_contact && lead.secondary_first_whatsapp
+                            | &nbsp;&nbsp;
+                            a(href="javascript:void(0);" onclick=`redirectToallmessagewhatsapp(${lead.secondary_first_contact})`)
+                              i.fab.fa-whatsapp(style="font-size: 20px;color: #128C7E;")
+                      if lead.secondary_Second_contact
                         li.list-group-item
-                          strong Status -
-                          | &nbsp;#{lead.status_id.name}
+                          strong Secondary Parent Number 2 -
+                          | &nbsp;#{lead.secondary_Second_contact ? lead.secondary_Second_contact : "Not provided" }
+                          if lead.secondary_Second_contact && lead.secondary_second_whatsapp
+                            | &nbsp;&nbsp;
+                            a(href="javascript:void(0);" onclick=`redirectToallmessagewhatsapp(${lead.secondary_Second_contact})`)
+                              i.fab.fa-whatsapp(style="font-size: 20px;color: #128C7E;")
+                      if lead.parent_email
                         li.list-group-item
-                          strong SubStatus -
-                          | &nbsp;#{lead.substatus_id.name}
-                        if lead.action_taken && lead.action_taken.length
-                          li.list-group-item
-                            strong Action Taken -
-                            | &nbsp;#{lead.action_taken.toString()}
+                          strong Primary Parent Email -
+                          | &nbsp;#{lead.parent_email}
+                          if lead.parent_email && lead.parent_email
+                            | &nbsp;&nbsp;
+                            a(href="javascript:void(0);" onclick=`redirectToallmessageemail('${lead.parent_email}')`)
+                              i.far.fa-envelope(style="font-size: 20px;color: #DB4437;")
+                      if lead.secondary_email
                         li.list-group-item
-                          strong Lead Stage -
-                          if lead.stage == "New Lead"
-                            div(style='display:flex;width:22%;justify-content:center;align-items:center')
-                              .circle
-                                span 1
-                              p(style='line-height: 16px; margin: 0;') New Lead
-                          else if lead.stage == "Enquiry Received"
-                            div(style='display:flex;width:22%;justify-content:center;align-items:center')
-                              .circle
-                                span 2
-                              p(style='line-height: 16px; margin: 0;') Enquiry Received
-                          else if lead.stage == "Tour Booked"
-                            div(style='display:flex;width:22%;justify-content:center;align-items:center')
-                              .circle
-                                span 3
-                              p(style='line-height: 16px; margin: 0;') Tour Booked
-                          else if lead.stage == "Closed-Lead Lost"
-                            div(style='display:flex;width:22%;justify-content:center;align-items:center')
-                              .circle
-                                span 4
-                              p(style='line-height: 16px; margin: 0;') Closed-Lead Lost
-                          else if lead.stage == "Post Tour"
-                            div(style='display:flex;width:22%;justify-content:center;align-items:center')
-                              .circle
-                                span 5
-                              p(style='line-height: 16px; margin: 0;') Post Tour
-                          else if lead.stage == "Closed-Enquiry Lost"
-                            div(style='display:flex;width:22%;justify-content:center;align-items:center')
-                              .circle
-                                span 6
-                              p(style='line-height: 16px; margin: 0;') Closed-Enquiry Lost
-                          else if lead.stage == "Closed - Won"
-                            div(style='display:flex;width:22%;justify-content:center;align-items:center')
-                              .circle
-                                span 7
-                              p(style='line-height: 16px; margin: 0;') Closed - Won
+                          strong Secondary Parent Email -
+                          | &nbsp;#{lead.secondary_email ? lead.secondary_email : "Not Provided"}
+                          if lead.secondary_email
+                            | &nbsp;&nbsp;
+                            a(href="javascript:void(0);" onclick=`redirectToallmessageemail('${lead.secondary_email}')`)
+                              i.far.fa-envelope(style="font-size: 20px;color: #DB4437;")
+                      if lead.parent_know_aboutus && lead.parent_know_aboutus.length || lead.source_category
+                        li.list-group-item
+                          strong Source Category / Lead Source -
+                          | &nbsp;#{lead.source_category && lead.source_category.length ? `${lead.source_category.toString()} / ` : ""} #{lead.parent_know_aboutus && lead.parent_know_aboutus.length ? `${lead.parent_know_aboutus.toString()}` : ""}
+                      if lead.school_id && Object.keys(lead.school_id).length
+                        li.list-group-item
+                          strong School Name -
+                          | &nbsp;#{lead.school_id.school_display_name} / #{lead.zone_id.name} / #{lead.country_id.country_name}
+                      li.list-group-item
+                        strong Program -
+                        | &nbsp;#{lead.program_id && lead.program_id.program_name ? lead.program_id.program_name : "Not provided"}
+                      li.list-group-item(style="margin-top: 50px;")
+                        strong(style="font-size: 20px;") Last Updated Status →
+                      li.list-group-item
+                        strong Status -
+                        | &nbsp;#{lead.status_id.name}
+                      li.list-group-item
+                        strong SubStatus -
+                        | &nbsp;#{lead.substatus_id.name}
+                      if lead.action_taken && lead.action_taken.length
+                        li.list-group-item
+                          strong Action Taken -
+                          | &nbsp;#{lead.action_taken.toString()}
+                      li.list-group-item
+                        strong Lead Stage -
+                        if lead.stage == "New Lead"
+                          div(style='display:flex;width:22%;justify-content:center;align-items:center')
+                            .circle
+                              span 1
+                            p(style='line-height: 16px; margin: 0;') New Lead
+                        else if lead.stage == "Enquiry Received"
+                          div(style='display:flex;width:22%;justify-content:center;align-items:center')
+                            .circle
+                              span 2
+                            p(style='line-height: 16px; margin: 0;') Enquiry Received
+                        else if lead.stage == "Tour Booked"
+                          div(style='display:flex;width:22%;justify-content:center;align-items:center')
+                            .circle
+                              span 3
+                            p(style='line-height: 16px; margin: 0;') Tour Booked
+                        else if lead.stage == "Closed-Lead Lost"
+                          div(style='display:flex;width:22%;justify-content:center;align-items:center')
+                            .circle
+                              span 4
+                            p(style='line-height: 16px; margin: 0;') Closed-Lead Lost
+                        else if lead.stage == "Post Tour"
+                          div(style='display:flex;width:22%;justify-content:center;align-items:center')
+                            .circle
+                              span 5
+                            p(style='line-height: 16px; margin: 0;') Post Tour
+                        else if lead.stage == "Closed-Enquiry Lost"
+                          div(style='display:flex;width:22%;justify-content:center;align-items:center')
+                            .circle
+                              span 6
+                            p(style='line-height: 16px; margin: 0;') Closed-Enquiry Lost
+                        else if lead.stage == "Closed - Won"
+                          div(style='display:flex;width:22%;justify-content:center;align-items:center')
+                            .circle
+                              span 7
+                            p(style='line-height: 16px; margin: 0;') Closed - Won
 
-                          //- | &nbsp;#{lead.stage == "New Lead" ? "1. New Lead" : lead.stage == "Enquiry Received" ? "2. Enquiry Received" : lead.stage == "Tour Booked" ? "3. Tour Booked" : lead.stage == "Closed-Lead Lost" ? "4. Closed-Lead Lost" : lead.stage == "Post Tour" ? "5. Post Tour" : lead.stage == "Closed-Enquiry Lost" ? "6. Closed-Enquiry Lost" : lead.stage == "Closed - Won" ? "7. Closed - Won" : "Not Provided"}
-                        if lead.remark
-                          li.list-group-item
-                            strong Notes -
-                            //- | &nbsp;#{lead.remark}
-                            if lead.remark.includes("{")
-                              br
-                              .social-leads(style="margin-left: 10px;")
-                                - let object = JSON.parse(lead.remark)
-                                - for (const property in object) {
-                                    strong
-                                      | #{`${property.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}:`}
-                                    | &nbsp;#{`${object[property].replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}`}
-                                    br
-                                - }
-                            else
-                              | #{lead.remark ? lead.remark : "Not Provided"}
+                        //- | &nbsp;#{lead.stage == "New Lead" ? "1. New Lead" : lead.stage == "Enquiry Received" ? "2. Enquiry Received" : lead.stage == "Tour Booked" ? "3. Tour Booked" : lead.stage == "Closed-Lead Lost" ? "4. Closed-Lead Lost" : lead.stage == "Post Tour" ? "5. Post Tour" : lead.stage == "Closed-Enquiry Lost" ? "6. Closed-Enquiry Lost" : lead.stage == "Closed - Won" ? "7. Closed - Won" : "Not Provided"}
+                      if lead.remark
                         li.list-group-item
-                          strong Updated on -
-                          | &nbsp;#{moment.utc(lead.updatedAt).tz("Asia/Kolkata").format("MM/DD/YYYY")}, #{moment.utc(lead.updatedAt).tz("Asia/Kolkata").format("h:mm A")}
-                        li.list-group-item
-                          strong Updated by -
+                          strong Notes -
+                          //- | &nbsp;#{lead.remark}
+                          if lead.remark.includes("{")
+                            br
+                            .social-leads(style="margin-left: 10px;")
+                              - let object = JSON.parse(lead.remark)
+                              - for (const property in object) {
+                                  strong
+                                    | #{`${property.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}:`}
+                                  | &nbsp;#{`${object[property].replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}`}
+                                  br
+                              - }
+                          else
+                            | #{lead.remark ? lead.remark : "Not Provided"}
+                      li.list-group-item
+                        strong Updated on -
+                        | &nbsp;#{moment.utc(lead.updatedAt).tz("Asia/Kolkata").format("MM/DD/YYYY")}, #{moment.utc(lead.updatedAt).tz("Asia/Kolkata").format("h:mm A")}
+                      li.list-group-item
+                        strong Updated by -
+                        if followups.length
+                          | &nbsp;#{followups[0].updatedBy_name}
+                        else 
                           | &nbsp;#{lead.updatedBy_name}
-                      //-div.cta-buttons-wrapper
-                        button.btn.btn-color.btm-block(type="button" onclick="redirectToallmessagewhatsapp()") Send Whatsapp
-                        button.btn.btn-color.btm-block(type="button" onclick="redirectToallmessageemail()") Send Email
+                          
+                    //-div.cta-buttons-wrapper
+                      button.btn.btn-color.btm-block(type="button" onclick="redirectToallmessagewhatsapp()") Send Whatsapp
+                      button.btn.btn-color.btm-block(type="button" onclick="redirectToallmessageemail()") Send Email
 
-                        //- li.list-group-item
-                        //-   strong Current Center -
-                        //-   | #{lead.center_id.center_name}
-                        //- li.list-group-item
-                        //-   strong Last Status -
-                        //-   | #{lead.follow_ups_id.slice(-1)[0].follow_status}
-                        //- li.list-group-item
-                        //-   strong Last Sub Status -
-                        //-   | #{lead.follow_ups_id.slice(-1)[0].follow_sub_status}
-                        //- li.list-group-item
-                        //-   strong Action Planned/Taken -
-                        //-   | #{lead.follow_ups_id.slice(-1)[0].action_taken}
-                        //- li.list-group-item
-                        //-   strong Lead/Enquiry Stage: -
-                        //-   | #{lead.follow_ups_id.slice(-1)[0].enq_stage}
-                        //- li.list-group-item
-                        //-   strong Notes -
-                        //-   | #{lead.follow_ups_id.slice(-1)[0].notes}
-                  if h.checkPermission(session.user, permissionCacheData, "FollowUpAdd") || checkSuperAdmin
-                    if lead.enrolled == 0
-                      form#add_followup.col-md-6.col-lg-6(action=`/admin/lead/add/followup/${lead._id}`, method="POST")
-                        p
-                          strong(style="font-size: 20px;") Update Follow-up →
-                        .row
-                          .col-md-6.col-lg-6
+                      //- li.list-group-item
+                      //-   strong Current Center -
+                      //-   | #{lead.center_id.center_name}
+                      //- li.list-group-item
+                      //-   strong Last Status -
+                      //-   | #{lead.follow_ups_id.slice(-1)[0].follow_status}
+                      //- li.list-group-item
+                      //-   strong Last Sub Status -
+                      //-   | #{lead.follow_ups_id.slice(-1)[0].follow_sub_status}
+                      //- li.list-group-item
+                      //-   strong Action Planned/Taken -
+                      //-   | #{lead.follow_ups_id.slice(-1)[0].action_taken}
+                      //- li.list-group-item
+                      //-   strong Lead/Enquiry Stage: -
+                      //-   | #{lead.follow_ups_id.slice(-1)[0].enq_stage}
+                      //- li.list-group-item
+                      //-   strong Notes -
+                      //-   | #{lead.follow_ups_id.slice(-1)[0].notes}
+                if h.checkPermission(session.user, permissionCacheData, "FollowUpAdd") || checkSuperAdmin
+                  if lead.enrolled == 0
+                    form#add_followup.col-md-6.col-lg-6(action=`/admin/lead/add/followup/${lead._id}`, method="POST")
+                      p
+                        strong(style="font-size: 20px;") Update Follow-up →
+                      .row
+                        .col-md-6.col-lg-6
+                          .form-group
+                            label(for='exampleFormControlSelect1') Stage
+                            span.required-label
+                              input.form-control(type='text' name='stageeee' placeholder='Enter stage' disabled value=(lead.stage == "New Lead" ? "1. New Lead" : lead.stage == "Enquiry Received" ? "2. Enquiry Received" : lead.stage == "Tour Booked" ? "3. Tour Booked" : lead.stage == "Closed-Lead Lost" ? "4. Closed-Lead Lost" : lead.stage == "Post Tour" ? "5. Post Tour" : lead.stage == "Closed-Enquiry Lost" ? "6. Closed-Enquiry Lost" : lead.stage == "Closed - Won" ? "7. Closed - Won" : "Not Provided"))
+                        .col-md-6.col-lg-6
+                          .form-group
+                            label(for='mode') Contacted via
+                            span.required-label *
+                            select#comm_mode.form-control(name='comm_mode', required='')
+                              option(value="") Select Mode
+                              option(value=`call`) Call
+                              option(value=`sms`) SMS
+                              option(value=`whatsapp`) Whatsapp
+                              option(value=`email`) E-mail
+                              option(value=`meeting`) Meeting
+                        .col-md-12.col-lg-12
+                          .form-group
+                            label(for='notes') Notes
+                            textarea#notes(name="notes",style="height:auto !important;width:100%;border:1px solid #ebedf2;border-radius:3px;" rows="6")
+                        .col-md-6.col-lg-6
+                          .form-group
+                            label(for='exampleFormControlSelect1') Select Status
+                            span.required-label *
+                            select#status.form-control(name='follow_status', required='')
+                              option(value='') Select Status
+                              each status in statuses
+                                if status.name !== "New Lead"
+                                  option(value=`${status._id}|${status.name}` data-type=status.type data-stage=status.stage ) #{status.name}
+                        .col-md-6.col-lg-6
+                          .form-group
+                            label(for='exampleFormControlSelect1') Select Sub Status
+                            span.required-label *
+                            select#substatus.form-control(name='follow_sub_status', required='')
+                            //- option(value='') -- Select Sub status
+                        .col-md-6.col-lg-6
+                          #tour_date_card.form-group
+                            label(for='dob') Tour Date
+                            span.required-label *
+                            .input-group
+                              input#tour_date.form-control(type='text' name='tour_date'  autocomplete="off" value="" onkeydown="return false;")
+                              .input-group-append
+                                span.input-group-text
+                                  i.fas.fa-calendar-alt
+                        .col-md-6.col-lg-6
+                          #tour_time_card.form-group
+                            label Tour Time
+                            span.required-label *
+                            .input-group
+                              input#tour_time.form-control(type='text' name='tour_time' )
+                              .input-group-append
+                                span.input-group-text
+                                  i.fa.fa-clock
+                        .col-md-12.col-lg-12
+                          .form-group
+                            label(for='exampleFormControlSelect1') Action Planned / Taken
+                            span.required-label *
+                            select#action_planned.form-control(name='action_taken[]', required='',multiple='multiple' )
+                              each action in actions
+                                option(value=action.name ) #{action.name}
+                        input#stage.form-control(type='hidden' name='stage' placeholder='Enter stage' value=lead.stage)
+                        input#lead_type.form-control(type='hidden' name='lead_type' placeholder='Enter stage' value=lead.type)
+                        .col-md-6.col-lg-6(style="padding-left:5px")
+                          .form-group
+                            .form-check
+                              label.form-check-label
+                                if lead.do_followup == 1
+                                  input.form-check-input(type='checkbox' name='no_followup' id="check_no_followup")
+                                  span.form-check-sign No Follow Up
+                                else
+                                  input.form-check-input(type='checkbox' name='no_followup' id="check_no_followup" checked)
+                                  span.form-check-sign No Follow Up
+                        .col-md-6.col-lg-6(style="padding-left:0px")
+                          .form-group
+                            .form-check
+                              label.form-check-label
+                                if lead.someday_follow == 1
+                                  input.form-check-input(type='checkbox' name='someday' id="someday_followup")
+                                  span.form-check-sign Someday
+                                else
+                                  input.form-check-input(type='checkbox' name='someday' id="someday_followup" checked)
+                                  span.form-check-sign Someday
+                        .col-md-6.col-lg-6
+                          #follow_card.form-group
+                            label(for='dob') Follow-Up Date
+                            span.required-label *
+                            .input-group
+                              input#follow_date.form-control(type='text' name='follow_up_date' required='' autocomplete="off" value="" onkeydown="return false;")
+                              .input-group-append
+                                span.input-group-text
+                                  i.fas.fa-calendar-alt
+                        .col-md-6.col-lg-6
+                          #follow_time.form-group
+                            label Select Time
+                            span.required-label *
+                            .input-group
+                              input#follow_up_time.form-control(type='text' name='follow_up_time'  required="")
+                              .input-group-append
+                                span.input-group-text
+                                  i.fa.fa-clock
+                        //- .col-md-6.col-lg-6
+                          .form-group
+                            label(for='updated_by')
+                            | Updated By
+                            span.required-label
+                            input#updated_by.form-control(type='text' value=currentUser.name disabled)
+                            input.form-control(type='hidden' name="updated_by" value=currentUser._id.toString() disabled hidden)
+                        .col-md-12.col-lg-12
+                          if h.checkPermission(session.user, permissionCacheData, "FollowUpAdd") || checkSuperAdmin
                             .form-group
-                              label(for='exampleFormControlSelect1') Stage
-                              span.required-label
-                                input.form-control(type='text' name='stageeee' placeholder='Enter stage' disabled value=(lead.stage == "New Lead" ? "1. New Lead" : lead.stage == "Enquiry Received" ? "2. Enquiry Received" : lead.stage == "Tour Booked" ? "3. Tour Booked" : lead.stage == "Closed-Lead Lost" ? "4. Closed-Lead Lost" : lead.stage == "Post Tour" ? "5. Post Tour" : lead.stage == "Closed-Enquiry Lost" ? "6. Closed-Enquiry Lost" : lead.stage == "Closed - Won" ? "7. Closed - Won" : "Not Provided"))
-                          .col-md-6.col-lg-6
+                              br
+                              button.btn.btn-block.btn-color.btm-block.sub_form(type="submit") Add follow-Up
+                  else
+                    form#add_followup.col-md-6.col-lg-6
+                      p
+                        strong(style="font-size: 20px;") Already Enrolled →
+                      .row
+                        .col-md-6.col-lg-6
+                          .form-group
+                            label(for='exampleFormControlSelect1') Stage
+                            span.required-label
+                              input.form-control(type='text' name='stageeee' placeholder='Enter stage' disabled value=lead.stage)
+                        .col-md-6.col-lg-6
+                          .form-group
+                            label(for='mode') Contacted via
+                            span.required-label *
+                            input.form-control(type='text' name='comm_mode' disabled value="meeting")
+                        .col-md-12.col-lg-12
+                          .form-group
+                            label(for='notes') Notes
+                            textarea#notes(name="notes",style="height:auto !important;width:100%;border:1px solid #ebedf2;border-radius:3px;" rows="6" disabled) #{followups.length && followups && followups[0].notes ? followups[0].notes : lead.remark}
+                        .col-md-6.col-lg-6
+                          .form-group
+                            label(for='exampleFormControlSelect1') Select Status
+                            span.required-label *
+                            input.form-control(type='text' name='status_id' disabled value=(followups.length && followups && followups[0].follow_status ? followups[0].follow_status : lead.status_id.name))
+                        .col-md-6.col-lg-6
+                          .form-group
+                            label(for='exampleFormControlSelect1') Select Sub Status
+                            span.required-label *
+                            input.form-control(type='text' name='status_id' disabled value=(followups.length && followups && followups[0].follow_sub_status ? followups[0].follow_sub_status : lead.substatus_id.name))
+                        .col-md-12.col-lg-12
+                          .form-group
+                            label(for='exampleFormControlSelect1') Action Planned / Taken
+                            span.required-label *
+                            if followups.length && followups && followups[0].action_taken
+                              input.form-control(type='text' name='action_taken[]' disabled value=followups[0].action_taken ? followups[0].action_taken.toString() : "")
+                            else
+                              input.form-control(type='text' name='action_taken[]' disabled value=(lead.action_taken ? lead.action_taken.toString() : ""))
+                        //- input#stage.form-control(type='hidden' name='stage' placeholder='Enter stage' value=lead.stage)
+                        //- input#lead_type.form-control(type='hidden' name='lead_type' placeholder='Enter stage' value=lead.type)
+                        //-.col-md-6.col-lg-6(style="padding-left:5px")
+                          .form-group
+                            .form-check
+                              label.form-check-label
+                                if lead.do_followup == 1
+                                  input.form-check-input(type='checkbox' name='no_followup' id="check_no_followup")
+                                  span.form-check-sign No Follow Up
+                                else
+                                  input.form-check-input(type='checkbox' name='no_followup' id="check_no_followup" checked)
+                                  span.form-check-sign No Follow Up
+                        //- .col-md-6.col-lg-6(style="padding-left:0px")
+                          .form-group
+                            .form-check
+                              label.form-check-label
+                                if lead.someday_follow == 1
+                                  input.form-check-input(type='checkbox' name='someday' id="someday_followup")
+                                  span.form-check-sign Someday
+                                else
+                                  input.form-check-input(type='checkbox' name='someday' id="someday_followup" checked)
+                                  span.form-check-sign Someday
+                        //- .col-md-6.col-lg-6
+                          #follow_card.form-group
+                            label(for='dob') Follow-Up Date
+                            span.required-label *
+                            .input-group
+                              input#follow_date.form-control(type='text' name='follow_up_date' required='' autocomplete="off" value="" onkeydown="return false;")
+                              .input-group-append
+                                span.input-group-text
+                                  i.fas.fa-calendar-alt
+                        //- .col-md-6.col-lg-6
+                          #follow_time.form-group
+                            label Select Time
+                            span.required-label *
+                            .input-group
+                              input#follow_up_time.form-control(type='text' name='follow_up_time'  required="")
+                              .input-group-append
+                                span.input-group-text
+                                  i.fa.fa-clock
+                        //- .col-md-6.col-lg-6
+                          .form-group
+                            label(for='updated_by')
+                            | Updated By
+                            span.required-label
+                            input#updated_by.form-control(type='text' value=currentUser.name disabled)
+                            input.form-control(type='hidden' name="updated_by" value=currentUser._id.toString() disabled hidden)
+                        //- .col-md-12.col-lg-12
+                          if h.checkPermission(session.user, permissionCacheData, "FollowUpAdd") || checkSuperAdmin
                             .form-group
-                              label(for='mode') Contacted via
-                              span.required-label *
-                              select#comm_mode.form-control(name='comm_mode', required='')
-                                option(value="") Select Mode
-                                option(value=`call`) Call
-                                option(value=`sms`) SMS
-                                option(value=`whatsapp`) Whatsapp
-                                option(value=`email`) E-mail
-                                option(value=`meeting`) Meeting
-                          .col-md-12.col-lg-12
-                            .form-group
-                              label(for='notes') Notes
-                              textarea#notes(name="notes",style="height:auto !important;width:100%;border:1px solid #ebedf2;border-radius:3px;" rows="6")
-                          .col-md-6.col-lg-6
-                            .form-group
-                              label(for='exampleFormControlSelect1') Select Status
-                              span.required-label *
-                              select#status.form-control(name='follow_status', required='')
-                                option(value='') Select Status
-                                each status in statuses
-                                  if status.name !== "New Lead"
-                                    option(value=`${status._id}|${status.name}` data-type=status.type data-stage=status.stage ) #{status.name}
-                          .col-md-6.col-lg-6
-                            .form-group
-                              label(for='exampleFormControlSelect1') Select Sub Status
-                              span.required-label *
-                              select#substatus.form-control(name='follow_sub_status', required='')
-                              //- option(value='') -- Select Sub status
-                          .col-md-6.col-lg-6
-                            #tour_date_card.form-group
-                              label(for='dob') Tour Date
-                              span.required-label *
-                              .input-group
-                                input#tour_date.form-control(type='text' name='tour_date'  autocomplete="off" value="" onkeydown="return false;")
-                                .input-group-append
-                                  span.input-group-text
-                                    i.fas.fa-calendar-alt
-                          .col-md-6.col-lg-6
-                            #tour_time_card.form-group
-                              label Tour Time
-                              span.required-label *
-                              .input-group
-                                input#tour_time.form-control(type='text' name='tour_time' )
-                                .input-group-append
-                                  span.input-group-text
-                                    i.fa.fa-clock
-                          .col-md-12.col-lg-12
-                            .form-group
-                              label(for='exampleFormControlSelect1') Action Planned / Taken
-                              span.required-label *
-                              select#action_planned.form-control(name='action_taken[]', required='',multiple='multiple' )
-                                each action in actions
-                                  option(value=action.name ) #{action.name}
-                          input#stage.form-control(type='hidden' name='stage' placeholder='Enter stage' value=lead.stage)
-                          input#lead_type.form-control(type='hidden' name='lead_type' placeholder='Enter stage' value=lead.type)
-                          .col-md-6.col-lg-6(style="padding-left:5px")
-                            .form-group
-                              .form-check
-                                label.form-check-label
-                                  if lead.do_followup == 1
-                                    input.form-check-input(type='checkbox' name='no_followup' id="check_no_followup")
-                                    span.form-check-sign No Follow Up
-                                  else
-                                    input.form-check-input(type='checkbox' name='no_followup' id="check_no_followup" checked)
-                                    span.form-check-sign No Follow Up
-                          .col-md-6.col-lg-6(style="padding-left:0px")
-                            .form-group
-                              .form-check
-                                label.form-check-label
-                                  if lead.someday_follow == 1
-                                    input.form-check-input(type='checkbox' name='someday' id="someday_followup")
-                                    span.form-check-sign Someday
-                                  else
-                                    input.form-check-input(type='checkbox' name='someday' id="someday_followup" checked)
-                                    span.form-check-sign Someday
-                          .col-md-6.col-lg-6
-                            #follow_card.form-group
-                              label(for='dob') Follow-Up Date
-                              span.required-label *
-                              .input-group
-                                input#follow_date.form-control(type='text' name='follow_up_date' required='' autocomplete="off" value="" onkeydown="return false;")
-                                .input-group-append
-                                  span.input-group-text
-                                    i.fas.fa-calendar-alt
-                          .col-md-6.col-lg-6
-                            #follow_time.form-group
-                              label Select Time
-                              span.required-label *
-                              .input-group
-                                input#follow_up_time.form-control(type='text' name='follow_up_time'  required="")
-                                .input-group-append
-                                  span.input-group-text
-                                    i.fa.fa-clock
-                          //- .col-md-6.col-lg-6
-                            .form-group
-                              label(for='updated_by')
-                              | Updated By
-                              span.required-label
-                              input#updated_by.form-control(type='text' value=currentUser.name disabled)
-                              input.form-control(type='hidden' name="updated_by" value=currentUser._id.toString() disabled hidden)
-                          .col-md-12.col-lg-12
-                            if h.checkPermission(session.user, permissionCacheData, "FollowUpAdd") || checkSuperAdmin
-                              .form-group
-                                br
-                                button.btn.btn-block.btn-color.btm-block.sub_form(type="submit") Add follow-Up
-                    else
-                      form#add_followup.col-md-6.col-lg-6
-                        p
-                          strong(style="font-size: 20px;") Already Enrolled →
-                        .row
-                          .col-md-6.col-lg-6
-                            .form-group
-                              label(for='exampleFormControlSelect1') Stage
-                              span.required-label
-                                input.form-control(type='text' name='stageeee' placeholder='Enter stage' disabled value=lead.stage)
-                          .col-md-6.col-lg-6
-                            .form-group
-                              label(for='mode') Contacted via
-                              span.required-label *
-                              input.form-control(type='text' name='comm_mode' disabled value="meeting")
-                          .col-md-12.col-lg-12
-                            .form-group
-                              label(for='notes') Notes
-                              textarea#notes(name="notes",style="height:auto !important;width:100%;border:1px solid #ebedf2;border-radius:3px;" rows="6" disabled) #{followups.length && followups && followups[0].notes ? followups[0].notes : lead.remark}
-                          .col-md-6.col-lg-6
-                            .form-group
-                              label(for='exampleFormControlSelect1') Select Status
-                              span.required-label *
-                              input.form-control(type='text' name='status_id' disabled value=(followups.length && followups && followups[0].follow_status ? followups[0].follow_status : lead.status_id.name))
-                          .col-md-6.col-lg-6
-                            .form-group
-                              label(for='exampleFormControlSelect1') Select Sub Status
-                              span.required-label *
-                              input.form-control(type='text' name='status_id' disabled value=(followups.length && followups && followups[0].follow_sub_status ? followups[0].follow_sub_status : lead.substatus_id.name))
-                          .col-md-12.col-lg-12
-                            .form-group
-                              label(for='exampleFormControlSelect1') Action Planned / Taken
-                              span.required-label *
-                              if followups.length && followups && followups[0].action_taken
-                                input.form-control(type='text' name='action_taken[]' disabled value=followups[0].action_taken ? followups[0].action_taken.toString() : "")
-                              else
-                                input.form-control(type='text' name='action_taken[]' disabled value=(lead.action_taken ? lead.action_taken.toString() : ""))
-                          //- input#stage.form-control(type='hidden' name='stage' placeholder='Enter stage' value=lead.stage)
-                          //- input#lead_type.form-control(type='hidden' name='lead_type' placeholder='Enter stage' value=lead.type)
-                          //-.col-md-6.col-lg-6(style="padding-left:5px")
-                            .form-group
-                              .form-check
-                                label.form-check-label
-                                  if lead.do_followup == 1
-                                    input.form-check-input(type='checkbox' name='no_followup' id="check_no_followup")
-                                    span.form-check-sign No Follow Up
-                                  else
-                                    input.form-check-input(type='checkbox' name='no_followup' id="check_no_followup" checked)
-                                    span.form-check-sign No Follow Up
-                          //- .col-md-6.col-lg-6(style="padding-left:0px")
-                            .form-group
-                              .form-check
-                                label.form-check-label
-                                  if lead.someday_follow == 1
-                                    input.form-check-input(type='checkbox' name='someday' id="someday_followup")
-                                    span.form-check-sign Someday
-                                  else
-                                    input.form-check-input(type='checkbox' name='someday' id="someday_followup" checked)
-                                    span.form-check-sign Someday
-                          //- .col-md-6.col-lg-6
-                            #follow_card.form-group
-                              label(for='dob') Follow-Up Date
-                              span.required-label *
-                              .input-group
-                                input#follow_date.form-control(type='text' name='follow_up_date' required='' autocomplete="off" value="" onkeydown="return false;")
-                                .input-group-append
-                                  span.input-group-text
-                                    i.fas.fa-calendar-alt
-                          //- .col-md-6.col-lg-6
-                            #follow_time.form-group
-                              label Select Time
-                              span.required-label *
-                              .input-group
-                                input#follow_up_time.form-control(type='text' name='follow_up_time'  required="")
-                                .input-group-append
-                                  span.input-group-text
-                                    i.fa.fa-clock
-                          //- .col-md-6.col-lg-6
-                            .form-group
-                              label(for='updated_by')
-                              | Updated By
-                              span.required-label
-                              input#updated_by.form-control(type='text' value=currentUser.name disabled)
-                              input.form-control(type='hidden' name="updated_by" value=currentUser._id.toString() disabled hidden)
-                          //- .col-md-12.col-lg-12
-                            if h.checkPermission(session.user, permissionCacheData, "FollowUpAdd") || checkSuperAdmin
-                              .form-group
-                                br
-                                button.btn.btn-block.btn-color.btm-block.sub_form(type="submit") Add follow-Up
+                              br
+                              button.btn.btn-block.btn-color.btm-block.sub_form(type="submit") Add follow-Up
 
             if h.checkPermission(session.user, permissionCacheData, "FollowUpListing") || checkSuperAdmin
               .card

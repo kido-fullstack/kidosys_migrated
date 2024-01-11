@@ -414,7 +414,7 @@ $(document).ready(function () {
     $(".waiting-loader-stage-srccat-2").css("display", "block");
     $(".after-loading-stage-srccat-2").css("display", "none");
     if (myHorizontalBarChart3) myHorizontalBarChart3.destroy();
-    ajaxApiCall("GET", `/admin/reports/chart/horizontal/3?startDate=${startDate}&endDate=${endDate}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcCatId}&`, {}, cb);
+    ajaxApiCall("GET", `/admin/reports/chart/horizontal/3?startDate=${dtFormater(startDate)}&endDate=${dtFormater(endDate)}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcCatId}&`, {}, cb);
     // sall("Please wait...", 3500);
   })
 
@@ -505,9 +505,9 @@ $(document).ready(function () {
     // CIRCLE 1
     $(".waiting-loader-circle-1").css("display", "block");
     $(".after-loading-circle-1").css("display", "none");
-    ajaxApiCall("GET", `/admin/reports/chart/circle/1/1?startDate=${startDate}&endDate=${endDate}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcID}`, {}, cb);
-    ajaxApiCall("GET", `/admin/reports/chart/circle/1/2?startDate=${startDate}&endDate=${endDate}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcID}`, {}, cb);
-    ajaxApiCall("GET", `/admin/reports/chart/circle/1/3?startDate=${startDate}&endDate=${endDate}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcID}`, {}, cb);
+    ajaxApiCall("GET", `/admin/reports/chart/circle/1/1?startDate=${dtFormater(startDate)}&endDate=${dtFormater(endDate)}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcID}`, {}, cb);
+    ajaxApiCall("GET", `/admin/reports/chart/circle/1/2?startDate=${dtFormater(startDate)}&endDate=${dtFormater(endDate)}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcID}`, {}, cb);
+    ajaxApiCall("GET", `/admin/reports/chart/circle/1/3?startDate=${dtFormater(startDate)}&endDate=${dtFormater(endDate)}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcID}`, {}, cb);
 
     // BAR GRAPH 1 - LAST 7 DAYS
     $(".waiting-loader-barchart-1").css("display", "block");
@@ -522,38 +522,38 @@ $(document).ready(function () {
     // CIRCLE 2
     $(".waiting-loader-circle-2").css("display", "block");
     $(".after-loading-circle-2").css("display", "none");
-    ajaxApiCall("GET", `/admin/reports/chart/circle/2/1?startDate=${startDate}&endDate=${endDate}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcID}`, {}, cb);
-    ajaxApiCall("GET", `/admin/reports/chart/circle/2/2?startDate=${startDate}&endDate=${endDate}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcID}`, {}, cb);
+    ajaxApiCall("GET", `/admin/reports/chart/circle/2/1?startDate=${dtFormater(startDate)}&endDate=${dtFormater(endDate)}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcID}`, {}, cb);
+    ajaxApiCall("GET", `/admin/reports/chart/circle/2/2?startDate=${dtFormater(startDate)}&endDate=${dtFormater(endDate)}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcID}`, {}, cb);
 
     // Doughnut 1
     $(".waiting-loader-doughnut-1").css("display", "block");
     $(".after-loading-doughnut-1").css("display", "none");
     if (myDoughnutChart) myDoughnutChart.destroy();
-    ajaxApiCall("GET", `/admin/reports/chart/doughnut/1/1?startDate=${startDate}&endDate=${endDate}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcID}`, {}, cb);
+    ajaxApiCall("GET", `/admin/reports/chart/doughnut/1/1?startDate=${dtFormater(startDate)}&endDate=${dtFormater(endDate)}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcID}`, {}, cb);
 
     // Doughnut 2
     $(".waiting-loader-piechart-1").css("display", "block");
     $(".after-loading-piechart-1").css("display", "none");
     if (myPieChart) myPieChart.destroy();
-    ajaxApiCall("GET", `/admin/reports/chart/doughnut/1/2?startDate=${startDate}&endDate=${endDate}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcID}`, {}, cb);
+    ajaxApiCall("GET", `/admin/reports/chart/doughnut/1/2?startDate=${dtFormater(startDate)}&endDate=${dtFormater(endDate)}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcID}`, {}, cb);
 
     // Horizontal bar graph 1
     $(".waiting-loader-piechart-2").css("display", "block");
     $(".after-loading-piechart-2").css("display", "none");
     if (myHorizontalBarChart) myHorizontalBarChart.destroy();
-    ajaxApiCall("GET", `/admin/reports/chart/horizontal/1?startDate=${startDate}&endDate=${endDate}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcID}`, {}, cb);
+    ajaxApiCall("GET", `/admin/reports/chart/horizontal/1?startDate=${dtFormater(startDate)}&endDate=${dtFormater(endDate)}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcID}`, {}, cb);
 
     // Horizontal bar graph 2
     $(".waiting-loader-hori-sta-2").css("display", "block");
     $(".after-loading-hori-sta-2").css("display", "none");
     if (myHorizontalBarChart2) myHorizontalBarChart2.destroy();
-    ajaxApiCall("GET", `/admin/reports/chart/horizontal/2?startDate=${startDate}&endDate=${endDate}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcID}`, {}, cb);
+    ajaxApiCall("GET", `/admin/reports/chart/horizontal/2?startDate=${dtFormater(startDate)}&endDate=${dtFormater(endDate)}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcID}`, {}, cb);
 
     // Horizontal bar graph 3
     $(".waiting-loader-stage-srccat-2").css("display", "block");
     $(".after-loading-stage-srccat-2").css("display", "none");
     if (myHorizontalBarChart3) myHorizontalBarChart3.destroy();
-    ajaxApiCall("GET", `/admin/reports/chart/horizontal/3?startDate=${startDate}&endDate=${endDate}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcCatId}&`, {}, cb);
+    ajaxApiCall("GET", `/admin/reports/chart/horizontal/3?startDate=${dtFormater(startDate)}&endDate=${dtFormater(endDate)}&country=${countryID}&zone=${zoneID}&center=${centerID}&src_cat=${srcCatId}&`, {}, cb);
 
     // MultiBar Chart
     $(".waiting-loader-multiplebarchart-1").css("display", "block");
@@ -591,13 +591,26 @@ var multipleLineChart = document.getElementById('multipleLineChart').getContext(
 
 var multipleBarChart = document.getElementById('multipleBarChart').getContext('2d');
 
+
+function dtFormater(str) {
+ return (moment(str, 'DD/MM/YYYY').toDate()).toISOString().substring(0, 10); 
+}
+
 $(document).ready(function () {
   // console.log($('#date').val());
   var dateVal = $('#date').val()
   var startDateFront = dateVal ? dateVal.split(" - ")[0] : "";
   var endDateFront = dateVal ? dateVal.split(" - ")[1] : "";
-  // console.log(startDateFront)
-  // console.log(endDateFront)
+
+  // console.log(startDateFront);
+  // console.log((moment(startDateFront, 'DD/MM/YYYY').toDate()).toISOString().substring(0, 10));
+  // console.log((moment(endDateFront, 'DD/MM/YYYY').toDate()).toISOString().substring(0, 10));
+
+  startDateFront = dtFormater(startDateFront);
+  endDateFront = dtFormater(endDateFront);
+
+  // console.log( (new Date(startDateFront)).toISOString()  )
+  // console.log( (new Date(endDateFront)).toISOString()  )
   $(".after-loading-barchart-1").hide(0);
   $(".after-loading-barchart-2").hide(0);
 

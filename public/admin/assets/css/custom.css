@@ -1145,3 +1145,7 @@ div.dataTables_filter,div.dataTables_paginate {
 div.buttons {
   clear: both;
 }
+
+.dropdown-menu{
+  width: max-content;
+}
