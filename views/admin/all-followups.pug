@@ -369,12 +369,23 @@ block content
       },
       columns: [
         {
-          data: `_id`,
+          data: '_id',
           bSortable: false,
           render: function (data, type, row) {
-            return `${onlyUserEntry || permissionAddFollow ? `<a class="btn btn-link btn-primary" data-toggle="tooltip" title="followup" data-original-title="Add Follow Up" href="/admin/lead/add/followup/${data}"><i class="fa fa-plus" style="font-size: 17px;"></i></a>` : ''}`
+            return `${onlyUserEntry || permissionAddFollow ? 
+              `<div class="btn-group" role="group">
+                <a class="btn btn-link btn-primary" data-toggle="tooltip" title="followup" data-original-title="Add Follow Up" href="/admin/lead/add/followup/${data}">
+                  <i class="fa fa-plus" style="font-size: 17px;"></i>
+                </a>
+                <button onclick="markUnread('${row._id}')" class="btn btn-link btn-primary tbl-action-btn">
+                  <i class="fas fa-regular ${row.is_external == 1 ? 'fa-envelope-open' : 'fa-envelope'}" style="font-size: 17px;"></i>
+                </button>
+              </div>` 
+              : ''}`;
           }
         },
+
+
         //- {
         //-   data: `_id`,
         //-   bSortable: false,
