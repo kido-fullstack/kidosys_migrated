@@ -99,7 +99,7 @@ exports.allCenter = async (req, res, next) => {
       let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
       centers = await Center.find({ _id: {$in: objectIdArray} }, { school_name: 1, school_display_name: 1 });
     }
-    centers.sort((a, b) => a.school_display_name < b.school_display_name ? -1 : 1)
+    centers.sort((a, b) => a.school_name < b.school_name ? -1 : 1)
     var indexOfHO = -1;
     var HOposbls = ["HEAD OFFICE", "head office", "Others", "Other","HO Centre"];
     centers.forEach((ele,key) => {
