@@ -47,7 +47,7 @@ exports.allResponses = async (req, res, next) => {
                     $regex: req.query.sSearch || "",
                     $options: 'i'
                   }
-                }
+                },
               ]
             }
           },
@@ -1129,6 +1129,12 @@ exports.datatableFilter = async (req, res, next) => {
                     $regex: req.query.sSearch,
                     $options: 'i'
                   }
+                },
+                {
+                  when_to_use: {
+                    $regex: req.query.sSearch,
+                    $options: 'i'
+                  }
                 }
               ]
             }
@@ -1194,7 +1200,6 @@ exports.datatableFilter = async (req, res, next) => {
             '$limit': parseInt(req.query.iDisplayLength)
           }
         ]
-        // console.log("searcjing")
 
         const messages = await Message.aggregate(aggregateQue)
         aggregateQue.splice(aggregateQue.length - 2, 2)
@@ -1249,9 +1254,34 @@ exports.datatableFilter = async (req, res, next) => {
         }
 
       } else {
-        const messages = await Message.aggregate([
+        const messages = await Message.aggregate
+        ([
           {
-            $match: srchFiltr
+            $match: srchFiltr,
+          },
+          {
+            '$match': {
+              $or: [
+                {
+                  title: {
+                    $regex: req.query.sSearch,
+                    $options: 'i'
+                  }
+                },
+                {
+                  msg: {
+                    $regex: req.query.sSearch,
+                    $options: 'i'
+                  }
+                },
+                {
+                  when_to_use: {
+                    $regex: req.query.sSearch,
+                    $options: 'i'
+                  }
+                }
+              ]
+            }
           },
           {
             $sort:{createdAt:-1}
@@ -1301,7 +1331,13 @@ exports.datatableFilter = async (req, res, next) => {
         ])
           .skip(parseInt(req.query.iDisplayStart))
           .limit(parseInt(req.query.iDisplayLength));
+
+
+        // const messages = await Message.aggregate(aggregateQue)
+          
         // console.log(messages,"messages")
+        console.log(messages,"searcjing------------------------")
+
         let totalCountDoc = await Message.countDocuments();
         let finObj = {
           sEcho: req.query.sEcho,
@@ -1348,15 +1384,98 @@ exports.datatableFilter = async (req, res, next) => {
       let centers = await Center.find({_id: {$in: req.session.user.center_id}, status: "active"}).distinct('_id');
 
       if(req.query.sSearch){
-        aggregateQue = [{
-            $match: {
-              srchFiltr,
-              $or:[
-                {center_id: {$in: centers}},
-                {added_by:1}
-              ]
-              // center_id: ObjectId(req.session.user.center_id),
-            }
+        // aggregateQue = [{
+        //     $match: {
+        //       srchFiltr,
+        //       $or:[
+        //         {center_id: {$in: centers}},
+        //         {added_by:1}
+        //       ]
+        //       // center_id: ObjectId(req.session.user.center_id),
+        //     }
+        //   },
+        //   {
+        //     '$match': {
+        //       $or: [
+        //         {
+        //           title: {
+        //             $regex: req.query.sSearch,
+        //             $options: 'i'
+        //           }
+        //         },
+        //         {
+        //           msg: {
+        //             $regex: req.query.sSearch,
+        //             $options: 'i'
+        //           }
+        //         },
+        //         {
+        //           when_to_use: {
+        //             $regex: req.query.sSearch,
+        //             $options: 'i'
+        //           }
+        //         }
+        //       ]
+        //     }
+        //   },
+        //   {
+        //     $lookup: {
+        //       from: "employees",
+        //       localField: "createdBy",
+        //       foreignField: "_id",
+        //       as: "employee",
+        //     }
+        //   },
+        //   {
+        //     $lookup: {
+        //       from: "responses",
+        //       // localField: "_id",
+        //       // foreignField: "msg_id",
+        //       let: { id: '$_id' },
+        //       pipeline: [
+        //           // { $match: { condition: { $exists: true },code:{$exists: true},category: { $exists: true },percentage:{$exists: true} } },
+        //           {
+
+        //               $match: {
+        //                   $expr: {
+        //                       $and: [
+        //                           { $eq: ['$msg_id', '$$id'] },
+        //                           { $eq: ['$center_id', centers] }
+        //                       ]
+        //                   }
+        //               }
+        //           }
+        //       ],
+        //       as: "total",
+        //     },
+        //   },
+        //   {
+        //     $unwind: {
+        //       path: "$total",
+        //       preserveNullAndEmptyArrays: true,
+        //     },
+        //   },
+        //   {
+        //     $sort: {
+        //       "createdAt": -1,
+        //     },
+        //   },
+        //   // {
+        //   //   '$sort': {
+        //   //     [sortingArr[req.query.iSortCol_0 ? req.query.iSortCol_0 : 1]]: req.query.sSortDir_0 == 'asc' ? 1 : -1
+        //   //   }
+        //   // },
+        //   {
+        //     '$skip': parseInt(req.query.iDisplayStart)
+        //   }, {
+        //     '$limit': parseInt(req.query.iDisplayLength)
+        //   }
+        // ]
+
+
+        aggregateQue = [
+          {
+            $match: srchFiltr,
           },
           {
             '$match': {
@@ -1369,6 +1488,12 @@ exports.datatableFilter = async (req, res, next) => {
                 },
                 {
                   msg: {
+                    $regex: req.query.sSearch,
+                    $options: 'i'
+                  }
+                },
+                {
+                  when_to_use: {
                     $regex: req.query.sSearch,
                     $options: 'i'
                   }
@@ -1387,55 +1512,65 @@ exports.datatableFilter = async (req, res, next) => {
           {
             $lookup: {
               from: "responses",
-              // localField: "_id",
-              // foreignField: "msg_id",
-              let: { id: '$_id' },
-              pipeline: [
-                  // { $match: { condition: { $exists: true },code:{$exists: true},category: { $exists: true },percentage:{$exists: true} } },
-                  {
-
-                      $match: {
-                          $expr: {
-                              $and: [
-                                  { $eq: ['$msg_id', '$$id'] },
-                                  { $eq: ['$center_id', centers] }
-                              ]
-                          }
-                      }
-                  }
-              ],
-              as: "total",
+              localField: "_id",
+              foreignField: "msg_id",
+              as: "result",
             },
           },
           {
-            $unwind: {
-              path: "$total",
-              preserveNullAndEmptyArrays: true,
-            },
+            $project:{
+              "_id":1,
+              "title":1,
+              "msg":1,
+              "when_to_use":1,
+              "attachment":1,
+              "type":1,
+              "employee": 1,
+              "result":{
+                $sum:"$result.sent_count"
+              },
+              "createdAt": 1
+            }
           },
           {
-            $sort: {
-              "createdAt": -1,
-            },
+            '$sort': {
+              [sortingArr[req.query.iSortCol_0 ? req.query.iSortCol_0 : 1]]: req.query.sSortDir_0 == 'asc' ? 1 : -1
+            }
           },
           // {
-          //   '$sort': {
-          //     [sortingArr[req.query.iSortCol_0 ? req.query.iSortCol_0 : 1]]: req.query.sSortDir_0 == 'asc' ? 1 : -1
-          //   }
+          //   $lookup: {
+          //     from: "responses",
+          //     localField: "_id",
+          //     foreignField: "msg_id",
+          //     as: "total",
+          //   },
+          // },
+          // {
+          //   $unwind: {
+          //     path: "$total",
+          //     preserveNullAndEmptyArrays: true,
+          //   },
+          // },
+          // {
+          //   $sort: {
+          //     "total.sent_count": -1,
+          //   },
           // },
           {
             '$skip': parseInt(req.query.iDisplayStart)
           }, {
             '$limit': parseInt(req.query.iDisplayLength)
           }
-        ]
+        ];
+        console.log(aggregateQue);
+        
         const messages = await Message.aggregate(aggregateQue)
         aggregateQue.splice(aggregateQue.length - 2, 2)
         // console.log(aggregateQue,"aggregateQue")
         const totalCount = await Message.aggregate(aggregateQue)
           // .skip(parseInt(req.query.iDisplayStart))
           // .limit(parseInt(req.query.iDisplayLength));
-        // console.log("messages--------",messages, "messages--------")
+        console.log("messages--------",messages, "messages--------")
         // let totalCountDoc = await Message.countDocuments({$or:[{center_id: ObjectId(req.session.user.center_id)},{added_by:1}],
         // title: {
         //   $regex: req.query.sSearch,
@@ -1498,6 +1633,12 @@ exports.datatableFilter = async (req, res, next) => {
                 },
                 {
                   msg: {
+                    $regex: req.query.sSearch,
+                    $options: 'i'
+                  }
+                },
+                {
+                  when_to_use: {
                     $regex: req.query.sSearch,
                     $options: 'i'
                   }

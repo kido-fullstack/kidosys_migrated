@@ -133,6 +133,9 @@ block content
         ordering: true,
         lengthMenu: [ [25, 50, 100], [25, 50, 100] ],
         order: [[2, 'desc']],
+        language: {
+          searchPlaceholder: "By ID, When to use..."
+        },
         pagination: true,
         sAjaxSource: "/admin/responses/datatable",
         fnServerParams: function ( data ) {
