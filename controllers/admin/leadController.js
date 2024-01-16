@@ -5988,7 +5988,7 @@ exports.datatableFollowupFilter29May2023 = async (req,res,next) => {
 exports.datatableFollowupFilter = async (req, res, next) => {
   try {
 
-    // -------------------------FOLLOWUP PAGE ----------------------------;
+    // -------------------------FOLLOWUP PAGE DATATABLE ----------------------------;
     // console.log('AAAAAAAAAAA');
     const timeZone = momentZone.tz.guess();
 
