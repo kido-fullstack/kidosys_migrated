@@ -754,9 +754,9 @@ block content
       }, function (start, end, label) {
         $("#dob").val(start.format('YYYY/MM/DD'))
       });
-      $('#dob').on('apply.daterangepicker', function(ev, picker) {
-        $(this).val(picker.startDate.format('DD/MM/YYYY '));
-      });
+      //- $('#dob').on('apply.daterangepicker', function(ev, picker) {
+      //-   $(this).val(picker.startDate.format('DD/MM/YYYY '));
+      //- });
       $('#stage').hide()
       $('#know_us').select2({
         placeholder: "Select Known us",
