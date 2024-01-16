@@ -6000,7 +6000,7 @@ exports.datatableFollowupFilter = async (req, res, next) => {
     // console.log('End of the week:', endOfWeek.format('YYYY-MM-DD'));
     const startDate = startOfWeek.toDate();
     const endDate = endOfWeek.toDate();
-    const dtBgin = new Date("2023-01-01");
+    // const dtBgin = new Date("2023-01-01");
     // console.log("startDate-------", startDate);
     // console.log("endDate-------", endDate);
     // console.log("req.body", req.body);
@@ -6017,7 +6017,7 @@ exports.datatableFollowupFilter = async (req, res, next) => {
       {
         '$match': {
           'follow_due_date': {
-            '$gte': dtBgin,
+            '$gte': startDate,
             '$lte': endDate
           }
         }
