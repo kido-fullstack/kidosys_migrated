@@ -6004,7 +6004,7 @@ exports.datatableFollowupFilter = async (req, res, next) => {
     // console.log("startDate-------", startDate);
     // console.log("endDate-------", endDate);
     // console.log("req.body", req.body);
-    const sortingArr = [" ", "lead_no_val", "lead_date", "updatedAt", "parent_name", "child_first_name", "child_last_name", "stage", "type", `${req.session.user.main && req.session.user.main == req.config.admin.main ? 'school_id.school_display_name' : 'child_first_name'}`, "parent_know_aboutus", "source_category", "programcategory_id.title", "program_id.program_name", "status_id.name","substatus_id.name","lead_no"];
+    const sortingArr = [" ", "lead_no_val", "lead_date", "updatedAt", "parent_name", "source_category", "child_first_name", "child_last_name", "stage", "type", `${req.session.user.main && req.session.user.main == req.config.admin.main ? 'school_id.school_display_name' : 'child_first_name'}`, "programcategory_id.title", "program_id.program_name", "status_id.name", "substatus_id.name", "lead_no"];
     let zoneCount = 0;
     let newArr = [];
     let findQue = {};
