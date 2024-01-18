@@ -6002,9 +6002,9 @@ exports.datatableFollowupFilter = async (req, res, next) => {
     const endDate = endOfWeek.toDate();
     // const dtBgin = new Date("2023-01-01");
     // console.log("startDate-------", startDate);
-    // console.log("endDate-------", endDate);
+    // console.log("endDate-------", endDate);`${req.session.user.main && req.session.user.main == req.config.admin.main ? 'school_id.school_display_name' : 'child_first_name'}`,
     // console.log("req.body", req.body);
-    const sortingArr = [" ", "lead_no_val", "lead_date", "updatedAt", "parent_name", "source_category", "child_first_name", "child_last_name", "stage", "type", `${req.session.user.main && req.session.user.main == req.config.admin.main ? 'school_id.school_display_name' : 'child_first_name'}`, "programcategory_id.title", "program_id.program_name", "status_id.name", "substatus_id.name", "lead_no"];
+    const sortingArr = [" ", "lead_no","updatedAt","follow_due_date","parent_name","source_category","parent_know_aboutus","program_id.program_name", `${req.session.user.main && req.session.user.main == req.config.admin.main ? 'school_id.school_display_name' : 'child_first_name'}`,"stage","status_id.name","substatus_id.name", "lead_no_val", "lead_date",   "child_first_name", "child_last_name",  "type",  "programcategory_id.title",  ];
     let zoneCount = 0;
     let newArr = [];
     let findQue = {};
