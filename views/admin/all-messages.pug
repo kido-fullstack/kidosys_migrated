@@ -29,6 +29,13 @@ block content
         `)
       }
 
+      function filterTable(type) {
+        var table = $('#basic-datatables').DataTable();
+        table.column(7).search(type).draw(); // Assuming 'type' is the column index for the 'type' column
+      }
+
+
+
   .main-panel
     .container
       .panel-header.bg-primary-gradient
@@ -42,6 +49,17 @@ block content
                 a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/message/add') Add Message
               a.btn.btn-white.btn-border.btn-round.mr-2(href='/admin/dashboard') Dashboard
       .page-inner
+        .nav-scroller
+          .nav.nav-tabs.nav-line.nav-color-secondary
+            a.nav-link.show.tabs_switch.active(href='#all', data-toggle='pill', onclick='filterTable("")' style='cursor: pointer;')
+                | All
+            a.nav-link.show.tabs_switch(href='#email', data-toggle='pill', onclick='filterTable("email")' style='cursor: pointer;')
+                | Emails
+            a.nav-link.show.tabs_switch(href='#message', data-toggle='pill', onclick='filterTable("message")' style='cursor: pointer;')
+                | Messages
+            a.nav-link.show.tabs_switch(href='#type-not-provided', data-toggle='pill', onclick='filterTable("type-not-provided")' style='cursor: pointer;')
+                | Type Not Provided
+    
         .row
           .col-md-12
             .card.card-with-nav
@@ -58,43 +76,198 @@ block content
                       option(value='disabled') In-active
                 .table-responsive
                   .col-sm-12
-                    table#basic-datatables.display.table.table-striped.table-hover.dataTable(role='grid', aria-describedby='basic-datatables_info')
-                      thead
-                        tr(role='row')
-                          th(style="display:none") Status
-                          th Title
-                          th When to use
-                          th Preview
-                          th Created on
-                          if session.user && session.user.main == "super_admin"
-                            th Created by
-                          th Status
-                          th type
-                          th Sent Count
-                          th Action
-                      tbody
-                        each message in messages
-                          a(href="#")
-                            tr.odd(role='row')
-                              td(style="display:none") #{message.status == "active" ? "enabled" : "disabled"}
-                              td.sorting_1 #{message.title}
-                                if message.attachment && message.attachment.length
-                                  span#view_attachment.badge.nowrap(onclick=`viewAttachment('${message._id}')`)
-                                    i.fa.fa-paperclip(style='float:right;')
-                              td.sorting_1 #{message.when_to_use}
-                              td
-                                a.btn.btn-link.btn-primary(onclick=`viewMsg(${JSON.stringify(message.msg)});`)
-                                  i.fa.fa-eye
-                              td #{moment(message.createdAt).format("DD/MM/YYYY ")}
-                              if session.user && session.user.main == "super_admin"
-                                td #{message.createdBy && message.createdBy.first_name ? message.createdBy.first_name : "System"} #{message.createdBy && message.createdBy.last_name ? message.createdBy.last_name : "Admin"}
-                              td #{message.status == 'active' ? 'Active' : 'Inactive'}
-                              td #{message.type} 
-                              td #{message.count}
-                              td
-                                if h.checkPermission(session.user, permissionCacheData, "MessageEdit") || checkSuperAdmin
-                                  a.btn.btn-link.btn-primary(href=`/admin/message/edit/${message._id}`)
-                                    i.fa.fa-edit
+                    .tab-content
+                      .tab-pane.fade.show.active(id='all')
+                          table#basic-datatables.display.table.table-striped.table-hover.dataTable(role='grid', aria-describedby='basic-datatables_info')
+                            thead
+                              tr(role='row')
+                                th(style="display:none") Status
+                                th Title
+                                th When to use
+                                th Preview
+                                th Created on
+                                if session.user && session.user.main == "super_admin"
+                                  th Created by
+                                th Status
+                                th type
+                                th Sent Count
+                                th Action
+                            tbody
+                              each message in messages
+                                a(href="#")
+                                  tr.odd(role='row')
+                                    td(style="display:none") #{message.status == "active" ? "enabled" : "disabled"}
+                                    td.sorting_1
+                                      | #{(message.title || '').split(/\s+/).slice(0, 5).join(' ')}
+                                      if (message.title || '').split(/\s+/).length > 5
+                                        br
+                                        | #{(message.title || '').split(/\s+/).slice(5).join(' ')}
+
+                                      if message.attachment && message.attachment.length
+                                        span#view_attachment.badge.nowrap(onclick=`viewAttachment('${message._id}')`)
+                                          i.fa.fa-paperclip(style='float:right;')
+                                    td.sorting_1
+                                      if message.when_to_use
+                                        | #{message.when_to_use.split(/\s+/).slice(0, 7).join(' ')}
+                                        br
+                                        | #{message.when_to_use.split(/\s+/).slice(7).join(' ')}
+                                    td
+                                      a.btn.btn-link.btn-primary(onclick=`viewMsg(${JSON.stringify(message.msg)});`)
+                                        i.fa.fa-eye
+                                    td #{moment(message.createdAt).format("DD/MM/YYYY ")}
+                                    if session.user && session.user.main == "super_admin"
+                                      td #{message.createdBy && message.createdBy.first_name ? message.createdBy.first_name : "System"} #{message.createdBy && message.createdBy.last_name ? message.createdBy.last_name : "Admin"}
+                                    td #{message.status == 'active' ? 'Active' : 'Inactive'}
+                                    td #{message.type} 
+                                    td #{message.count}
+                                    td
+                                      if h.checkPermission(session.user, permissionCacheData, "MessageEdit") || checkSuperAdmin
+                                        a.btn.btn-link.btn-primary(href=`/admin/message/edit/${message._id}`)
+                                          i.fa.fa-edit
+                      .tab-pane.fade.show(id='email')
+                        table#basic-datatables.display.table.table-striped.table-hover.dataTable(role='grid', aria-describedby='basic-datatables_info')
+                          thead
+                              tr(role='row')
+                                th(style="display:none") Status
+                                th Title
+                                th When to use
+                                th Preview
+                                th Created on
+                                if session.user && session.user.main == "super_admin"
+                                  th Created by
+                                th Status
+                                th type
+                                th Sent Count
+                                th Action
+                          tbody
+                              each message in messages
+                                if message.type === 'email'
+                                  a(href="#")
+                                    tr.odd(role='row')
+                                      td(style="display:none") #{message.status == "active" ? "enabled" : "disabled"}
+                                      td.sorting_1
+                                        | #{(message.title || '').split(/\s+/).slice(0, 5).join(' ')}
+                                        if (message.title || '').split(/\s+/).length > 5
+                                          br
+                                          | #{(message.title || '').split(/\s+/).slice(5).join(' ')}
+
+                                        if message.attachment && message.attachment.length
+                                          span#view_attachment.badge.nowrap(onclick=`viewAttachment('${message._id}')`)
+                                            i.fa.fa-paperclip(style='float:right;')
+                                      td.sorting_1
+                                        if message.when_to_use
+                                          | #{message.when_to_use.split(/\s+/).slice(0, 7).join(' ')}
+                                          br
+                                          | #{message.when_to_use.split(/\s+/).slice(7).join(' ')}
+                                      td
+                                        a.btn.btn-link.btn-primary(onclick=`viewMsg(${JSON.stringify(message.msg)});`)
+                                          i.fa.fa-eye
+                                      td #{moment(message.createdAt).format("DD/MM/YYYY ")}
+                                      if session.user && session.user.main == "super_admin"
+                                        td #{message.createdBy && message.createdBy.first_name ? message.createdBy.first_name : "System"} #{message.createdBy && message.createdBy.last_name ? message.createdBy.last_name : "Admin"}
+                                      td #{message.status == 'active' ? 'Active' : 'Inactive'}
+                                      td #{message.type} 
+                                      td #{message.count}
+                                      td
+                                        if h.checkPermission(session.user, permissionCacheData, "MessageEdit") || checkSuperAdmin
+                                          a.btn.btn-link.btn-primary(href=`/admin/message/edit/${message._id}`)
+                                            i.fa.fa-edit
+                      .tab-pane.fade.show(id='message')
+                        table#basic-datatables.display.table.table-striped.table-hover.dataTable(role='grid', aria-describedby='basic-datatables_info')
+                          thead
+                              tr(role='row')
+                                th(style="display:none") Status
+                                th Title
+                                th When to use
+                                th Preview
+                                th Created on
+                                if session.user && session.user.main == "super_admin"
+                                  th Created by
+                                th Status
+                                th type
+                                th Sent Count
+                                th Action
+                          tbody
+                              each message in messages
+                                if message.type === 'message'
+                                  a(href="#")
+                                    tr.odd(role='row')
+                                      td(style="display:none") #{message.status == "active" ? "enabled" : "disabled"}
+                                      td.sorting_1
+                                        | #{(message.title || '').split(/\s+/).slice(0, 5).join(' ')}
+                                        if (message.title || '').split(/\s+/).length > 5
+                                          br
+                                          | #{(message.title || '').split(/\s+/).slice(5).join(' ')}
+
+                                        if message.attachment && message.attachment.length
+                                          span#view_attachment.badge.nowrap(onclick=`viewAttachment('${message._id}')`)
+                                            i.fa.fa-paperclip(style='float:right;')
+                                      td.sorting_1
+                                        if message.when_to_use
+                                          | #{message.when_to_use.split(/\s+/).slice(0, 7).join(' ')}
+                                          br
+                                          | #{message.when_to_use.split(/\s+/).slice(7).join(' ')}
+                                      td
+                                        a.btn.btn-link.btn-primary(onclick=`viewMsg(${JSON.stringify(message.msg)});`)
+                                          i.fa.fa-eye
+                                      td #{moment(message.createdAt).format("DD/MM/YYYY ")}
+                                      if session.user && session.user.main == "super_admin"
+                                        td #{message.createdBy && message.createdBy.first_name ? message.createdBy.first_name : "System"} #{message.createdBy && message.createdBy.last_name ? message.createdBy.last_name : "Admin"}
+                                      td #{message.status == 'active' ? 'Active' : 'Inactive'}
+                                      td #{message.type} 
+                                      td #{message.count}
+                                      td
+                                        if h.checkPermission(session.user, permissionCacheData, "MessageEdit") || checkSuperAdmin
+                                          a.btn.btn-link.btn-primary(href=`/admin/message/edit/${message._id}`)
+                                            i.fa.fa-edit  
+                      .tab-pane.fade.show(id='type-not-provided')
+                        table#basic-datatables.display.table.table-striped.table-hover.dataTable(role='grid', aria-describedby='basic-datatables_info')
+                          thead
+                              tr(role='row')
+                                th(style="display:none") Status
+                                th Title
+                                th When to use
+                                th Preview
+                                th Created on
+                                if session.user && session.user.main == "super_admin"
+                                  th Created by
+                                th Status
+                                th type
+                                th Sent Count
+                                th Action
+                          tbody
+                              each message in messages
+                                if !message.type || (message.type !== 'email' && message.type !== 'message')
+                                  a(href="#")
+                                    tr.odd(role='row')
+                                      td(style="display:none") #{message.status == "active" ? "enabled" : "disabled"}
+                                      td.sorting_1
+                                        | #{(message.title || '').split(/\s+/).slice(0, 5).join(' ')}
+                                        if (message.title || '').split(/\s+/).length > 5
+                                          br
+                                          | #{(message.title || '').split(/\s+/).slice(5).join(' ')}
+
+                                        if message.attachment && message.attachment.length
+                                          span#view_attachment.badge.nowrap(onclick=`viewAttachment('${message._id}')`)
+                                            i.fa.fa-paperclip(style='float:right;')
+                                      td.sorting_1
+                                        if message.when_to_use
+                                          | #{message.when_to_use.split(/\s+/).slice(0, 7).join(' ')}
+                                          br
+                                          | #{message.when_to_use.split(/\s+/).slice(7).join(' ')}
+                                      td
+                                        a.btn.btn-link.btn-primary(onclick=`viewMsg(${JSON.stringify(message.msg)});`)
+                                          i.fa.fa-eye
+                                      td #{moment(message.createdAt).format("DD/MM/YYYY ")}
+                                      if session.user && session.user.main == "super_admin"
+                                        td #{message.createdBy && message.createdBy.first_name ? message.createdBy.first_name : "System"} #{message.createdBy && message.createdBy.last_name ? message.createdBy.last_name : "Admin"}
+                                      td #{message.status == 'active' ? 'Active' : 'Inactive'}
+                                      td #{message.type} 
+                                      td #{message.count}
+                                      td
+                                        if h.checkPermission(session.user, permissionCacheData, "MessageEdit") || checkSuperAdmin
+                                          a.btn.btn-link.btn-primary(href=`/admin/message/edit/${message._id}`)
+                                            i.fa.fa-edit   
   block script
     script(src='/admin/assets/js/common.js')
   script.
@@ -102,8 +275,9 @@ block content
 
          $("#dropdown1").select2();
         var table = $('#basic-datatables').DataTable({
+          lengthMenu: [ [25, 50, 100], [25, 50, 100] ],
           ordering: true,
-          order: [[3, 'desc']],
+          order: [[2, 'desc']],
         });
 
         $('#dropdown1').on('change', function () {
