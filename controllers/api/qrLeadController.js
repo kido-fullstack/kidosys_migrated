@@ -20,6 +20,10 @@ exports.test= async (req,res,next) => {
 }
 
 exports.checkValid = async (req,res,next) => {
+  // let viewOptionId = helper.encryptQr("64c13b0ecb8e8cb4f5066376");
+  // 2NuVQ3zoOgdRm2Z87DIeDjWRhk98-gNMN
+  // let viewOptionId = String.fromCharCode.apply(null, helper.decryptQr(req.params.view_option));
+  // return res.status(200).json({"msg": viewOptionId});
   try{
     // console.log(req.params,"req.body")
     let viewOptionId = helper.decryptQr(req.params.view_option);
