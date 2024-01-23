@@ -1673,7 +1673,7 @@ const processReportsMTD = async (currPage, length, countries, zones, centers, st
 
     if (start || end) {
       // startMonthDate = momentZone.tz(`${start}`, "Asia/Kolkata").startOf('day').toDate();
-      startMonthDate = moment(end, 'DD/MM/YYYY').startOf('day').toDate();
+      startMonthDate = moment(start, 'DD/MM/YYYY').startOf('day').toDate();
       endMonthDate = moment(end, 'DD/MM/YYYY').endOf('day').toDate();
     } else {
       // by default date range should be current month
