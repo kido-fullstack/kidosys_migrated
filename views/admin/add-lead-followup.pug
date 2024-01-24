@@ -588,7 +588,7 @@ block content
                                                   i.fa.fa-eye
                                               else
                                                 | #{lead.initial_notes ? lead.initial_notes : "Not Provided"}
-                                    td #{lead.createdBy_name ? lead.createdBy_name : "Not Provided"}
+                                    td #{lead.parent_know_aboutus ? lead.parent_know_aboutus.length ? lead.parent_know_aboutus[0]  : "Not Provided" : "Not Provided"}
                                     //- //- td #{followup.enq_stage}
                                     //- td #{"Not Provided"}
                                     //- td #{followup.updatedBy_name}
