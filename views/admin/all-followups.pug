@@ -344,7 +344,7 @@ block content
       lengthMenu: [[25, 50, 100], [25, 50, 100]],
       "info": true,
       "dom": 'lfrtip',
-      order: [[2, 'desc']],
+      order: [[3, 'desc']],
       language: {
           searchPlaceholder: "By ID, Name, Number, Email.."
       },
@@ -411,11 +411,17 @@ block content
         {
           data: 'follow_due_date',
           render: function (data, type, row) {
+            //- return row.follow_due_date;
             var regex = /\ba\b/;
+            //- let dueDate = moment(data).format("YYYY-MM-DDTHH:mm:ss.SSSZ");
             let dueDate = moment(data).format("YYYY-MM-DD");
             if (row.follow_due_date) {
               if (row.follow_due_time) {
-                var mainData = moment(`${dueDate} ${row.follow_due_time}`).fromNow();
+                //- var mainData = moment(`${dueDate} ${row.follow_due_time}`).fromNow();
+                //- var mainData1 = moment(`${dueDate} ${row.follow_due_time}`).format("YYYY-MM-DD h:mm A");
+                var mainData1 = moment(data).format("YYYY-MM-DD h:mm A");
+                var mainData = moment(mainData1).fromNow();
+                //- console.log(data,"-----",dueDate,"-------",row.follow_due_date,"-----",mainData1,"-------",row.follow_due_time,"-------",mainData);
                 if (regex.test(mainData)) {
                   mainData = mainData.replace("a", 1)
                 }
