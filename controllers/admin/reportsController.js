@@ -1704,7 +1704,7 @@ const processReportsMTD = async (currPage, length, countries, zones, centers, st
     if (zonesWithCentersGrouped && zonesWithCentersGrouped.length) {
       for (const date of currentPageDates) {
         const repObj = {
-          date: moment(date).format("DD-MMMM-YYYY")
+          date: moment(date).format("ddd, D MMM YYYY")
         };
         let total = 0; // Initialize the total to 0
         for (const [i, center_id] of listOfSchoolsWithIds.entries()) {
@@ -1778,7 +1778,7 @@ const processReportsMTDNonAdmin = async (currPage, length, countries, zones, cen
     if (zonesWithCentersGrouped && zonesWithCentersGrouped.length) {
       for (const date of currentPageDates) {
         const repObj = {
-          date: moment(date).format("DD-MMMM-YYYY")
+          date: moment(date).format("ddd, D MMM YYYY")
         };
         let total = 0; // Initialize the total to 0
         for (const [i, center_id] of listOfSchoolsWithIds.entries()) {
