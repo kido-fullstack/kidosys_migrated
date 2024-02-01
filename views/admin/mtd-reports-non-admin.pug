@@ -579,12 +579,39 @@ block content
         columnDefs: [
           { "width": "20%", "targets": 0 }
         ],
-        drawCallback: function (settings, start, end, max, total, pre) {
+        //- drawCallback: function (settings, start, end, max, total, pre) {
+        //-   var api = this.api();
+        //-   total_records = this.fnSettings().fnRecordsTotal();
+        //-   // Output the data for the visible rows to the browser's console
+        //-   //- console.log( api.rows( {page:'current'} ).data() );
+        //-   //- console.log(table.page.info().page + 1);
+        //- },
+        drawCallback: function(settings) {
           var api = this.api();
-          total_records = this.fnSettings().fnRecordsTotal();
-          // Output the data for the visible rows to the browser's console
-          //- console.log( api.rows( {page:'current'} ).data() );
-          //- console.log(table.page.info().page + 1);
+
+          // Calculate totals
+          var totals = [];
+          api.columns().every(function(index) {
+              if (index !== 0) { // Exclude the first column from sum calculation
+                  var columnData = this.data();
+                  var sum = columnData.reduce(function(a, b) {
+                      return parseFloat(a) + parseFloat(b);
+                  }, 0);
+                  totals.push(sum);
+              }
+          });
+
+          // Insert the total values at the top of the table
+          totalRow.children('th:gt(0)').remove(); // Remove existing total columns
+          totals.forEach(function(sum) {
+              totalRow.append('<th>' + sum + '</th>');
+          });
+
+          // Remove any existing total row
+          $(this.api().table().header()).find('tr.total-row').remove();
+
+          // Insert the total row at the top
+          $(this.api().table().header()).prepend(totalRow.clone().addClass('total-row'));
         },
         fnServerParams: function (data, osettings) {
           //- console.log(data);
