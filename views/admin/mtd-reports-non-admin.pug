@@ -123,11 +123,13 @@ block content
     //- console.log(centers);
 
     $(document).ready(function () {
+      let totalRow = $('<tr>').append('<th>Total</th>');
       var total_records = 0;
       table = $('#mtd_reports').DataTable({
         ordering: false,
         searching: false,
         //- paging: false,
+        //- dom: 'Bfrtip',
         bProcessing: true,
         bServerSide: true,
         lengthMenu: [ [25, 50, 100], [25, 50, 100] ],
@@ -138,12 +140,39 @@ block content
         columnDefs: [
           { "width": "20%", "targets": 0 }
         ],
-        drawCallback: function (settings) {
+        //- drawCallback: function (settings) {
+        //-   var api = this.api();
+        //-   total_records = this.fnSettings().fnRecordsTotal();
+        //-   // Output the data for the visible rows to the browser's console
+        //-   //- console.log( api.rows( {page:'current'} ).data() );
+        //-   //- console.log(table.page.info().page + 1);
+        //- },
+        drawCallback: function(settings) {
           var api = this.api();
-          total_records = this.fnSettings().fnRecordsTotal();
-          // Output the data for the visible rows to the browser's console
-          //- console.log( api.rows( {page:'current'} ).data() );
-          //- console.log(table.page.info().page + 1);
+
+          // Calculate totals
+          var totals = [];
+          api.columns().every(function(index) {
+              if (index !== 0) { // Exclude the first column from sum calculation
+                  var columnData = this.data();
+                  var sum = columnData.reduce(function(a, b) {
+                      return parseFloat(a) + parseFloat(b);
+                  }, 0);
+                  totals.push(sum);
+              }
+          });
+
+          // Insert the total values at the top of the table
+          totalRow.children('th:gt(0)').remove(); // Remove existing total columns
+          totals.forEach(function(sum) {
+              totalRow.append('<th>' + sum + '</th>');
+          });
+
+          // Remove any existing total row
+          $(this.api().table().header()).find('tr.total-row').remove();
+
+          // Insert the total row at the top
+          $(this.api().table().header()).prepend(totalRow.clone().addClass('total-row'));
         },
         fnServerParams: function (data, osettings) {
           //- console.log(data);
@@ -164,34 +193,33 @@ block content
             "value": $('input[name="date_range"]').val()
           });
         },
-        footerCallback: function (tfoot, data, start, end, display) {
-          //- console.log('hihihi');
-          //- console.log(data);
-          var api = this.api();
+        //- footerCallback: function (tfoot, data, start, end, display) {
+        //-   //- console.log('hihihi');
+        //-   //- console.log(data);
+        //-   var api = this.api();
 
-          // Iterate over each column
-          api.columns().every(function (index) {
-            var columnData = this.data();
-            var sum = 0;
+        //-   // Iterate over each column
+        //-   api.columns().every(function (index) {
+        //-     var columnData = this.data();
+        //-     var sum = 0;
 
-            if (index !== 0) { // Exclude the first column from sum calculation
-              sum = columnData.reduce(function (a, b) {
-                // Parsing the data as numbers before summing
-                return parseFloat(a) + parseFloat(b);
-              }, 0);
-            }
+        //-     if (index !== 0) { // Exclude the first column from sum calculation
+        //-       sum = columnData.reduce(function (a, b) {
+        //-         // Parsing the data as numbers before summing
+        //-         return parseFloat(a) + parseFloat(b);
+        //-       }, 0);
+        //-     }
 
-            // Display "Total" in the footer of the first column
-            if (index === 0) {
-              $(this.footer()).html("Total");
-            } else {
-              // Update the footer cell with the sum for other columns
-              $(this.footer()).html(sum);
-            }
-          });
-        }
+        //-     // Display "Total" in the footer of the first column
+        //-     if (index === 0) {
+        //-       $(this.footer()).html("Total");
+        //-     } else {
+        //-       // Update the footer cell with the sum for other columns
+        //-       $(this.footer()).html(sum);
+        //-     }
+        //-   });
+        //- }
       });
-      dom: 'Bfrtip',
       $(document).on('click','#show_filter', function () {
         $('.filter').slideToggle()
       })
@@ -579,39 +607,12 @@ block content
         columnDefs: [
           { "width": "20%", "targets": 0 }
         ],
-        //- drawCallback: function (settings, start, end, max, total, pre) {
-        //-   var api = this.api();
-        //-   total_records = this.fnSettings().fnRecordsTotal();
-        //-   // Output the data for the visible rows to the browser's console
-        //-   //- console.log( api.rows( {page:'current'} ).data() );
-        //-   //- console.log(table.page.info().page + 1);
-        //- },
-        drawCallback: function(settings) {
+        drawCallback: function (settings, start, end, max, total, pre) {
           var api = this.api();
-
-          // Calculate totals
-          var totals = [];
-          api.columns().every(function(index) {
-              if (index !== 0) { // Exclude the first column from sum calculation
-                  var columnData = this.data();
-                  var sum = columnData.reduce(function(a, b) {
-                      return parseFloat(a) + parseFloat(b);
-                  }, 0);
-                  totals.push(sum);
-              }
-          });
-
-          // Insert the total values at the top of the table
-          totalRow.children('th:gt(0)').remove(); // Remove existing total columns
-          totals.forEach(function(sum) {
-              totalRow.append('<th>' + sum + '</th>');
-          });
-
-          // Remove any existing total row
-          $(this.api().table().header()).find('tr.total-row').remove();
-
-          // Insert the total row at the top
-          $(this.api().table().header()).prepend(totalRow.clone().addClass('total-row'));
+          total_records = this.fnSettings().fnRecordsTotal();
+          // Output the data for the visible rows to the browser's console
+          //- console.log( api.rows( {page:'current'} ).data() );
+          //- console.log(table.page.info().page + 1);
         },
         fnServerParams: function (data, osettings) {
           //- console.log(data);
