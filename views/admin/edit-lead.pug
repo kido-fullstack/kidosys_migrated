@@ -527,8 +527,8 @@ block content
             .card-action
               .row
                 .col-md-12
-                  //- button.btn.btn-color.btm-block(type="submit") Save Changes
-                  button.btn.btn-color.btm-block(type="submit" class="btn-save-changes") Save Changes
+                  button.btn.btn-color.btm-block(type="submit") Save Changes
+                  //- button.btn.btn-color.btm-block(type="submit" class="btn-save-changes") Save Changes
 
   block script
     script(type='text/javascript' src='https://cdn.jsdelivr.net/momentjs/latest/moment.min.js')
@@ -579,29 +579,29 @@ block content
         });
       };
 
-      $(document).ready(function() {
-        // Function to check if the "Enrolled" option is selected
-        function isEnrolledSelected() {
-          return $('#substatus option:selected').text().trim().toLowerCase() === 'enrolled';
-        }
+      //- $(document).ready(function() {
+      //-   // Function to check if the "Enrolled" option is selected
+      //-   function isEnrolledSelected() {
+      //-     return $('#substatus option:selected').text().trim().toLowerCase() === 'enrolled';
+      //-   }
 
-        // Initially hide/show the button based on the selected option
-        if (isEnrolledSelected()) {
-          $('.btn-save-changes').hide();
-        } else {
-          $('.btn-save-changes').show();
-        }
+      //-   // Initially hide/show the button based on the selected option
+      //-   if (isEnrolledSelected()) {
+      //-     $('.btn-save-changes').hide();
+      //-   } else {
+      //-     $('.btn-save-changes').show();
+      //-   }
 
-        // Attach an event listener to the dropdown change event
-        $('#substatus').change(function() {
-          // Check if the "Enrolled" option is selected and hide/show the button accordingly
-          if (isEnrolledSelected()) {
-            $('.btn-save-changes').hide();
-          } else {
-            $('.btn-save-changes').show();
-          }
-        });
-      });
+      //-   // Attach an event listener to the dropdown change event
+      //-   $('#substatus').change(function() {
+      //-     // Check if the "Enrolled" option is selected and hide/show the button accordingly
+      //-     if (isEnrolledSelected()) {
+      //-       $('.btn-save-changes').hide();
+      //-     } else {
+      //-       $('.btn-save-changes').show();
+      //-     }
+      //-   });
+      //- });
 
       let checkbox = document.getElementById("checkItem1");
       checkbox.addEventListener( "change", () => {
