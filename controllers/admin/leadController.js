@@ -6051,7 +6051,13 @@ exports.datatableFollowupFilter = async (req, res, next) => {
           // 'includeArrayIndex': 'string',
           // 'preserveNullAndEmptyArrays': true
         }
-      }, {
+      },
+      {
+        '$match':{
+            'status_id.stage': {$ne: "Closed - Won"},
+          },
+      }      
+      , {
         '$lookup': {
           'from': 'centers',
           'localField': 'school_id',
