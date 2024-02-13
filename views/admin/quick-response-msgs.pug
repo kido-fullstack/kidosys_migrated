@@ -308,7 +308,7 @@ block content
       //- return;
       $.ajax({
         method: 'POST',
-        url: `/admin/message/add/from/direct/lead/msg`,
+        url: `/admin/message/edit/${message._id}`,
         data: {
           msg_title: msgTit,
           msg_desc: msgComm,

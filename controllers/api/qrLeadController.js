@@ -147,7 +147,7 @@ exports.addLead = async (req,res,next) => {
 exports.postAddLead = async (req,res,next) => {
   try{
     // console.log('HEYHEYHEYHEYHEYHEYHEY')
-    // console.log(req.body.school_id);
+    // console.log(req.body);
     const zone = await Center.findOne({ _id: req.body.school_id });
     // console.log(zone);
     let secParentName = "";
@@ -179,6 +179,29 @@ exports.postAddLead = async (req,res,next) => {
       sec_parent_second_whatsapp = 1;
       sec_parent_first_whatsapp = 0;
     }
+
+    const leadChk = await Lead.find({ parent_email: req.body.parent_email});
+
+    // console.log(leadChk);
+    let flDate = momentZone.tz(new Date(), "Asia/Kolkata");
+
+    if(leadChk){
+      for (let lead of leadChk) {
+
+        if(lead.child_first_name.trim() == req.body.child_first_name.trim() || lead.child_first_name.trim() == req.body.child_first_name_1.trim() ){
+
+          lead.is_external = 2; // duplicate lead flag
+          lead.is_dup = 1; // this lead is duplicated
+          lead.dup_no = lead.dup_no ? parseInt(lead.dup_no) + 1 : 1; // increase count by 1 for duplicate leads
+          lead.updatedAt = flDate;
+          lead.follow_due_date = flDate;
+          await lead.save();
+          return res.send({ success: true });
+        }
+      }
+    }
+
+    // return res.send({ success: true });
 
     if(req.body.sibling == "on"){
       const randomNumber = Math.floor(100000 + Math.random() * 900000);
@@ -320,6 +343,8 @@ exports.postAddLead = async (req,res,next) => {
       await newLead2.save();
       newLead.is_related = newLead2._id;
       await newLead.save();
+      // return res.send({ success: true });
+
       await mail.send({
         user: req.body.parent_email,
         subject: `Welcome - ${zone.school_display_name}`,
@@ -461,7 +486,7 @@ exports.postAddLead = async (req,res,next) => {
         enrolled: 0,
         follow_due_date: dateByTimeZone,
         follow_due_time : "",
-        is_external: 0,
+        is_external: 1,
         external_source: "",
         sibling: 0,
         is_related: null,

@@ -1704,7 +1704,7 @@ const processReportsMTD = async (currPage, length, countries, zones, centers, st
     if (zonesWithCentersGrouped && zonesWithCentersGrouped.length) {
       for (const date of currentPageDates) {
         const repObj = {
-          date: moment(date).format("DD-MMMM-YYYY")
+          date: moment(date).format("ddd, D MMM YYYY")
         };
         let total = 0; // Initialize the total to 0
         for (const [i, center_id] of listOfSchoolsWithIds.entries()) {
@@ -1746,13 +1746,23 @@ const processReportsMTDNonAdmin = async (currPage, length, countries, zones, cen
     let startMonthDate;
     let endMonthDate;
 
+    // if (start || end) {
+    //   startMonthDate = momentZone.tz(`${start}`, "Asia/Kolkata").startOf('day').toDate();
+    //   endMonthDate = momentZone.tz(`${end}`, "Asia/Kolkata").endOf('day').toDate();
+    // } else {
+    //   // by default date range should be current month
+    //   startMonthDate = currentDate.clone().startOf('month');
+    //   endMonthDate = currentDate.clone().endOf('month');
+    // }
+
     if (start || end) {
-      startMonthDate = momentZone.tz(`${start}`, "Asia/Kolkata").startOf('day').toDate();
-      endMonthDate = momentZone.tz(`${end}`, "Asia/Kolkata").endOf('day').toDate();
+      // startMonthDate = momentZone.tz(`${start}`, "Asia/Kolkata").startOf('day').toDate();
+      startMonthDate = moment(start, 'DD/MM/YYYY').startOf('day').toDate();
+      endMonthDate = moment(end, 'DD/MM/YYYY').endOf('day').toDate();
     } else {
       // by default date range should be current month
       startMonthDate = currentDate.clone().startOf('month');
-      endMonthDate = currentDate.clone().endOf('month');
+      endMonthDate = currentDate.clone().endOf('day');
     }
 
     // get start date and end date of a month
@@ -1778,7 +1788,7 @@ const processReportsMTDNonAdmin = async (currPage, length, countries, zones, cen
     if (zonesWithCentersGrouped && zonesWithCentersGrouped.length) {
       for (const date of currentPageDates) {
         const repObj = {
-          date: moment(date).format("DD-MMMM-YYYY")
+          date: moment(date).format("ddd, D MMM YYYY")
         };
         let total = 0; // Initialize the total to 0
         for (const [i, center_id] of listOfSchoolsWithIds.entries()) {
