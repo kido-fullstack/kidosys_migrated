@@ -289,6 +289,7 @@ block content
                           th Stage
                           th Status
                           th Substatus
+                          //- th Tour Booked
                       tbody
                 .row
   block script
@@ -510,8 +511,9 @@ block content
       "drawCallback": function (settings) {
         console.log(settings);
         const totalEntries = settings.fnRecordsTotal();
-        const message = `${settings.json.newLds} new leads from ${totalEntries} entries`;
-        $('.newleads').html(message);
+          const newLeadsMessage = `${settings.json.newLds} new leads & ${settings.json.prmsoMT} without primary source from ${totalEntries} entries `;
+          //- const prmsoMTMessage = `${settings.json.prmsoMT} leads without any primary source from ${totalEntries} entries`;
+          $('.newleads').html(newLeadsMessage);
         //- newLeadsCount = 0; 
       },
       fnServerParams: function (data) {
