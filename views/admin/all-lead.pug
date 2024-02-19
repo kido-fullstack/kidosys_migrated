@@ -277,6 +277,7 @@ block content
                   .col-sm-12
                     table#all_lead.display.table.table-striped.table-hover.dataTable(role='grid', aria-describedby='basic-datatables_info')
                       h4.newleads(style="caption-side: top; text-align: center; font-weight: bold;")
+                      //- h4.prmsrcleads(style="caption-side: top; text-align: center; font-weight: bold;")
                       thead
                         tr(role='row')
                           th(data-orderable="false") Actions
@@ -925,10 +926,12 @@ block content
 
           const totalEntries = settings.fnRecordsTotal();
           total_records = totalEntries;
-          const message = `${settings.json.newLds} new leads from ${totalEntries} entries`;
-          $('.newleads').html(message);
-          //-  console.log('From Total Entries:', totalEntries);
-          //- newLeadsCount = 0; 
+          const newLeadsMessage = `${settings.json.newLds} new leads & ${settings.json.prmsoMT} without primary source from ${totalEntries} entries `;
+          //- const prmsoMTMessage = `${settings.json.prmsoMT} leads without any primary source from ${totalEntries} entries`;
+          $('.newleads').html(newLeadsMessage);
+          //- $('.prmsrcleads').html(prmsoMTMessage);
+          // console.log('From Total Entries:', totalEntries);
+          // newLeadsCount = 0; 
         },
         columns: colDT,
         fnServerParams: function (data, osettings) {

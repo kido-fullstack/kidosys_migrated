@@ -5014,15 +5014,18 @@ exports.datatableFilter = async (req, res, next) => {
 
     const totalCount = await Lead.aggregate(aggregateQue);
     var newLds = 0;
+    var prmsoMT = 0;
     totalCount.forEach((ele) => {
       (ele.is_external == 1) ? newLds++ : false;
+      (ele.parent_know_aboutus.length == 0) ? prmsoMT++ : false;
     })
 
     let finObj = {
       sEcho: req.query.sEcho,
       iTotalRecords: totalCount.length,
       iTotalDisplayRecords: totalCount.length,
-      newLds: newLds
+      newLds: newLds,
+      prmsoMT: prmsoMT
     };
 
     delete aggregateQue;
@@ -5943,14 +5946,17 @@ exports.datatableFollowupFilter29May2023 = async (req,res,next) => {
     const totalCount = await Followup.aggregate(aggregateQue);
     // console.log(followUps,"followUps")
     var newLds = 0;
+    var prmsoMT = 0;
     totalCount.forEach((ele) => {
       (ele.is_external == 1) ? newLds++ : false;
+      (ele.parent_know_aboutus.length == 0) ? prmsoMT++ : false;
     })
     let finObj = {
       sEcho: req.query.sEcho,
       iTotalRecords: totalCount.length,
       iTotalDisplayRecords: totalCount.length,
-      newLds: newLds
+      newLds: newLds,
+      prmsoMT: prmsoMT
     };
 
     // console.log(followUps);
@@ -6125,7 +6131,7 @@ exports.datatableFollowupFilter = async (req, res, next) => {
           'is_external': 1,
           'is_dup': 1,
           'dup_no': 1,
-          'lead_no_val': 1
+          'lead_no_val': 1,
         }
       }, {
         '$sort': {
@@ -6402,14 +6408,17 @@ exports.datatableFollowupFilter = async (req, res, next) => {
     const totalCount = await Lead.aggregate(aggregateQue);
 
     var newLds = 0;
+    var prmsoMT = 0;
     totalCount.forEach((ele) => {
       (ele.is_external == 1) ? newLds++ : false;
+      (ele.parent_know_aboutus.length == 0) ? prmsoMT++ : false;
     })
     let finObj = {
       sEcho: req.query.sEcho,
       iTotalRecords: totalCount.length,
       iTotalDisplayRecords: totalCount.length,
-      newLds: newLds
+      newLds: newLds,
+      prmsoMT: prmsoMT
     };
 
     delete aggregateQue;
