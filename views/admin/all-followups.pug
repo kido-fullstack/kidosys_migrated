@@ -289,7 +289,7 @@ block content
                           th Stage
                           th Status
                           th Substatus
-                          //- th Tour Booked
+                          th Tour Booked
                       tbody
                 .row
   block script
@@ -507,6 +507,25 @@ block content
             return `${data ? data : 'Not Provided'}`;
           }
         },
+        {
+          data: 'followup_id',
+          render: function (data, type, row) {
+            if(row.stage == "Tour Booked"){
+              if(data.length){
+                let turDt = "Not Provided";
+                data.forEach((ele) => {
+                  ele.tour_date ? turDt = moment(ele.tour_date).format("YYYY-MM-DD HH:mm:ss") : true;
+                });
+                return turDt;
+              }else{
+                return "Not Provided";
+              }
+
+            }else{
+             return "";
+            }
+          }
+        }
       ],
       "drawCallback": function (settings) {
         console.log(settings);

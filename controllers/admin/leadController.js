@@ -6039,6 +6039,13 @@ exports.datatableFollowupFilter = async (req, res, next) => {
           'foreignField': '_id',
           'as': 'status_id'
         }
+      },{
+        '$lookup': {
+          'from': 'followups',
+          'localField': '_id',
+          'foreignField': 'lead_id',
+          'as': 'followup_id'
+        }
       }, 
       {
         '$lookup': {
@@ -6136,6 +6143,7 @@ exports.datatableFollowupFilter = async (req, res, next) => {
           'is_dup': 1,
           'dup_no': 1,
           'lead_no_val': 1,
+          'followup_id.tour_date': 1,
         }
       }, {
         '$sort': {
