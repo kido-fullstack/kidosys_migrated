@@ -4634,7 +4634,8 @@ exports.datatableFilter = async (req, res, next) => {
     // console.log("startDate-------", startDate);
     // console.log("endDate-------", endDate);
     // console.log("req.body", req.body);
-    const sortingArr = [" ","lead_no_val", "lead_date", "updatedAt", "parent_name", "child_first_name", "child_last_name", "stage", "type", `${req.session.user.main && req.session.user.main == req.config.admin.main ? 'school_id.school_display_name' : 'child_first_name'}`, "source_category", "parent_know_aboutus",  "program_id.program_name",  "status_id.name","substatus_id.name", "programcategory_id.title",  "lead_no"];
+    const stages = ["New Lead", "Enquiry Received", "Tour Booked", "Closed-Lead Lost", "Post Tour", "Closed-Enquiry Lost", "Closed - Won"];
+    const sortingArr = [" ","lead_no_val", "lead_date", "updatedAt", "parent_name", "child_first_name", "child_last_name", "stage_sort", "type", `${req.session.user.main && req.session.user.main == req.config.admin.main ? 'school_id.school_display_name' : 'child_first_name'}`, "source_category", "parent_know_aboutus",  "program_id.program_name",  "status_id.name","substatus_id.name", "programcategory_id.title",  "lead_no"];
     // const sortingArr = ["","lead_no","lead_date", "updatedAt", "parent_name","","","stage","","source_category","parent_know_aboutus","","","","source_category","" ,"type", `${req.session.user.main && req.session.user.main == req.config.admin.main ? 'school_id.school_display_name' : 'child_first_name'}`, "parent_know_aboutus", "programcategory_id.title", "program_id.program_name", "status_id.name","substatus_id.name"];
     let zoneCount = 0;
     let newArr = [];
@@ -4715,7 +4716,7 @@ exports.datatableFilter = async (req, res, next) => {
             }
           }
         }
-      }, {
+      },{
         '$unwind': {
           'path': '$program_id',
           'preserveNullAndEmptyArrays': true
@@ -4744,7 +4745,10 @@ exports.datatableFilter = async (req, res, next) => {
           'is_external': 1,
           'is_dup': 1,
           'dup_no': 1,
-          'lead_no_val': 1
+          'lead_no_val': 1,
+          'stage_sort':{
+            $indexOfArray: [stages, "$stage"]
+          }
         }
       }, {
         '$sort': {
