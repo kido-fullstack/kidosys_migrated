@@ -6014,7 +6014,8 @@ exports.datatableFollowupFilter = async (req, res, next) => {
     // console.log("startDate-------", startDate);
     // console.log("endDate-------", endDate);`${req.session.user.main && req.session.user.main == req.config.admin.main ? 'school_id.school_display_name' : 'child_first_name'}`,
     // console.log("req.body", req.body);
-    const sortingArr = [" ", "lead_no","updatedAt","follow_due_date","parent_name","source_category","parent_know_aboutus","program_id.program_name", `${req.session.user.main && req.session.user.main == req.config.admin.main ? 'school_id.school_display_name' : 'child_first_name'}`,"stage","status_id.name","substatus_id.name", "lead_no_val", "lead_date",   "child_first_name", "child_last_name",  "type",  "programcategory_id.title",  ];
+    const stages = ["New Lead", "Enquiry Received", "Tour Booked", "Closed-Lead Lost", "Post Tour", "Closed-Enquiry Lost", "Closed - Won"];
+    const sortingArr = [" ", "lead_no","updatedAt","follow_due_date","parent_name","source_category","parent_know_aboutus","program_id.program_name", `${req.session.user.main && req.session.user.main == req.config.admin.main ? 'school_id.school_display_name' : 'child_first_name'}`,"stage_sort","status_id.name","substatus_id.name", "lead_no_val", "lead_date",   "child_first_name", "child_last_name",  "type",  "programcategory_id.title",  ];
     let zoneCount = 0;
     let newArr = [];
     let findQue = {};
@@ -6144,6 +6145,9 @@ exports.datatableFollowupFilter = async (req, res, next) => {
           'dup_no': 1,
           'lead_no_val': 1,
           'followup_id.tour_date': 1,
+          'stage_sort':{
+            $indexOfArray: [stages, "$stage"]
+          }
         }
       }, {
         '$sort': {
