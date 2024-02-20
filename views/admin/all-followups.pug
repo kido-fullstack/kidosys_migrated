@@ -514,13 +514,12 @@ block content
               if(data.length){
                 let turDt = "Not Provided";
                 data.forEach((ele) => {
-                  ele.tour_date ? turDt = moment(ele.tour_date).format("YYYY-MM-DD HH:mm:ss") : true;
+                  ele.tour_date ? turDt = moment(ele.tour_date).format("YYYY-MM-DD") +"<br>"+ele.tour_time : true;
                 });
                 return turDt;
               }else{
                 return "Not Provided";
               }
-
             }else{
              return "";
             }

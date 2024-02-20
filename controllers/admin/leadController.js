@@ -6145,6 +6145,7 @@ exports.datatableFollowupFilter = async (req, res, next) => {
           'dup_no': 1,
           'lead_no_val': 1,
           'followup_id.tour_date': 1,
+          'followup_id.tour_time': 1,
           'stage_sort':{
             $indexOfArray: [stages, "$stage"]
           }
