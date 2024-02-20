@@ -135,7 +135,7 @@ block content
                       label(for='parent_email') Email Id
                       span.required-label *
                       input#parent_email.form-control(type='text' required='' name='parent_email' placeholder='Enter Email')
-                      p#primary_err(style="display:none;font-size: 13px;color: red;") This email with LD004839 already exist. Use different email address.
+                      p#primary_err.err_p(style="display:none;font-size: 13px;color: red;") This email with LD004839 already exist. Use different email address.
                   .col-md-6.col-lg-6
                     .form-group
                       label(for='parent_education') Education
@@ -328,7 +328,7 @@ block content
                       label(for='secondary_email') Email Id
                       span.required-label *
                       input#secondary_email.form-control(type='text' required="" name='secondary_email' placeholder='Enter Email')
-                      p#secondary_err(style="display:none;font-size: 13px;color: red;") This email with LD004839 already exist. Use different email address.
+                      p#secondary_err.err_p(style="display:none;font-size: 13px;color: red;") This email with LD004839 already exist. Use different email address.
                   .col-md-6.col-lg-6
                     .form-group
                       label(for='secondary_education') Education
@@ -478,33 +478,39 @@ block content
     var programcategorys = !{JSON.stringify(programcategorys)}
 
 
-
     $('.siblingdiv').css('display', 'none')
     $(document).ready(function () {
-      //- $("#parent_email").keyup(function () {
-      //-   $.ajax({
-      //-     method: 'POST',
-      //-     url: `/admin/check/email/validation`,
-      //-     data: {
-      //-       emailId: $('#parent_email').val(),
-      //-       type: "primary"
-      //-     },
-      //-     dataType: 'json',
-      //-     success: function (response) {
-      //-       //- swal.close();
-      //-       console.log(response,"response");
-      //-       if (response && response.data) {
-      //-         $("#primary_err").css("display", "block");
-      //-         $("#primary_err").text(`This email with ${response.data.lead_no} already exist. Use different email address.`);
-      //-         $(".sub_form").prop("disabled", true);
-      //-         sall(`This email with ${response.data.lead_no} already exist. Use different email address.`, 2500)
-      //-       } else {
-      //-         $("#primary_err").css("display", "none");
-      //-         $(".sub_form").prop("disabled", false);
-      //-       }
-      //-     }
-      //-   });
-      //- })
+      $("#parent_email,#secondary_email").blur(function () {
+        var elem = $(this);
+        $.ajax({
+          method: 'POST',
+          url: `/admin/check/email/validation`,
+          data: {
+            emailId: elem.val(),
+            type: "primary"
+          },
+          dataType: 'json',
+          success: function (response) {
+            //- swal.close();
+            console.log(response,"response");
+            if (response && response.data) {
+              elem.siblings('.err_p').css("display", "block");
+              elem.siblings('.err_p').text(`This email with ${response.data.lead_no} already exist. Use different email address.`);
+              $(".sub_form").prop("disabled", true);
+              sall(`This email with ${response.data.lead_no} already exist. Use different email address.`, 2500)
+            } else {
+              let err = 0;
+              $(".err_p").each(function() {
+                $(this).css("display") == 'block' ? err = 1 : true;
+              });
+              if(!err){
+                elem.next().css("display", "none");
+                $(".sub_form").prop("disabled", false);
+              }
+            }
+          }
+        });
+      })
 
       //- $("#secondary_email").keyup(function () {
       //-   $.ajax({
@@ -533,9 +539,18 @@ block content
 
 
       $("#add_lead").submit(function () {
-        $(".sub_form").attr("disabled", true);
-        $('#cover-spin').show(0);
-        return true;
+        let err = 0;
+        $(".err_p").each(function() {
+          $(this).css("display") == 'block' ? err = 1 : true;
+        });
+        if(err){
+          sall(`Please correct form errors.`, 1500);
+          return;
+        }else{
+          $(".sub_form").attr("disabled", true);
+          $('#cover-spin').show(0);
+          return true;
+        }
       });
 
       let checkbox = document.getElementById("checkItem1");
