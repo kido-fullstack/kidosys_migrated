@@ -32,7 +32,7 @@ block content
                     if message.attachment && message.attachment.length
                       button.btn.pull-right.btn-color.btm-block(type="button" onclick=`viewAttachment('${message._id}')` style="margin-bottom:20px;") View Attachment(s)
                     textarea.form-control.quick-response-lead-message-box(rows='10', cols='10', id="msg", name="msg" width='50' required) #{message.msg}
-                    p(style="margin-top: 5px;cursor:pointer;display:inline-block;float:right;" onclick=`editMessageAdd(${JSON.stringify(message.msg)});`) Edit Message Template
+                    p(style="margin-top: 5px;cursor:pointer;display:inline-block;float:right;" onclick=`saveMessage();`) Save Message Template
                     .clearfix
                     if message.attachment && message.attachment.length
                       p(style="margin-top: -43px;") Note: Attachment will not be sent via Whatsapp.
@@ -299,13 +299,11 @@ block content
       });
     }
     function saveMessage() {
-      $.fancybox.close();
-      sall ("Please wait...", 12000);
-      const msgTit = $("#msg_title").val();
-      const msgComm = $("#comment").val();
-      //- console.log("msgTit------", msgTit);
-      //- console.log("msgComm------", msgComm);
-      //- return;
+      sall("Please wait...");
+      const msgTit = $(".quick-response-lead-name").text();
+      const msgComm = CKEDITOR.instances["msg"].getData();
+      //- console.log("msgTit2------", CKEDITOR.instances["msg"].getData());
+      console.log("msgComm------", msgComm);
       $.ajax({
         method: 'POST',
         url: `/admin/message/edit/${message._id}`,
@@ -316,10 +314,9 @@ block content
           status: message.status
         },
         dataType: 'json',
-        success: function (response) {
-          //- console.log(response,"-----response");
-          //- swal.close();
-          window.location.href = `/admin/responses/send/${response.data._id}`;
+        success: function (response) {},
+        complete: function() {
+          console.log($(".swal-overlay").remove());
         }
       });
     }
@@ -563,8 +560,10 @@ block content
 
       var tempDivElement = document.createElement("div");
       tempDivElement.innerHTML = msg;
-      var prsdMsg = tempDivElement.textContent || tempDivElement.innerText || "";
-      console.log(prsdMsg);
+      var prsdMsg = CKEDITOR.instances["msg"].getData();
+      if (checkMedium == "whatsapp") {
+        prsdMsg = tempDivElement.textContent || tempDivElement.innerText || "";
+      }
       let attachment = (message.attachment && message.attachment.length) ? message.attachment : []
       let messageData = {"msg" : prsdMsg, "attachment" :attachment, "subject": $(".quick-response-lead-name").text()}
       //- console.log(messageData,"dataa")
