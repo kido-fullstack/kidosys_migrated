@@ -817,6 +817,11 @@ block content
         var type = $(this).find(':selected').attr('data-type');
         var stage = $(this).find(':selected').attr('data-stage');
 
+        $("#check_no_followup").attr("disabled", false);
+        let noFolDis = ["To call back/followup","Booked a tour","Walked-in","Walked in - Need to follow up","New Lead"];
+
+        noFolDis.indexOf($(this).find(':selected').text()) !== -1 ? $("#check_no_followup").attr("disabled", true) : true;
+
         $("#lead_type").val(type);
         $("#stage").val(stage);
 
