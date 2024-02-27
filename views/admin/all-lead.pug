@@ -246,18 +246,18 @@ block content
                   //-     select#know_us(name='know_us[]' multiple='multiple' data-container="body" data-live-search="true" data-actions-box="true" data-selected-text-format="count > 1").selectpicker
                   //-       each knowus in knowuss
                   //-         option(value=knowus.name) #{knowus.name}
-                  .col-md-3(style="margin-top: -10px;")
-                    .form-group
-                      label(for='stage',style="margin-bottom:0px;") Lead Stage
-                      select#stage(name='stage' data-container="body" data-live-search="true" ).selectpicker
-                        option(value='') Select Stage
-                        option(value="New Lead") 1. New Lead
-                        option(value="Enquiry Received") 2. Enquiry Received
-                        option(value="Tour Booked") 3. Tour Booked
-                        option(value="Closed-Lead Lost") 4. Closed-Lead Lost
-                        option(value="Post Tour") 5. Post Tour
-                        option(value="Closed-Enquiry Lost") 6. Closed-Enquiry Lost
-                        option(value="Closed - Won") 7. Closed - Won         
+                  //- .col-md-3(style="margin-top: -10px;")
+                  //-   .form-group
+                  //-     label(for='stage',style="margin-bottom:0px;") Lead Stage
+                  //-     select#stage(name='stage' data-container="body" data-live-search="true" ).selectpicker
+                  //-       option(value='') Select Stage
+                  //-       option(value="New Lead") 1. New Lead
+                  //-       option(value="Enquiry Received") 2. Enquiry Received
+                  //-       option(value="Tour Booked") 3. Tour Booked
+                  //-       option(value="Closed-Lead Lost") 4. Closed-Lead Lost
+                  //-       option(value="Post Tour") 5. Post Tour
+                  //-       option(value="Closed-Enquiry Lost") 6. Closed-Enquiry Lost
+                  //-       option(value="Closed - Won") 7. Closed - Won         
                   //- .col-md-3(style="margin-top: -10px;")
                   //-   .form-group
                   //-     label(for='status',style="margin-bottom:0px;") Status
@@ -276,6 +276,23 @@ block content
                 .table-responsive
                   .col-sm-12
                     table#all_lead.display.table.table-striped.table-hover.dataTable(role='grid', aria-describedby='basic-datatables_info')
+                      .nav.nav-tabs.nav-line.nav-color-secondary#stage
+                        a.nav-link.show.tabs_switch.active(data-toggle='tab' srchDt='all' style='cursor: pointer;')
+                          | All
+                        a.nav-link.show.tabs_switch(data-toggle='tab' srchDt='New Lead' style='cursor: pointer;')
+                          | New Lead
+                        a.nav-link.show.tabs_switch(data-toggle='tab' srchDt='Enquiry Received' style='cursor: pointer;')
+                          | Enquiry Received
+                        a.nav-link.show.tabs_switch(data-toggle='tab' srchDt='Tour Booked' style='cursor: pointer;')
+                          | Tour Booked
+                        a.nav-link.show.tabs_switch(data-toggle='tab' srchDt='Closed-Lead Lost' style='cursor: pointer;')
+                          | Closed-Lead Lost
+                        a.nav-link.show.tabs_switch(data-toggle='tab' srchDt='Post Tour' style='cursor: pointer;')
+                          | Post Tour
+                        a.nav-link.show.tabs_switch(data-toggle='tab' srchDt='Closed-Enquiry Lost' style='cursor: pointer;')
+                          | Closed-Enquiry Lost  
+                        a.nav-link.show.tabs_switch(data-toggle='tab' srchDt='Closed - Won' style='cursor: pointer;')
+                          | Closed - Won
                       h4.newleads(style="caption-side: top; text-align: center; font-weight: bold;")
                       //- h4.prmsrcleads(style="caption-side: top; text-align: center; font-weight: bold;")
                       thead
@@ -922,6 +939,7 @@ block content
             }
           }
         },
+
         "drawCallback": function (settings) {
 
           const totalEntries = settings.fnRecordsTotal();
@@ -973,6 +991,28 @@ block content
             });
         }
       });
+
+      $('.tabs_switch').on('click', function(e) {
+        
+        $(this).attr("srchDt") == "all" ? table.columns(6).search("").draw() : false;
+        $(this).attr("srchDt") == "New Lead" ? table.columns(6).search("New Lead").draw() : false;
+        $(this).attr("srchDt") == "Enquiry Received" ? table.columns(6).search("Enquiry Received").draw() : false;
+        $(this).attr("srchDt") == "Tour Booked" ? table.columns(6).search("Tour Booked").draw() : false;
+        $(this).attr("srchDt") == "Closed-Lead Lost" ? table.columns(6).search("Closed-Lead Lost").draw() : false;
+        $(this).attr("srchDt") == "Post Tour" ? table.columns(6).search("Post Tour").draw() : false;
+        $(this).attr("srchDt") == "Closed-Enquiry Lost" ? table.columns(6).search("Closed-Enquiry Lost").draw() : false;
+        $(this).attr("srchDt") == "Closed - Won" ? table.columns(6).search("Closed - Won").draw() : false;
+
+        //- table.columns(0).search("Tour Booked").draw();
+          //-       table
+          //- .columns(6)
+          //- .search("Tour Booked")
+          //- .draw();
+
+        //- console.log(table);
+
+      });
+
 
       $("#ExportReporttoExcel").on("click", function() {
         //- table.button('.buttons-excel').trigger();

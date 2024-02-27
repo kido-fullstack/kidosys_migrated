@@ -271,6 +271,24 @@ block content
                 .table-responsive
                   .col-sm-12
                     table#basic-datatables.display.table.table-striped.table-hover.dataTable(role='grid', aria-describedby='basic-datatables_info')
+                      .nav.nav-tabs.nav-line.nav-color-secondary#stage
+                        a.nav-link.show.tabs_switch.active(data-toggle='tab' srchDt='all' style='cursor: pointer;')
+                          | All
+                        a.nav-link.show.tabs_switch(data-toggle='tab' srchDt='today' style='cursor: pointer;')
+                          | Today
+                        a.nav-link.show.tabs_switch(data-toggle='tab' srchDt='Tomorrow' style='cursor: pointer;')
+                          | Tomorrow
+                        a.nav-link.show.tabs_switch(data-toggle='tab' srchDt='Yesterday' style='cursor: pointer;')
+                          | Yesterday
+                        a.nav-link.show.tabs_switch(data-toggle='tab' srchDt='This Week' style='cursor: pointer;')
+                          | This Week
+                        a.nav-link.show.tabs_switch(data-toggle='tab' srchDt='This Month' style='cursor: pointer;')
+                          | This Month
+                        a.nav-link.show.tabs_switch(data-toggle='tab' srchDt='Last 90 Days' style='cursor: pointer;')
+                          | Last 90 Days
+                        a.nav-link.show.tabs_switch(data-toggle='tab' srchDt='Overdue(All)' style='cursor: pointer;')
+                          | Overdue(All)  
+
                       h4.newleads(style="caption-side: top; text-align: center; font-weight: bold;") 
                       thead
                         tr(role='row')
@@ -1090,6 +1108,55 @@ block content
       }
       //- cb(moment().startOf('isoWeek'), moment().endOf('isoWeek'));
       cb(moment("01/01/2023"), moment());
+
+      $('.tabs_switch').on('click', function(e) {
+          var start = null, end = null;
+
+          if ($(this).attr("srchDt") == "all") {
+              // No filtering for "all"
+          } else if ($(this).attr("srchDt") == "Today") {
+              start = 0;
+              end = 0;
+          } else if ($(this).attr("srchDt") == "Tomorrow") {
+              start = 1;
+              end = 1;
+          } else if ($(this).attr("srchDt") == "Yesterday") {
+              start = 1;
+              end = 1;
+          } else if ($(this).attr("srchDt") == "This Week") {
+              start = 7;
+          } else if ($(this).attr("srchDt") == "This Month") {
+              start = 30;
+          } else if ($(this).attr("srchDt") == "Last 90 Days") {
+              start = 90;
+          } else if ($(this).attr("srchDt") == "Overdue(All)") {
+              start = 500;
+          }
+
+          if (start !== null) {
+              var yesterdayStartDate = moment().subtract(start, 'days').format('YYYY/MM/DD');
+              var yesterdayEndDate = moment().subtract(end, 'days').format('YYYY/MM/DD');
+
+              table
+                  .columns(4) // for start date
+                  .search(yesterdayStartDate) // for start date
+                  .columns(5) // for end date
+                  .search(yesterdayEndDate) // for end date
+                  .draw();
+          } else {
+              // Clear any existing search
+              table
+                  .columns(4) // for start date
+                  .search('') // clear search
+                  .columns(5) // for end date
+                  .search('') // clear search
+                  .draw();
+          }
+          
+          $("#clr_date_range").css('visibility', 'visible');
+      });
+
+
 
       $('input[name="date_range"]').on('apply.daterangepicker', function(ev, picker) {
           $(this).val(picker.startDate.format('YYYY/MM/DD') + ' - ' + picker.endDate.format('YYYY/MM/DD'));
