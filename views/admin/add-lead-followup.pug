@@ -251,14 +251,26 @@ block content
                             select#status.form-control(name='follow_status', required='')
                               option(value='') Select Status
                               each status in statuses
-                                if status.name !== "New Lead"
+                                if status.name == "New Lead"
+                                  if lead.status_id.name == "New Lead"
+                                    - temp = JSON.stringify(status._id)
+                                    option(value=`${status._id}|${status.name}` selected disabled data-type=status.type data-stage=status.stage ) #{status.name}
+                                else
                                   option(value=`${status._id}|${status.name}` data-type=status.type data-stage=status.stage ) #{status.name}
                         .col-md-6.col-lg-6
                           .form-group
                             label(for='exampleFormControlSelect1') Select Sub Status
                             span.required-label *
                             select#substatus.form-control(name='follow_sub_status', required='')
-                            //- option(value='') -- Select Sub status
+                              each substatus in substatuses
+                                if temp == JSON.stringify(substatus.status_id)
+                                  option(value=`${substatus._id}|${substatus.name}` ) #{substatus.name}
+
+                              //- if temp
+                              //-   each substatus in substatuses
+                              //-     if temp == substatus.status_id
+                              //-       option(value=`${substatus._id}|${substatus.name}` ) #{substatus.name}
+                                
                         .col-md-6.col-lg-6
                           #tour_date_card.form-group
                             label(for='dob') Tour Date
@@ -602,10 +614,11 @@ block content
   script.
     var followups = !{JSON.stringify(followups)}
     var substatuses = !{JSON.stringify(substatuses)}
+    var statuses = !{JSON.stringify(statuses)}
     var lead = !{JSON.stringify(lead)}
     var timezone = !{JSON.stringify(timezone)}
 
-    console.log(timezone, "---from server");
+    //- console.log(statuses, "---from server");
 
     $(document).ready(function() {
       $("#tour_date_card").hide();
@@ -803,6 +816,11 @@ block content
         var statusId = $(this).val();
         var type = $(this).find(':selected').attr('data-type');
         var stage = $(this).find(':selected').attr('data-stage');
+
+        $("#check_no_followup").attr("disabled", false);
+        let noFolDis = ["To call back/followup","Booked a tour","Walked-in","Walked in - Need to follow up","New Lead"];
+
+        noFolDis.indexOf($(this).find(':selected').text()) !== -1 ? $("#check_no_followup").attr("disabled", true) : true;
 
         $("#lead_type").val(type);
         $("#stage").val(stage);
