@@ -254,7 +254,7 @@ block content
                                 if status.name == "New Lead"
                                   if lead.status_id.name == "New Lead"
                                     - temp = JSON.stringify(status._id)
-                                    option(value=`${status._id}|${status.name}` selected disabled data-type=status.type data-stage=status.stage ) #{status.name}
+                                    option(value=`${status._id}|${status.name}` selected  data-type=status.type data-stage=status.stage ) #{status.name}
                                 else
                                   option(value=`${status._id}|${status.name}` data-type=status.type data-stage=status.stage ) #{status.name}
                         .col-md-6.col-lg-6
