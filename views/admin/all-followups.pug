@@ -1115,33 +1115,34 @@ block content
           if ($(this).attr("srchDt") == "all") {
               // No filtering for "all"
           } else if ($(this).attr("srchDt") == "Today") {
-              start = 0;
-              end = 0;
+              start = moment().format('YYYY/MM/DD');
+              end = moment().format('YYYY/MM/DD');
           } else if ($(this).attr("srchDt") == "Tomorrow") {
-              start = 1;
-              end = 1;
+              start = moment().add(1, 'day').format('YYYY/MM/DD');
+              end = moment().add(1, 'day').format('YYYY/MM/DD');
           } else if ($(this).attr("srchDt") == "Yesterday") {
-              start = 1;
-              end = 1;
+              start = moment().subtract(1, 'day').format('YYYY/MM/DD');
+              end = moment().subtract(1, 'day').format('YYYY/MM/DD');
           } else if ($(this).attr("srchDt") == "This Week") {
-              start = 7;
+              start = moment().startOf('week').format('YYYY/MM/DD');
+              end = moment().endOf('week').format('YYYY/MM/DD');
           } else if ($(this).attr("srchDt") == "This Month") {
-              start = 30;
+              start = moment().startOf('month').format('YYYY/MM/DD');
+              end = moment().endOf('month').format('YYYY/MM/DD');
           } else if ($(this).attr("srchDt") == "Last 90 Days") {
-              start = 90;
+              start = moment().subtract(90, 'day').format('YYYY/MM/DD');
+              end = moment().format('YYYY/MM/DD');
           } else if ($(this).attr("srchDt") == "Overdue(All)") {
-              start = 500;
+              start = moment().subtract(1900, 'day').format('YYYY/MM/DD');
+              end = moment().format('YYYY/MM/DD');
           }
 
           if (start !== null) {
-              var yesterdayStartDate = moment().subtract(start, 'days').format('YYYY/MM/DD');
-              var yesterdayEndDate = moment().subtract(end, 'days').format('YYYY/MM/DD');
-
               table
                   .columns(4) // for start date
-                  .search(yesterdayStartDate) // for start date
+                  .search(start) // for start date
                   .columns(5) // for end date
-                  .search(yesterdayEndDate) // for end date
+                  .search(end) // for end date
                   .draw();
           } else {
               // Clear any existing search
