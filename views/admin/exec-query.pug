@@ -105,7 +105,7 @@ block content
         $.ajax({
           method: 'POST',
           url: `/admin/reports/execQuery`,
-          data: {qString: $("#queryInp").val(),tblNm: "Lead"},
+          data: {qString: $("#queryInp").val(),tblNm: $("#colecSn").val()},
           dataType: 'json',
           success: function (response) {
 

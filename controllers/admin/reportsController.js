@@ -637,34 +637,7 @@ exports.execQueryRun = async (req, res, next) => {
       }
       return stage;
     });
-   let temp = 
-   [
-     {
-       $match: {
-         createdAt: {
-           $gte: new Date('2023-01-01T00:00:00.000Z')
-         }
-       }
-     },
-     { $limit: 5 },
-     {
-       $project: {
-         lead_no: 1,
-         lead_date: 1,
-         createdAt: 1,
-         updatedAt: 1,
-         parent_name: 1,
-         child_first_name: 1,
-         child_last_name: 1,
-         stage: 1,
-         type: 1,
-         dup_no: 1,
-         lead_no_val: 1
-       }
-     }
-   ];
-
-    const collection = mongoose.model("Lead");
+    const collection = mongoose.model(req.body.tblNm);
     
     let centers = await collection.aggregate(
       qPipline,
