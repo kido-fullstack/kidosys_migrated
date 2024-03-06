@@ -36,6 +36,15 @@ router.get('/mtd/all',
   reportsController.mtdLeadsReports
 );
 
+router.get('/execQuery',
+  // handlers.requirePermission(permission_name.REPORT_MTD),
+  reportsController.execQueryView
+);
+router.post('/execQuery',
+  // handlers.requirePermission(permission_name.REPORT_MTD),
+  reportsController.execQueryRun
+);
+
 router.get('/datatable/mtd',
   reportsController.mtdDatatableLeadsReports
 );

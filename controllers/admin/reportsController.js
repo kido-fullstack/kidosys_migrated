@@ -618,6 +618,87 @@ exports.exportLeads = async (req, res, next) => {
   }
 };
 
+exports.execQueryRun = async (req, res, next) => {
+
+  try{
+
+    let qPipline = JSON.parse(req.body.qString);
+
+    qPipline = qPipline.map(stage => {
+      if (stage.hasOwnProperty('$match')){
+        const keys = Object.keys(stage.$match);
+        const value = stage.$match[keys[0]];
+        if (typeof value === 'object') {
+          value.hasOwnProperty('$gte') ? stage.$match[keys[0]].$gte = new Date(value.$gte) : true;
+          value.hasOwnProperty('$lte') ? stage.$match[keys[0]].$lte = new Date(value.$lte) : true;
+          value.hasOwnProperty('$gt') ? stage.$match[keys[0]].$gt = new Date(value.$gt) : true;
+          value.hasOwnProperty('$lt') ? stage.$match[keys[0]].$lt = new Date(value.$lt) : true;
+        }
+      }
+      return stage;
+    });
+   let temp = 
+   [
+     {
+       $match: {
+         createdAt: {
+           $gte: new Date('2023-01-01T00:00:00.000Z')
+         }
+       }
+     },
+     { $limit: 5 },
+     {
+       $project: {
+         lead_no: 1,
+         lead_date: 1,
+         createdAt: 1,
+         updatedAt: 1,
+         parent_name: 1,
+         child_first_name: 1,
+         child_last_name: 1,
+         stage: 1,
+         type: 1,
+         dup_no: 1,
+         lead_no_val: 1
+       }
+     }
+   ];
+
+    const collection = mongoose.model("Lead");
+    
+    let centers = await collection.aggregate(
+      qPipline,
+      // temp,
+      { maxTimeMS: 60000, allowDiskUse: true }
+    );
+    // const centers = await mongoose.Query;
+
+    return res.send(centers);  
+
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "exportLeads not working - get request", req.originalUrl, req.body, {}, "redirect", __filename);
+    next(err);
+    return;
+  }
+
+
+}
+
+exports.execQueryView = async (req, res, next) => {
+  // const collections = await mongoose.connection.db.listCollections().toArray();
+  let collections = {};
+  mongoose.modelNames().forEach(modelName => {
+    const modl = mongoose.model(modelName);
+    const fields = Object.keys(modl.schema.paths);
+    collections[modelName] = fields;
+  });
+
+  res.render('admin/exec-query', {
+    title: "Exe Reports",
+    collections:collections
+  });
+
+}
 exports.exportFollowups = async (req, res, next) => {
   try {
     const timeZone = momentZone.tz.guess();
