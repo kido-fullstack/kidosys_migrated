@@ -169,9 +169,10 @@ html(lang='en')
 												li
 													a(href='/admin/reports/ytd/all')
 														span.sub-item YTD Reports
-											li
-												a(href='/admin/reports/execQuery')
-													span.sub-item Run Query
+											if ["new@pass.in"].indexOf(session.user.email)  !== -1
+												li
+													a(href='/admin/reports/execQuery')
+														span.sub-item #{session.user.email}
 							//- li.nav-item
 								a.collapsed(href='/admin/client/all')
 									i.far.fa-address-book
