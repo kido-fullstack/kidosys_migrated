@@ -15,12 +15,12 @@ block content
                 div.form-group
                   a#MTDReporttoExcel.btn.btn-white.btn-border.btn-round.mr-2(href='javascript:void(0)',style="height: 45px;margin-top: 0px;") Export to Excel
                   a#clear_filter.btn.btn-white.btn-border.btn-round.mr-2(href='javascript:void(0)',style="height: 45px;margin-top: 0px;") Clear Filter
-      if ["new@pass.in"].indexOf(session.user.email)  == -1
+      if ["new@pass.in"].indexOf(session.user.email)  !== -1
         .page-inner
           .row
             .col-2
               span
-                select#colecSn(name="")
+                select#colecSn(name="") 
                   option(value="") Select Table
               span 
                 button#runQuery Run Query
