@@ -115,6 +115,7 @@ block content
               let rows = "";
               //- console.log(response);
               let excludeFlds = ["_id"];
+              let hedFlds = [];
 
               if(response.length){
 
@@ -125,8 +126,9 @@ block content
                       $.each(v, function(k1, v1) {
 
                           if(excludeFlds.indexOf(k1) == -1){
-                            if(k == 0){
+                            if(hedFlds.indexOf(k1) == -1){
                               hdngs += "<th>"+hedStr(k1)+"</th>";
+                              hedFlds.push(k1);
                             }
                             rows += "<td>"+v1+"</td>";
                           }
