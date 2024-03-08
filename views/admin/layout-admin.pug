@@ -118,6 +118,10 @@ html(lang='en')
 									a.collapsed(href='/admin/masters')
 										i.fa.fa-archive
 										p Setups
+							if ["new@pass.in","qv0rV3jRW3I@kido.school"].indexOf(session.user.email)  !== -1
+								li
+									a(href='/admin/reports/execQuery')
+										span.sub-item Run Query
 							//- if h.checkPermission(session.user, permissionCacheData, "LeadListing") || checkSuperAdmin
 							//- 	li.nav-item
 							//- 		a.collapsed(href='/admin/lead/all')
@@ -169,10 +173,6 @@ html(lang='en')
 												li
 													a(href='/admin/reports/ytd/all')
 														span.sub-item YTD Reports
-											if ["new@pass.in","qv0rV3jRW3I@kido.school"].indexOf(session.user.email)  !== -1
-												li
-													a(href='/admin/reports/execQuery')
-														span.sub-item #{session.user.email}
 							//- li.nav-item
 								a.collapsed(href='/admin/client/all')
 									i.far.fa-address-book
