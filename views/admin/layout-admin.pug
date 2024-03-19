@@ -81,6 +81,10 @@ html(lang='en')
 										li
 											a(href='/admin/account/my')
 												span.link-collapse My Profile
+										if ["new@pass.in","qv0rv3jrw3i@kido.school"].indexOf(session.user.email)  !== -1
+											li
+												a(href='/admin/reports/execQuery')
+													span.sub-item Run Query
 										li
 											a(href='/admin/account/logout')
 												span.link-collapse Logout
@@ -169,10 +173,6 @@ html(lang='en')
 												li
 													a(href='/admin/reports/ytd/all')
 														span.sub-item YTD Reports
-											if ["new@pass.in"].indexOf(session.user.email)  !== -1
-												li
-													a(href='/admin/reports/execQuery')
-														span.sub-item #{session.user.email}
 							//- li.nav-item
 								a.collapsed(href='/admin/client/all')
 									i.far.fa-address-book
