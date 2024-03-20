@@ -50,7 +50,7 @@ block content
                           | &nbsp;#{lead.type.toUpperCase()}
                       li.list-group-item
                         strong LD Date -
-                        | &nbsp;#{moment.utc(lead.createdAt).tz("Asia/Kolkata").format("Do MMM YYYY")}
+                        | &nbsp;#{moment(lead.lead_date).format('Do MMM YYYY').toString().toUpperCase()}
                       //- li.list-group-item
                         strong Lead No -
                         | &nbsp;#{lead.lead_no}
