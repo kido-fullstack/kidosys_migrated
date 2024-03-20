@@ -229,6 +229,7 @@ exports.exportLeads = async (req, res, next) => {
           'zone_id': 1,
           'source_category': 1,
           'parent_know_aboutus': 1,
+          'parent_email': 1,
           'programcategory_id.title': 1,
           'program_id.program_name': 1,
           'status_id.name': 1,
@@ -473,6 +474,11 @@ exports.exportLeads = async (req, res, next) => {
           headerStyle: {},
           width: 120
         },
+        parent_email: {
+          displayName: "Parent Email",
+          headerStyle: {},
+          width: 120
+        },        
         leadDate: {
           displayName: "Lead Date",
           headerStyle: {},
@@ -570,6 +576,7 @@ exports.exportLeads = async (req, res, next) => {
           center: lead.school_id.school_display_name,
           walkins: getLeadType(lead.type ? lead.type : ""),
           lead_id: lead.lead_no,
+          parent_email: lead.parent_email,
           leadDate: lead.lead_date ? moment.utc(lead.lead_date).tz("Asia/Kolkata").format("DD/MM/YYYY ") : "",
           leadUpdatedDate: lead.updatedAt ? moment.utc(lead.updatedAt).tz("Asia/Kolkata").format("DD/MM/YYYY  h:mm A") : "",
           dueIn: dueDateFormatWithMoment(lead.follow_due_date ? lead.follow_due_date : "", lead.follow_due_time),
