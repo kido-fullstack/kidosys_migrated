@@ -133,6 +133,9 @@ exports.getAddCenter = async (req, res, next) => {
 // };
 
 exports.postAddCenter = async(req,res,next) => {
+
+  console.log(req.body);
+
   try {
     // console.log(req.body,"adding center");
     // console.log(req.session);
@@ -152,8 +155,8 @@ exports.postAddCenter = async(req,res,next) => {
       program_id:req.body.program_id || null,
       action_taken: [],
       setup_type:req.body.setup_type,
-      agreement_term_start:req.body.agreement_term_start,
-      agreement_term_end:req.body.agreement_term_end,
+      agreement_term_start:  moment(req.body.agreement_term_start, 'DD/MM/YYYY').toDate(),
+      agreement_term_end: moment(req.body.agreement_term_end, 'DD/MM/YYYY').toDate(),
       no_of_room:req.body.no_of_room,
       school_code:schoolCode,
       size_of_school:req.body.size_of_school,
