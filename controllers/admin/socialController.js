@@ -11,7 +11,7 @@ const axios = require('axios');
 const mail = require("../../handlers/mail");
 const OLD_FACEBOOK_PAGE_ACCESS_TOKEN = 'EAAXPWqCw9K0BAKYzqmISs2vHGVpIsQbuYqrMHINN3k530XHVF3oon0WLg8RYuqmiSpQDewyU93vjaIyb8uadhZBGZCKmPWfaDdyGhLutqVNVunPJQT3K8RkT4ZATn2EpKAf6ZCCLRrLL2gDgBpimoaflePx2XjtntnYeJ7GC1nfW9bRWQ0KWzPDemXdQhdEZD';
 
-const FACEBOOK_PAGE_ACCESS_TOKEN = 'EAAMXu6IFVZBYBOZCKZAorugZCeHvRcqNGw1jvL4ffnfkTltfKQlZB7JXygrsMR4e2PabrowhVvS72QvXKq8xz75xbjfGC3LcvYya1DM5thbfgS9IMNmnr3rX1pkVk7WaUN79rZCKhXMGUUUhrVM96xtgHlxNAcjvJmGbZA3f09i3tdiNZAQfWwZA4iyyw';
+const FACEBOOK_PAGE_ACCESS_TOKEN = 'EAAMXu6IFVZBYBO0oFEcB13d3sI2GRUdk3TZA7AYOJcljzLvL1nKxoqJnULH6WooP9E0h6dSoxy2fjd7bION5ZALz7GsIv4kPpEKVZAcTjl5QMXsXpp1X8dwBvx5cHpqaHrpdPes55dDs1XKof5vjKOFxIp4gbZAZBLxEyNnIuES6OivrZBJpZAbskZBXS';
 
 exports.getTest = (req, res, next) => {
   return res.send('working');
@@ -22,7 +22,7 @@ exports.getTest = (req, res, next) => {
 exports.getLeadIds = async (req, res, next) => {
   var response = "";
   try {
-    response = await axios.get(`https://graph.facebook.com/v18.0/412531742274219?fields=leadgen_forms&access_token=EAAMXu6IFVZBYBOZBE7ohzH9u6sUEd7zGDlN9pucujeEEW0MWo2PstPb4T1cNNZBHKjLr9gcA4sJDKPNABsLKgZC1MD9BWkYtRZAHUoaYCKM5NEnCZAo9LzY7AxUKkxQDCMuzzXlAIJLIS0zV0CF9cmtvyzCaSWvxwfiIS1sJtasMW1s1u3ZAALHey6RGgRIJVZAClUXVB2Sv5XdtpJQD5a3nrD64`);
+    response = await axios.get(`https://graph.facebook.com/v18.0/412531742274219?fields=leadgen_forms&access_token=${FACEBOOK_PAGE_ACCESS_TOKEN}`);
 
     // if (!response.data || (response.data && (response.data.error || !response.data.field_data))) {
     //   return console.warn(`An invalid response was received from the Facebook API: ${response}`);
