@@ -193,7 +193,7 @@ exports.postFBLeadsWebhook = async (req, res, next) => {
           // }
           finSocialData = await processNewLead(change.value.leadgen_id);
           if(finSocialData == "error"){
-            return res.status(200).send(`An invalid response was received from the Facebook API:`);
+            return res.status(200).send(`Lead ID does not exists or not a leadgen entity.`);
           }
       }
     }
