@@ -18,11 +18,29 @@ exports.getTest = (req, res, next) => {
   return res.send('working');
 };
 
-exports.newFBPushLeads = (req, res, next) => {
+exports.newFBPushLeads = async (req, res, next) => {
   // let data = "Hello, this is some text I want to write to a file.";
-  fs.writeFile("../outfile.txt", JSON.stringify(req.body), (err) => {
-    return res.send('working');
-  });
+  // fs.writeFile("../outfile.txt", JSON.stringify(req.body), (err) => {
+  //   return res.send('working');
+  // });
+  let finSocialData;
+  let foundCenter;
+  let mailSent = 0;
+  const dateByTimeZone = moment().tz("Asia/Kolkata");
+  const latestLeadCount = await helper.leadCounter();
+  if (!req.body.entry) {
+    return res.status(500).send({ error: 'Invalid POST data received' });
+  }
+
+  // Travere entries & changes and process lead IDs
+  for (const entry of req.body.entry) {
+    for (const change of entry.changes) {
+        // Process new lead (leadgen_id)
+        // console.log(change, "----this is change");
+        finSocialData = await processNewLead(change.value.leadgen_id);
+    }
+  }
+  return res.send(finSocialData);
 
 };
 
@@ -85,7 +103,7 @@ async function processNewLead(leadId) {
 
   try {
     // Get lead details by lead ID from Facebook API
-    response = await axios.get(`https://graph.facebook.com/v17.0/${leadId}/?fields=ad_id,adset_id,adset_name,campaign_id,campaign_name,created_time,custom_disclaimer_responses,field_data,form_id,home_listing,id,is_organic,partner_name,platform,post,retailer_item_id,vehicle,ad_name&access_token=${FACEBOOK_PAGE_ACCESS_TOKEN}`);
+    response = await axios.get(`https://graph.facebook.com/v18.0/${leadId}/?fields=ad_id,adset_id,adset_name,campaign_id,campaign_name,created_time,custom_disclaimer_responses,field_data,form_id,home_listing,id,is_organic,partner_name,platform,post,retailer_item_id,vehicle,ad_name&access_token=${FACEBOOK_PAGE_ACCESS_TOKEN}`);
   }
   catch (err) {
     console.log('ERR in processing.....');
