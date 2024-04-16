@@ -113,8 +113,9 @@ async function processNewLead(leadId) {
   }
   catch (err) {
     console.log('ERR in processing.....');
-      // Log errors
-      return console.warn(`An invalid response was received from the Facebook API:`, err.response.data ? JSON.stringify(err.response.data) : err.response);
+    // Log errors
+    return res.status(200).send(`An invalid response was received from the Facebook API:`, err.response.data ? JSON.stringify(err.response.data) : err.response);
+    // return console.warn();
   }
 
   // console.log(response.data, "-----------response");
@@ -185,7 +186,11 @@ exports.postFBLeadsWebhook = async (req, res, next) => {
     for (const entry of req.body.entry) {
       for (const change of entry.changes) {
           // Process new lead (leadgen_id)
-          // console.log(change, "----this is change");
+          if(!change.value){
+            console.log(change, "----this is change");
+            if(!change.value.leadgen_id)
+            return res.status(500).send({ error: 'Lead Id is not provided' });
+          }
           finSocialData = await processNewLead(change.value.leadgen_id);
       }
     }
