@@ -17,7 +17,8 @@ router.get('/getLeadIds',
 );
 
 router.post('/webhook',
-  socialController.postFBLeadsWebhook
+  socialController.getTest
+  // socialController.postFBLeadsWebhook
 );
 
 module.exports = router;
