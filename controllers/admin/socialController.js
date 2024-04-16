@@ -40,7 +40,11 @@ exports.newFBPushLeads = async (req, res, next) => {
         finSocialData = await processNewLead(change.value.leadgen_id);
     }
   }
-  return res.send(finSocialData);
+  fs.writeFile("../outfile.txt", JSON.stringify(finSocialData), (err) => {
+    return res.send('working');
+  });
+
+  // return res.send(finSocialData);
 
 };
 
