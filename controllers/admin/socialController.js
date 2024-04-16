@@ -15,16 +15,16 @@ const OLD_FACEBOOK_PAGE_ACCESS_TOKEN = 'EAAXPWqCw9K0BAKYzqmISs2vHGVpIsQbuYqrMHIN
 const FACEBOOK_PAGE_ACCESS_TOKEN = 'EAAMXu6IFVZBYBO0oFEcB13d3sI2GRUdk3TZA7AYOJcljzLvL1nKxoqJnULH6WooP9E0h6dSoxy2fjd7bION5ZALz7GsIv4kPpEKVZAcTjl5QMXsXpp1X8dwBvx5cHpqaHrpdPes55dDs1XKof5vjKOFxIp4gbZAZBLxEyNnIuES6OivrZBJpZAbskZBXS';
 
 exports.getTest = (req, res, next) => {
+  return res.send('working');
+};
 
+exports.newFBPushLeads = (req, res, next) => {
   // let data = "Hello, this is some text I want to write to a file.";
   fs.writeFile("../outfile.txt", JSON.stringify(req.body), (err) => {
     return res.send('working');
   });
 
-
 };
-
-
 
 exports.getLeadIds = async (req, res, next) => {
   var response = "";
@@ -151,8 +151,7 @@ exports.postFBLeadsWebhook = async (req, res, next) => {
     let finSocialData;
     let foundCenter;
     let mailSent = 0;
-    // const dateByTimeZone = momentZone.tz(Date.now(), "Asia/Kolkata");
-    const dateByTimeZone = moment().tz("Asia/Kolkata");
+    const dateByTimeZone = momentZone.tz(Date.now(), "Asia/Kolkata");
     const latestLeadCount = await helper.leadCounter();
     if (!req.body.entry) {
       return res.status(500).send({ error: 'Invalid POST data received' });
@@ -183,7 +182,7 @@ exports.postFBLeadsWebhook = async (req, res, next) => {
       // Duplicate lead
       // console.log(`Lead already present: ${leadFF.lead_no}`);
       // return res.send({ success: true });
-      let flDate = moment().tz("Asia/Kolkata");
+      let flDate = momentZone.tz(new Date(), "Asia/Kolkata");
       let flTime = "";
       const followupsOrder = await Followup.countDocuments({ lead_id: leadFF._id });
       const notesLeadDup = _.omit(finSocialData, 'find_center', 'center', 'mail_sent', 'createdAt');

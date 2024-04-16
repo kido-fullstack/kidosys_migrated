@@ -17,7 +17,7 @@ router.get('/getLeadIds',
 );
 
 router.post('/webhook',
-  socialController.getTest
+  socialController.newFBPushLeads
   // socialController.postFBLeadsWebhook
 );
 
