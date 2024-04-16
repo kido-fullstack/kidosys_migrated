@@ -23,6 +23,8 @@ exports.newFBPushLeads = async (req, res, next) => {
   // fs.writeFile("../outfile.txt", JSON.stringify(req.body), (err) => {
   //   return res.send('working');
   // });
+  // return res.send({status:true});
+
   let finSocialData;
   let foundCenter;
   let mailSent = 0;
@@ -40,9 +42,9 @@ exports.newFBPushLeads = async (req, res, next) => {
         finSocialData = await processNewLead(change.value.leadgen_id);
     }
   }
-  fs.writeFile("../outfile.txt", JSON.stringify(finSocialData), (err) => {
-    return res.send('working');
-  });
+  // fs.writeFile("../outfile.txt", JSON.stringify(finSocialData), (err) => {
+  //   return res.send('working');
+  // });
 
   // return res.send(finSocialData);
 
@@ -269,6 +271,7 @@ exports.postFBLeadsWebhook = async (req, res, next) => {
       }
 
       // console.log(foundCenter);
+      mailSent = 0;
 
       const zone = await Center.findOne({ _id: foundCenter });
 
