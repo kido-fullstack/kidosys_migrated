@@ -151,7 +151,7 @@ exports.postFBLeadsWebhook = async (req, res, next) => {
     let finSocialData;
     let foundCenter;
     let mailSent = 0;
-    const dateByTimeZone = momentZone.tz(Date.now(), "Asia/Kolkata");
+    const dateByTimeZone = moment().tz("Asia/Kolkata");
     const latestLeadCount = await helper.leadCounter();
     if (!req.body.entry) {
       return res.status(500).send({ error: 'Invalid POST data received' });
@@ -182,7 +182,7 @@ exports.postFBLeadsWebhook = async (req, res, next) => {
       // Duplicate lead
       // console.log(`Lead already present: ${leadFF.lead_no}`);
       // return res.send({ success: true });
-      let flDate = momentZone.tz(new Date(), "Asia/Kolkata");
+      let flDate = moment().tz("Asia/Kolkata");
       let flTime = "";
       const followupsOrder = await Followup.countDocuments({ lead_id: leadFF._id });
       const notesLeadDup = _.omit(finSocialData, 'find_center', 'center', 'mail_sent', 'createdAt');
