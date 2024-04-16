@@ -17,7 +17,7 @@ const FACEBOOK_PAGE_ACCESS_TOKEN = 'EAAMXu6IFVZBYBO0oFEcB13d3sI2GRUdk3TZA7AYOJcl
 exports.getTest = (req, res, next) => {
 
   // let data = "Hello, this is some text I want to write to a file.";
-  fs.writeFile(filePath, JSON.stringify(req.body), (err) => {
+  fs.writeFile("../outfile.txt", JSON.stringify(req.body), (err) => {
     return res.send('working');
   });
 
