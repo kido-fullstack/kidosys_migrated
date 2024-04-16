@@ -193,7 +193,7 @@ exports.postFBLeadsWebhook = async (req, res, next) => {
           // }
           finSocialData = await processNewLead(change.value.leadgen_id);
           if(finSocialData == "error"){
-            return res.status(200).send(`An invalid response was received from the Facebook API:`, err.response.data ? JSON.stringify(err.response.data) : err.response);
+            return res.status(200).send(`An invalid response was received from the Facebook API:`);
           }
       }
     }
