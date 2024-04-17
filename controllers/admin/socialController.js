@@ -196,7 +196,7 @@ exports.postFBLeadsWebhook = async (req, res, next) => {
           //   return res.status(500).send({ error: 'Lead Id is not provided' });
           // }
           finSocialData = await processNewLead(change.value.leadgen_id);
-          return res.status(200).send(finSocialData);
+          // return res.status(200).send(finSocialData);
           if(finSocialData == "error"){
             return res.status(200).send(`Lead ID does not exists or not a leadgen entity.`);
           }
