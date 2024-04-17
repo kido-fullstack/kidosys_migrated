@@ -279,7 +279,7 @@ exports.postFBLeadsWebhook = async (req, res, next) => {
       }
 
       // console.log(foundCenter);
-      mailSent = 0;
+      // mailSent = 0;
 
       const zone = await Center.findOne({ _id: foundCenter });
 
