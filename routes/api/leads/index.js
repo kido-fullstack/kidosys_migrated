@@ -179,6 +179,14 @@ router.post('/add',
   leadsController.addLeadPost
 );
 
+router.post('/addext', 
+  accountController.Auth,
+  accountController.checkToken,
+  Validator('addLead'),
+  handlers.requireAPIPermission(permission_name.LEAD_ADD),
+  leadsController.addLeadPost_ext
+);
+
 router.get('/edit/:lead_id',
   accountController.Auth,
   accountController.checkToken,

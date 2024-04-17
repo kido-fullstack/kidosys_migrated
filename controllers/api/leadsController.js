@@ -801,6 +801,196 @@ exports.addLeadPost = async (req, res, next) => {
   }
 };
 
+exports.addLeadPost_ext = async (req, res, next) => {
+  try {
+    const randomNumber = Math.floor(100000 + Math.random() * 900000);
+    const timeZone = momentZone.tz.guess();
+    const dateByTimeZone = momentZone.tz(Date.now(), "Asia/Kolkata");
+    const StatusCollection = mongoose.connection.db.collection("statuses");
+    let childPre = "";
+    let secParentName = "";
+
+    let sec_whatsapp_number = "";
+    let sec_parent_second_whatsapp = 0;
+    let sec_parent_first_whatsapp = 0;
+
+    const zone = await Center.findOne({ _id: req.body.school_id });
+    const status = await StatusCollection.find({ _id: mongoose.Types.ObjectId(req.body.status_id) }).toArray();
+
+    if (status[0].type == "enquiry") {
+      childPre = req.body.child_pre_school;
+      secParentName = req.body.secondary_parent_name;
+      if (req.body.secondary_first_whatsapp == 1) {
+        sec_whatsapp_number = req.body.parent_first_contact;
+        sec_parent_second_whatsapp = 0;
+        sec_parent_first_whatsapp = 1;
+      } else if (req.body.secondary_second_whatsapp == 1) {
+        sec_whatsapp_number = req.body.parent_second_contact;
+        sec_parent_second_whatsapp = 1;
+        sec_parent_first_whatsapp = 0;
+      }
+    }
+
+    let whatsapp_number;
+    let parent_second_whatsapp;
+    let parent_first_whatsapp;
+
+    if (req.body.whatsapp_first == 1) {
+      whatsapp_number = req.body.parent_first_contact;
+      parent_second_whatsapp = 0;
+      parent_first_whatsapp = 1;
+    } else if (req.body.whatsapp_second == 1) {
+      whatsapp_number = req.body.parent_second_contact;
+      parent_second_whatsapp = 1;
+      parent_first_whatsapp = 0;
+    }
+
+    const latestLeadCount = await helper.leadCounter();
+    const newLead = new Lead({
+      lead_date: req.body.secondary_profession,
+      lead_no: latestLeadCount,
+      child_first_name: req.body.child_first_name,
+      child_dob: req.body.child_dob,
+      child_last_name: req.body.child_last_name,
+      child_gender: req.body.child_gender,
+      child_pre_school: childPre,
+      programcategory_id: req.body.programcategory_id,
+      program_id: req.body.program_id ? req.body.program_id : null,
+      school_id: req.body.school_id,
+      zone_id: zone.zone_id || null,
+      country_id: zone.country_id,
+      viewoption: null,
+      primary_parent: req.body.primary_parent,
+      parent_name: req.body.parent_name,
+      parent_first_contact: req.body.parent_first_contact,
+      parent_second_contact: req.body.parent_second_contact,
+      parent_email: req.body.parent_email,
+      parent_education: req.body.parent_education,
+      parent_profession: req.body.parent_profession,
+      parent_reference: req.body.parent_reference,
+      secondary_parent_name: secParentName,
+      secondary_parent_type: req.body.secondary_parent_type || "",
+      secondary_first_contact: req.body.secondary_first_contact || "",
+      secondary_Second_contact: req.body.secondary_Second_contact || "",
+      secondary_second_whatsapp: sec_parent_second_whatsapp,
+      secondary_first_whatsapp: sec_parent_first_whatsapp,
+      secondary_whatsapp: sec_whatsapp_number,
+      secondary_email: req.body.secondary_email || "",
+      secondary_education: req.body.secondary_education || "",
+      secondary_profession: req.body.secondary_profession || "",
+      parent_landmark: req.body.parent_landmark || "",
+      parent_house: req.body.parent_house || "",
+      parent_street: req.body.parent_street || "",
+      parent_address: req.body.parent_address || "",
+      parent_country: req.body.parent_country || null,
+      parent_state: req.body.parent_state || null,
+      parent_pincode: req.body.parent_pincode,
+      parent_area: req.body.parent_area,
+      parent_city: req.body.parent_city || null,
+      parent_know_aboutus: req.body.parent_know_aboutus && req.body.parent_know_aboutus.length
+        ? req.body.parent_know_aboutus
+        : [],
+      parent_whatsapp: whatsapp_number,
+      parent_second_whatsapp: parent_second_whatsapp,
+      parent_first_whatsapp: parent_first_whatsapp,
+      source_category: req.body.source_category,
+      status_id: req.body.status_id,
+      substatus_id: req.body.substatus_id,
+      updatedBy_name: "bulk-api",
+      createdBy_name:  "bulk-api",
+      createdAt:  req.body.secondary_profession,
+      updatedAt:  req.body.secondary_profession,
+      stage: status[0].stage,
+      remark: req.body.remark,
+      action_taken: req.body.action_taken && req.body.action_taken.length ? req.body.action_taken : [],
+      type: status[0].type,
+      initial_status: req.body.status_id,
+      initial_sub_status: req.body.substatus_id,
+      initial_action: req.body.action_taken && req.body.action_taken.length ? req.body.action_taken : [],
+      initial_notes: req.body.remark,
+      follow_due_date: dateByTimeZone,
+      follow_due_time : "",
+      is_external: 1,
+      external_source: "",
+      cor_parent: req.body.cor_parent,
+      company_name_parent: req.body.company_name_parent,
+      do_followup: 1
+    });
+    await newLead.save();
+    // await mail.send({
+    //   user: req.body.parent_email,
+    //   subject: `Welcome - ${zone.school_display_name}`,
+    //   msg: {
+    //     lead_name: req.body.parent_name || "",
+    //     center_name: zone.school_display_name || "",
+    //     center_area: zone.area || "",
+    //     sal: zone.cor_sal || "",
+    //     spoc: zone.cor_spoc || "",
+    //     email: zone.email_id || "",
+    //     whatsapp: zone.whatsapp_number,
+    //     contact: zone.contact_number || "",
+    //     video: zone.center_video_url || "",
+    //     website: zone.website_url || "",
+    //     designation: zone.designation || "",
+    //     activities: zone.activities_portal || ""
+    //   },
+    //   filename: "email-welcome-lead",
+    //   title: `Welcome - ${zone.school_display_name}`,
+    // });
+    if (0) {
+      // if stage in Post Tour, the send mail
+      // mail sent
+      await mail.send({
+        user: req.body.parent_email,
+        subject: "Thank You",
+        msg: {
+          lead_name: req.body.parent_name || "",
+          center_name: zone.school_display_name || "",
+          center_area: zone.area || "",
+          sal: zone.cor_sal || "",
+          spoc: zone.cor_spoc || "",
+          email: zone.email_id || "",
+          whatsapp: zone.whatsapp_number,
+          contact: zone.contact_number || "",
+          video: zone.center_video_url || "",
+          website: zone.website_url || "",
+          designation: zone.designation || "",
+          mon_fir_start: zone.mon_to_fri_start_time,
+    // await mail.send({
+    //   user: req.body.parent_email,
+    //   subject: `Welcome - ${zone.school_display_name}`,
+    //   msg: {
+    //     lead_name: req.body.parent_name || "",
+    //     center_name: zone.school_display_name || "",
+    //     center_area: zone.area || "",
+    //     sal: zone.cor_sal || "",
+    //     spoc: zone.cor_spoc || "",
+    //     email: zone.email_id || "",
+    //     whatsapp: zone.whatsapp_number,
+    //     contact: zone.contact_number || "",
+    //     video: zone.center_video_url || "",
+    //     website: zone.website_url || "",
+    //     designation: zone.designation || "",
+    //     activities: zone.activities_portal || ""
+    //   },
+    //   filename: "email-welcome-lead",
+    //   title: `Welcome - ${zone.school_display_name}`,
+    // });       mon_fir_end: zone.mon_to_fri_end_time,
+          sat_start: zone.saturday_start_time,
+          sat_end: zone.saturday_end_time
+        },
+        filename: "email-post-tour-lead",
+        title: "Thank You",
+      });
+    }
+    return res.status(200).json(response.responseSuccess("New lead added into system.", [], 200));
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "addLeadPost not working - post request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
 exports.getEditLeadPost = async (req, res, next) => {
   try {
     const lead = await Lead.findOne({ _id: req.params.lead_id })
