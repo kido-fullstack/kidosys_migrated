@@ -4,12 +4,15 @@ const _ = require('lodash');
 const Center = mongoose.model("Center");
 const Followup = mongoose.model('Followup');
 const Lead = mongoose.model("Lead");
+const Program = mongoose.model("Program");
 const momentZone = require('moment-timezone');
 const moment = require("moment");
 const helper = require("../../handlers/helper");
 const axios = require('axios');
 const mail = require("../../handlers/mail");
 const fs = require('fs');
+const config = require('../../config');
+
 const OLD_FACEBOOK_PAGE_ACCESS_TOKEN = 'EAAXPWqCw9K0BAKYzqmISs2vHGVpIsQbuYqrMHINN3k530XHVF3oon0WLg8RYuqmiSpQDewyU93vjaIyb8uadhZBGZCKmPWfaDdyGhLutqVNVunPJQT3K8RkT4ZATn2EpKAf6ZCCLRrLL2gDgBpimoaflePx2XjtntnYeJ7GC1nfW9bRWQ0KWzPDemXdQhdEZD';
 
 const FACEBOOK_PAGE_ACCESS_TOKEN = 'EAAMXu6IFVZBYBO0oFEcB13d3sI2GRUdk3TZA7AYOJcljzLvL1nKxoqJnULH6WooP9E0h6dSoxy2fjd7bION5ZALz7GsIv4kPpEKVZAcTjl5QMXsXpp1X8dwBvx5cHpqaHrpdPes55dDs1XKof5vjKOFxIp4gbZAZBLxEyNnIuES6OivrZBJpZAbskZBXS';
@@ -175,6 +178,7 @@ exports.postFBLeadsWebhook = async (req, res, next) => {
   try {
     let finSocialData;
     let foundCenter;
+    let programId;
     let mailSent = 0;
     const dateByTimeZone = moment().tz("Asia/Kolkata");
     const latestLeadCount = await helper.leadCounter();
@@ -270,6 +274,14 @@ exports.postFBLeadsWebhook = async (req, res, next) => {
         }
       });
 
+      programId = await Program.find({ "program_name": { $regex: new RegExp(".*" + finSocialData.ad_name + ".*") } });
+
+      if(programId && programId.length) {
+        programId = programId[0]._id;
+      } else {
+        programId = "";
+      }
+      
       if (foundCenter && foundCenter.length) {
         foundCenter = foundCenter[0]._id;
         mailSent = 1;
@@ -280,6 +292,7 @@ exports.postFBLeadsWebhook = async (req, res, next) => {
 
       // console.log(foundCenter);
       // mailSent = 0;
+      (config.server.devenv == "dev") ? mailSent = 0 : false;
 
       const zone = await Center.findOne({ _id: foundCenter });
 
@@ -293,7 +306,7 @@ exports.postFBLeadsWebhook = async (req, res, next) => {
         child_gender: "",
         child_pre_school: "",
         programcategory_id: mongoose.Types.ObjectId("64a27694d081b651a5b83db4"),
-        program_id: mongoose.Types.ObjectId("64a276bdd081b651a5b83db8"),
+        program_id: programId,
         school_id: foundCenter,
         zone_id: zone ? zone.zone_id : null,
         country_id: zone ? zone.country_id : null,
