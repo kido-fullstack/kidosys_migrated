@@ -12,6 +12,7 @@ const _ = require("lodash");
 const mail = require("../../handlers/mail");
 const helpers = require("../../handlers/helper");
 const cacher = require("../../services/redis/cacher");
+const config = require('../../config');
 
 exports.getAllLeads = async (req, res, next) => {
   return res.send('jeu');
@@ -1708,6 +1709,8 @@ exports.addLeadForWebIntegration = async (req, res, next) => {
     } else {
       mailSent = 1;
     }
+    (config.server.devenv == "dev") ? mailSent = 0 : false;
+
     if (req.body.form == "enquiry") {
       // website form 1
       newLead = new Lead({
@@ -1751,7 +1754,7 @@ exports.addLeadForWebIntegration = async (req, res, next) => {
         parent_pincode: "",
         parent_area: "",
         parent_city: null,
-        parent_know_aboutus: ["KIDO Website"],
+        parent_know_aboutus: req.body.parent_know_aboutus ? req.body.parent_know_aboutus : ["KIDO Website"],
         parent_whatsapp: req.body.parent_first_contact,
         parent_second_whatsapp: 0,
         parent_first_whatsapp: 1,
@@ -1821,7 +1824,7 @@ exports.addLeadForWebIntegration = async (req, res, next) => {
         parent_pincode: "",
         parent_area: "",
         parent_city: null,
-        parent_know_aboutus: ["KIDO Website"],
+        parent_know_aboutus: req.body.parent_know_aboutus ? req.body.parent_know_aboutus : ["KIDO Website"],
         parent_whatsapp: req.body.parent_first_contact,
         parent_second_whatsapp: 0,
         parent_first_whatsapp: 1,
