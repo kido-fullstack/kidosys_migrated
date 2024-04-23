@@ -77,4 +77,9 @@ router.post('/approve/status/toggle',
   employeeController.approveStatus
 );
 
+router.post('/empCentrEdt',
+  handlers.requirePermission(permission_name.USER_EDIT_USER),
+  employeeController.empCentrEdt
+);
+
 module.exports = router;

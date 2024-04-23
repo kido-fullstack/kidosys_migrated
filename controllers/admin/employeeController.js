@@ -595,6 +595,7 @@ exports.postAddEmployeee = async (req, res, next) => {
 exports.getEditEmployee = async (req, res, next) => {
   try {
     const roles = await Role.find({ status: req.responseAdmin.ACTIVE }).sort({ name: 1 });
+    const allCentres = await Center.find({ status: req.responseAdmin.ACTIVE }).sort({ name: 1 });
     const employee = await Employee.findOne({
       _id: req.params.employee_id
     })
@@ -623,6 +624,7 @@ exports.getEditEmployee = async (req, res, next) => {
         title: 'Update Employee',
         employee,
         roles,
+        allCentres,
         roleAssign
       });
       return;
@@ -637,6 +639,78 @@ exports.getEditEmployee = async (req, res, next) => {
     return;
   }
 };
+
+exports.empCentrEdt = async (req, res, next) => {
+  try {
+    const { empId,centerId,act } = req.body;
+
+    const empObj = await Employee.findOne({ _id: empId });
+
+    if (empObj) {
+      // const newIsExternalValue = oldLead.is_external === 1 ? 0 : 1;
+      var updatedCentrList = [];
+
+      if(empObj.center_id.length){
+
+        updatedCentrList = empObj.center_id;
+
+        if(act == "add"){
+
+          updatedCentrList.push(ObjectId(centerId));
+
+        }else{
+
+          updatedCentrList = updatedCentrList.filter(id => id.toString() !== centerId);
+
+        }
+
+      }
+
+      console.log(updatedCentrList,'------------------------',act);
+
+      const updateLead = await Employee.updateOne(
+        {
+          _id: empId,
+        },
+        {
+          $set: {
+            center_id: updatedCentrList,
+          },
+        }
+      ).exec();
+
+      await ViewOption.updateOne(
+        {
+          user_id: empId,
+        },
+        {
+          $set: {
+            centers: updatedCentrList,
+          },
+        }
+      ).exec();
+
+      return res.status(200).json({
+        msg: "markLeadUnread",
+        data: updateLead,
+        code: 200,
+      });
+    } else {
+      return res.status(404).json({
+        msg: "Lead not found",
+        code: 404,
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      msg: "Internal Server Error",
+      code: 500,
+    });
+  }
+};
+
+
 
 exports.postEditEmployee = async (req, res, next) => {
   try {

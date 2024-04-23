@@ -1,6 +1,29 @@
 extends layout-admin
 
 block content
+  script.
+      function edtCentr(elem){
+          var empid = elem.getAttribute("empid");
+          var cntrid = elem.getAttribute("cntrid");
+          console.log(cntrid,empid);
+        $.ajax({
+          method: 'POST',
+          url: `/admin/employee/empCentrEdt`,
+          data: {
+            empId:empid,
+            centerId:cntrid,
+            act: elem.checked ? "add" : "remove",
+          },
+          dataType: 'json',
+            success: function (response) {
+              console.log(response);
+              //- window.location.reload();
+            }
+          });
+      }
+
+    
+  - var centrIdArr = employee.center_id.map(obj => obj._id.toString());
   .main-panel
     .container
       .panel-header.bg-primary-gradient
@@ -119,8 +142,10 @@ block content
                       | Center(s)
                       span.required-label *
                     .col-lg-7.col-md-9.col-sm-8
-                      .select2-input
-                        input#center.form-control(type='text', name='country', value=(employee.center_id && employee.center_id.length ? employee.center_id.map(center => `${center.school_display_name}`).join(", ") : "Not Provided") disabled)
+                      each centre in allCentres
+                        input.form-check-input(tabindex="-1" type='checkbox' name='secondary_second_whatsapp' onclick="edtCentr(this)" empid=(employee._id) cntrid=(centre._id)  checked=(centrIdArr.indexOf(centre._id.toString()) != -1 ? 'checked' : false) )
+                        span.form-check-sign #{centre.school_display_name} &emsp;<br>
+                        //- input#center.form-control(type='text', name='country', value=(employee.center_id && employee.center_id.length ? employee.center_id.map(center => `${center.school_display_name}`).join(", ") : "Not Provided") disabled)
                   .form-group.form-show-validation.row
                     label.col-lg-3.col-md-3.col-sm-4.mt-sm-2.text-right(for='country_id')
                       | Status
