@@ -84,7 +84,7 @@ exports.allLeads = async (req, res, next) => {
           }
         }
       ])
-      // console.log(programs,"programss")
+      // console.log(req.session.user,"---------------------------programss")
       datas = await ViewOption.findOne({
         _id: req.session.user.view_option,
       })
@@ -93,10 +93,18 @@ exports.allLeads = async (req, res, next) => {
       })
       .populate({
         path: 'zones'
-      })
-      .populate({
-        path: 'centers'
       });
+      // .populate({
+      //   path: 'centers'
+      // });
+      // const employee = await Employee.find({ status: "active" }, { _id: req.session.user._id });
+      const empObj = await Employee.findOne({ _id: req.session.user._id });
+      const centers = await Center.find({ _id: { $in: empObj.center_id }, status: "active" });
+      datas.centers = centers;
+      // {_id: {$nin :[ObjectId("64394ba0b858bfdf6844e96e")
+      console.log(empObj,"programss");
+      // console.log(datas.centers,"-----------------------");
+
     }
 
     const permissionEditLead = handlers.checkPermission(req.session.user, req.permissionCacheData, "LeadEdit");
