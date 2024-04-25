@@ -307,7 +307,7 @@ exports.postFBLeadsWebhook = async (req, res, next) => {
         child_gender: "",
         child_pre_school: "",
         programcategory_id: mongoose.Types.ObjectId("64a27694d081b651a5b83db4"),
-        program_id: programId,
+        program_id: programId == "" ? null : programId,
         school_id: foundCenter,
         zone_id: zone ? zone.zone_id : null,
         country_id: zone ? zone.country_id : null,
