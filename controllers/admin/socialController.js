@@ -16,6 +16,7 @@ const config = require('../../config');
 const OLD_FACEBOOK_PAGE_ACCESS_TOKEN = 'EAAXPWqCw9K0BAKYzqmISs2vHGVpIsQbuYqrMHINN3k530XHVF3oon0WLg8RYuqmiSpQDewyU93vjaIyb8uadhZBGZCKmPWfaDdyGhLutqVNVunPJQT3K8RkT4ZATn2EpKAf6ZCCLRrLL2gDgBpimoaflePx2XjtntnYeJ7GC1nfW9bRWQ0KWzPDemXdQhdEZD';
 
 const FACEBOOK_PAGE_ACCESS_TOKEN = 'EAAMXu6IFVZBYBO0oFEcB13d3sI2GRUdk3TZA7AYOJcljzLvL1nKxoqJnULH6WooP9E0h6dSoxy2fjd7bION5ZALz7GsIv4kPpEKVZAcTjl5QMXsXpp1X8dwBvx5cHpqaHrpdPes55dDs1XKof5vjKOFxIp4gbZAZBLxEyNnIuES6OivrZBJpZAbskZBXS';
+const AMELIO_FACEBOOK_PAGE_ACCESS_TOKEN = 'EAAQFNZBo9gNsBO2TnMXysI7ayXKl9lJoMmdBhZBZAnZBCoCD5Aol7Nksu8GxICZA1Wwf23ACIt87Dh0Mt1bS7jtxP7spdsMdQa8lWVHrwUwGleIdqgXVm0QP3QXZCfzVye768LVyCtZBTYaxDZCZBRzZBYEDnGM46ay1pSEkNmZC9oB2lJLJd6HKm1w0091';
 
 exports.getTest = (req, res, next) => {
   return res.send('working');
@@ -42,7 +43,7 @@ exports.newFBPushLeads = async (req, res, next) => {
     for (const change of entry.changes) {
         // Process new lead (leadgen_id)
         // console.log(change, "----this is change");
-        finSocialData = await processNewLead(change.value.leadgen_id);
+        finSocialData = await processNewLead(change.value.leadgen_id,change.value.page_id);
     }
   }
   // fs.writeFile("../outfile.txt", JSON.stringify(finSocialData), (err) => {
@@ -106,13 +107,17 @@ exports.getFBLeadsWebhook = async (req, res, next) => {
 };
 
 // Process incoming leads
-async function processNewLead(leadId) {
+async function processNewLead(leadId,page_id) {
   let response;
   let valArr = [];
 
   try {
     // Get lead details by lead ID from Facebook API
-    response = await axios.get(`https://graph.facebook.com/v18.0/${leadId}/?fields=ad_id,adset_id,adset_name,campaign_id,campaign_name,created_time,custom_disclaimer_responses,field_data,form_id,home_listing,id,is_organic,partner_name,platform,post,retailer_item_id,vehicle,ad_name&access_token=${FACEBOOK_PAGE_ACCESS_TOKEN}`);
+    if(page_id == "122470541109175"){ //Amelio Page
+      response = await axios.get(`https://graph.facebook.com/v19.0/${leadId}/?fields=ad_id,adset_id,adset_name,campaign_id,campaign_name,created_time,custom_disclaimer_responses,field_data,form_id,home_listing,id,is_organic,partner_name,platform,post,retailer_item_id,vehicle,ad_name&access_token=${AMELIO_FACEBOOK_PAGE_ACCESS_TOKEN}`);
+    }else{
+      response = await axios.get(`https://graph.facebook.com/v18.0/${leadId}/?fields=ad_id,adset_id,adset_name,campaign_id,campaign_name,created_time,custom_disclaimer_responses,field_data,form_id,home_listing,id,is_organic,partner_name,platform,post,retailer_item_id,vehicle,ad_name&access_token=${FACEBOOK_PAGE_ACCESS_TOKEN}`);
+    }
   }
   catch (err) {
     console.log('ERR in processing.....');
@@ -175,6 +180,14 @@ async function processNewLead(leadId) {
 }
 
 exports.postFBLeadsWebhook = async (req, res, next) => {
+
+try{
+    fs.writeFile("../outfile.txt", JSON.stringify(req.body), (err) => {
+      // return res.send('working');
+    });
+  }catch(e){
+    console.log(e);
+  }
   try {
     let finSocialData;
     let foundCenter;
@@ -195,7 +208,7 @@ exports.postFBLeadsWebhook = async (req, res, next) => {
           //   if(!change.value.leadgen_id)
           //   return res.status(500).send({ error: 'Lead Id is not provided' });
           // }
-          finSocialData = await processNewLead(change.value.leadgen_id);
+            finSocialData = await processNewLead(change.value.leadgen_id,change.value.page_id);
           // return res.status(200).send(finSocialData);
           if(finSocialData == "error"){
             return res.status(200).send(`Lead ID does not exists or not a leadgen entity.`);
