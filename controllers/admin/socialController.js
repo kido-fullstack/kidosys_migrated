@@ -182,7 +182,7 @@ async function processNewLead(leadId,page_id) {
 exports.postFBLeadsWebhook = async (req, res, next) => {
 
 try{
-    fs.writeFile("../outfile.txt", JSON.stringify(req.body), (err) => {
+    fs.appendFile("../outfile.txt\n\n\n", JSON.stringify(req.body), (err) => {
       // return res.send('working');
     });
   }catch(e){
