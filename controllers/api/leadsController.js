@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Lead = mongoose.model('Lead');
 const Center = mongoose.model("Center");
+const Program = mongoose.model("Program");
 const Followup = mongoose.model('Followup');
 const Bookmark = mongoose.model('Bookmark');
 const RoleAssign = mongoose.model('RoleAssign');
@@ -815,8 +816,18 @@ exports.addLeadPost_ext = async (req, res, next) => {
     let sec_parent_second_whatsapp = 0;
     let sec_parent_first_whatsapp = 0;
 
-    const zone = await Center.findOne({ _id: req.body.school_id });
+    let zone = await Center.findOne({ "school_display_name": req.body.school_id });
     const status = await StatusCollection.find({ _id: mongoose.Types.ObjectId(req.body.status_id) }).toArray();
+
+    if(!zone){
+      zone = await Center.findOne({ "school_display_name": "HO Centre" });
+    }
+
+    let program = await Program.findOne({ "program_name": req.body.program_id });
+
+    if(!program){
+      program = await Program.findOne({ "program_name": "Other Program" });
+    }
 
     if (status[0].type == "enquiry") {
       childPre = req.body.child_pre_school;
@@ -850,14 +861,14 @@ exports.addLeadPost_ext = async (req, res, next) => {
     const newLead = new Lead({
       lead_date: req.body.secondary_profession,
       lead_no: latestLeadCount,
-      child_first_name: req.body.child_first_name,
-      child_dob: req.body.child_dob,
+      child_first_name: req.body.child_first_name ||"",
+      child_dob: req.body.child_dob || "Child DOB",
       child_last_name: req.body.child_last_name,
       child_gender: req.body.child_gender,
       child_pre_school: childPre,
-      programcategory_id: req.body.programcategory_id,
-      program_id: req.body.program_id ? req.body.program_id : null,
-      school_id: req.body.school_id,
+      programcategory_id: program.programcategory_id || null,
+      program_id: program._id || null,
+      school_id: zone._id,
       zone_id: zone.zone_id || null,
       country_id: zone.country_id,
       viewoption: null,
