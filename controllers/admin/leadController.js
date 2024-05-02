@@ -7388,21 +7388,31 @@ exports.getCenterAccordingToUser = async (req, res, next) => {
       });
     } else {
       // non-admin
-      centers = await ViewOption.findOne({
-        _id: req.session.user.view_option,
-      }, { centers: 1 })
-      .populate({
-        path: 'centers',
-        select: {
-          school_name: 1,
-          school_display_name: 1
-        }
-      });
+
+      centers = await Center.find({ status: "active",_id:{$in:req.session.user.center_id} }, { school_name: 1, school_display_name: 1 });
       return res.status(200).json({
-        message: "Centers for non-admin",
-        data: centers.centers || [],
+        message: "Centers for non admin",
+        data: centers || [],
         code: 200
       });
+
+
+
+      // centers = await ViewOption.findOne({
+      //   _id: req.session.user.view_option,
+      // }, { centers: 1 })
+      // .populate({
+      //   path: 'centers',
+      //   select: {
+      //     school_name: 1,
+      //     school_display_name: 1
+      //   }
+      // });
+      // return res.status(200).json({
+      //   message: "Centers for non-admin",
+      //   data: centers.centers || [],
+      //   code: 200
+      // });
     }
   } catch (err) {
     helper.errorDetailsForControllers(err, "getCenterAccordingToUser not working - post request", req.originalUrl, req.body, {}, "redirect", __filename);
