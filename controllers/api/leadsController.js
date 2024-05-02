@@ -1804,7 +1804,7 @@ exports.addLeadForWebIntegration = async (req, res, next) => {
         child_pre_school: "",
         programcategory_id: req.body.programcategory_id ? req.body.programcategory_id : mongoose.Types.ObjectId("64a27694d081b651a5b83db4"),
         program_id: req.body.program_id ? req.body.program_id : mongoose.Types.ObjectId("64a276bdd081b651a5b83db8"),
-        school_id: mongoose.Types.ObjectId("64a26f270754b33d31c62b79"),
+        school_id: req.body.center_id ? req.body.center_id : mongoose.Types.ObjectId("64a26f270754b33d31c62b79"),
         zone_id: zone ? zone.zone_id : null,
         country_id: zone ? zone.country_id : null,
         viewoption: null,
