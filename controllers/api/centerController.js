@@ -94,10 +94,10 @@ exports.allCenter = async (req, res, next) => {
   try {
     let centers = [];
     if (req.user.main && req.user.main == req.config.admin.main) {
-      centers = await Center.find({ status: req.responseAdmin.ACTIVE }, { school_name: 1, school_display_name: 1 });
+      centers = await Center.find({ status: req.responseAdmin.ACTIVE }, { school_name: 1, school_display_name: 1,school_code:1 });
     } else {
       let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
-      centers = await Center.find({ _id: {$in: objectIdArray} }, { school_name: 1, school_display_name: 1 });
+      centers = await Center.find({ _id: {$in: objectIdArray} }, { school_name: 1, school_display_name: 1,school_code:1 });
     }
     centers.sort((a, b) => a.school_name < b.school_name ? -1 : 1)
     var indexOfHO = -1;
