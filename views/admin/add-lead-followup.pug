@@ -181,7 +181,7 @@ block content
                               - for (const property in object) {
                                   strong
                                     | #{`${property.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}:`}
-                                  | &nbsp;#{`${object[property].replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}`}
+                                  | &nbsp;#{`${(object[property].toString()).replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}`}
                                   br
                               - }
                           else
@@ -525,7 +525,7 @@ block content
                                             - for (const property in object) {
                                               strong
                                                 | #{`${property.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}:`}
-                                              | &nbsp;#{`${object[property].replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}`}
+                                              | &nbsp;#{`${(object[property].toString()).replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}`}
                                               br
                                             - }
                                           else if followup.notes.split(" ").length >= 15
@@ -581,7 +581,7 @@ block content
                                           - for (const property in object) {
                                               strong
                                                 | #{`${property.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}:`}
-                                              | &nbsp;#{`${object[property].replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}`}
+                                              | &nbsp;#{`${(object[property].toString()).replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}`}
                                               br
                                           - }
                                         else
@@ -591,7 +591,7 @@ block content
                                               - for (const property in object) {
                                                   strong
                                                     | #{`${property.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}:`}
-                                                  | &nbsp;#{`${object[property].replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}`}
+                                                  | &nbsp;#{`${(object[property].toString()).replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}`}
                                                   br
                                               - }
                                             else
