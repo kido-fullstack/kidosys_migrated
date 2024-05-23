@@ -337,7 +337,7 @@ try{
       }
 
 
-      return res.send(finSocialData);
+      // return res.send(finSocialData);
 
       const notesLead = _.omit(finSocialData, 'find_center', 'center', 'mail_sent', 'createdAt');
 
