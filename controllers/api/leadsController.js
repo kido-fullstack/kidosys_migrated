@@ -816,14 +816,17 @@ exports.addLeadPost_ext = async (req, res, next) => {
     let sec_parent_second_whatsapp = 0;
     let sec_parent_first_whatsapp = 0;
 
-    let zone = await Center.findOne({ "school_display_name": req.body.school_id });
+    let zone = await Center.findOne({ "school_display_name": req.body.school_id.trim() });
     const status = await StatusCollection.find({ _id: mongoose.Types.ObjectId(req.body.status_id) }).toArray();
+
+    // return zone
+    // return res.status(200).json(zone);    
 
     if(!zone){
       zone = await Center.findOne({ "school_display_name": "HO Centre" });
     }
 
-    let program = await Program.findOne({ "program_name": req.body.program_id });
+    let program = await Program.findOne({ "program_name": req.body.program_id.trim() });
 
     if(!program){
       program = await Program.findOne({ "program_name": "Other Program" });
