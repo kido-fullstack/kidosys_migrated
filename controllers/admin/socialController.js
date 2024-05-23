@@ -323,7 +323,21 @@ try{
           }
         }
       }
-      // return res.send({ zone });
+
+      if(finSocialData.school_code){
+        var regPatn = /school_code#([^\-]+)/;
+        var match = finSocialData.school_code.match(regPatn);
+        if (match) {                      
+          let cntrByScod = await Center.findOne({ school_code: "#"+match[1] });
+          if(cntrByScod){
+            zone = cntrByScod;
+            foundCenter = cntrByScod._id;
+          }
+        }
+      }
+
+
+      return res.send(finSocialData);
 
       const notesLead = _.omit(finSocialData, 'find_center', 'center', 'mail_sent', 'createdAt');
 
