@@ -1718,6 +1718,16 @@ exports.addLeadForWebIntegration = async (req, res, next) => {
     // if (!zone) {
     //   return res.status(400).json(response.responseError("Center not found", 400, {}, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
     // }
+
+    if(req.body.school_code){
+      let cntrByScod = await Center.findOne({ school_code: req.body.school_code });
+      if(cntrByScod){
+        zone = cntrByScod;
+        console.log(cntrByScod);
+      }
+    }
+    // return res.status(400).json(zone);
+    // -----------------------MAIL SETTING---------------------------
     if (zone && zone.school_name == "HEAD OFFICE") {
       mailSent = 0;
     } else {

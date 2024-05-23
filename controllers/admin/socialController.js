@@ -220,6 +220,8 @@ try{
     // console.log(finSocialData);
     // console.log("FINAL FINAL FINAL FINAL FINAL FINAL FINAL FINAL FINAL FINAL FINAL FINAL FINAL FINAL FINAL FINAL ");
 
+    // return res.send(finSocialData);
+
     const leadFF = await Lead
       .findOne({ email: finSocialData.email.trim() })
       .populate({
@@ -308,7 +310,20 @@ try{
       // mailSent = 0;
       (config.server.devenv == "dev") ? mailSent = 0 : false;
 
-      const zone = await Center.findOne({ _id: foundCenter });
+      let zone = await Center.findOne({ _id: foundCenter });
+
+      if(finSocialData.adset_name){
+        var regPatn = /school_code#([^\-]+)/;
+        var match = finSocialData.adset_name.match(regPatn);
+        if (match) {                      
+          let cntrByScod = await Center.findOne({ school_code: "#"+match[1] });
+          if(cntrByScod){
+            zone = cntrByScod;
+            foundCenter = cntrByScod._id;
+          }
+        }
+      }
+      // return res.send({ zone });
 
       const notesLead = _.omit(finSocialData, 'find_center', 'center', 'mail_sent', 'createdAt');
 
