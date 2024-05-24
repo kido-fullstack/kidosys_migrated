@@ -1735,6 +1735,17 @@ exports.addLeadForWebIntegration = async (req, res, next) => {
     }
     (config.server.devenv == "dev") ? mailSent = 0 : false;
 
+
+    let foundCenter = req.body.center_id;
+
+    if(req.body.school_code){
+      let cntrByScod = await Center.findOne({ school_code: req.body.school_code });
+      if(cntrByScod){
+        // zone = cntrByScod;
+        foundCenter = cntrByScod._id;
+      }
+    }
+
     if (req.body.form == "enquiry") {
       // website form 1
       newLead = new Lead({
@@ -1747,7 +1758,7 @@ exports.addLeadForWebIntegration = async (req, res, next) => {
         child_dob: req.body.child_dob,
         programcategory_id: mongoose.Types.ObjectId("64a27694d081b651a5b83db4"),
         program_id: mongoose.Types.ObjectId("64a276bdd081b651a5b83db8"),
-        school_id: req.body.center_id,
+        school_id: foundCenter,
         zone_id: zone ? zone.zone_id : null,
         country_id: zone ? zone.country_id : null,
         viewoption: null,
@@ -1817,7 +1828,7 @@ exports.addLeadForWebIntegration = async (req, res, next) => {
         child_pre_school: "",
         programcategory_id: req.body.programcategory_id ? req.body.programcategory_id : mongoose.Types.ObjectId("64a27694d081b651a5b83db4"),
         program_id: req.body.program_id ? req.body.program_id : mongoose.Types.ObjectId("64a276bdd081b651a5b83db8"),
-        school_id: req.body.center_id ? req.body.center_id : mongoose.Types.ObjectId("64a26f270754b33d31c62b79"),
+        school_id: foundCenter ? foundCenter : mongoose.Types.ObjectId("64a26f270754b33d31c62b79"),
         zone_id: zone ? zone.zone_id : null,
         country_id: zone ? zone.country_id : null,
         viewoption: null,
