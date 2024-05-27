@@ -1719,14 +1719,25 @@ exports.addLeadForWebIntegration = async (req, res, next) => {
     //   return res.status(400).json(response.responseError("Center not found", 400, {}, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
     // }
 
+    // if(req.body.school_code){
+    //   let cntrByScod = await Center.findOne({ school_code: req.body.school_code });
+    //   if(cntrByScod){
+    //     zone = cntrByScod;
+    //     console.log(cntrByScod);
+    //   }
+    // }
+    // return res.status(400).json(zone);
+   
+    let foundCenter = req.body.center_id ? req.body.center_id : "64a26f270754b33d31c62b79";
+
     if(req.body.school_code){
       let cntrByScod = await Center.findOne({ school_code: req.body.school_code });
       if(cntrByScod){
         zone = cntrByScod;
-        console.log(cntrByScod);
+        foundCenter = cntrByScod._id;
       }
     }
-    // return res.status(400).json(zone);
+
     // -----------------------MAIL SETTING---------------------------
     if (zone && zone.school_name == "HEAD OFFICE") {
       mailSent = 0;
@@ -1734,17 +1745,6 @@ exports.addLeadForWebIntegration = async (req, res, next) => {
       mailSent = 1;
     }
     (config.server.devenv == "dev") ? mailSent = 0 : false;
-
-
-    let foundCenter = req.body.center_id;
-
-    if(req.body.school_code){
-      let cntrByScod = await Center.findOne({ school_code: req.body.school_code });
-      if(cntrByScod){
-        // zone = cntrByScod;
-        foundCenter = cntrByScod._id;
-      }
-    }
 
     if (req.body.form == "enquiry") {
       // website form 1
