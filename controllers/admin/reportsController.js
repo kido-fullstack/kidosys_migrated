@@ -128,14 +128,21 @@ const getProperNotes = (lead) => {
   }
 };
 
+const convertToCSV = (objArray) => {
+    const array = [Object.keys(objArray[0])].concat(objArray);
+    return array.map(it => {
+        return Object.values(it).toString().replaceAll("\n"," ")
+    }).join('\n');
+};
+
+
 exports.exportLeads = async (req, res, next) => {
   try {
     let currentDateTZ = moment.tz(moment(), "Asia/Kolkata");
     let currentDate = currentDateTZ.clone().tz("Asia/Kolkata");
-    // const startTime = Date.now();
+    const startTime = Date.now();
     const results = await Lead.find({});
-    // const endTime = Date.now();
-    // const timeTaken = (endTime - startTime) / 1000; // Convert milliseconds to seconds
+    const endTime = Date.now();
     // let out  = 'Processing batch:'+ results.length+ ` - Time taken: ${timeTaken} seconds`;
     // console.log(out);
 
@@ -301,6 +308,8 @@ exports.exportLeads = async (req, res, next) => {
       return acc;
     }, {});
 
+    const timeTaken = (endTime - startTime) / 1000; // Convert milliseconds to seconds
+
     // const SubstatusesCollection = mongoose.connection.db.collection("substatuses")
     // const substatus = await SubstatusesCollection.find({}); // Use lean() to get plain JavaScript objects
     // const substatusById = substatus.reduce((acc, substatus) => {
@@ -346,6 +355,13 @@ exports.exportLeads = async (req, res, next) => {
       });
     });
 
+
+    const csvData = convertToCSV(dataset);
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename="'+`Lead Export__${currentDate.format("DD-MMMM-YYYY hh:mm")}.csv`+'"');
+    return res.send(csvData);
+
     Promise.all(dataset)
       .then(result => {
         const report = excel.buildExport([
@@ -357,6 +373,7 @@ exports.exportLeads = async (req, res, next) => {
           }
         ]);
         res.attachment(`Lead Export__${currentDate.format("DD-MMMM-YYYY hh:mm")}.xlsx`);
+        // return res.send("-----------"+timeTaken);
         return res.send(report);
       });
   //   const timeZone = momentZone.tz.guess();
