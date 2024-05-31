@@ -170,7 +170,7 @@ exports.exportLeads = async (req, res, next) => {
 
     let results = JSON.parse(output);
 
-    // console.log(temp.length);
+    console.log("data from python");
 
     const timeTaken1 = (endTime - startTime) / 1000; // Convert milliseconds to seconds
 
@@ -391,6 +391,8 @@ exports.exportLeads = async (req, res, next) => {
       return acc;
     }, {});
 
+    console.log("data all models");
+
     // const timeTaken = (endTime - startTime) / 1000; // Convert milliseconds to seconds
     // return res.send(countrysById);
 
@@ -439,8 +441,12 @@ exports.exportLeads = async (req, res, next) => {
       });
     });
 
+    console.log("dataset ready");
 
     const csvData = convertToCSV(dataset);
+
+
+    console.log("csv responded");
 
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader('Content-Disposition', 'attachment; filename="'+`Lead Export__${currentDate.format("DD-MMMM-YYYY hh:mm")}.csv`+'"');
