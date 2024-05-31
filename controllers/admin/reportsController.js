@@ -137,12 +137,95 @@ const convertToCSV = (objArray) => {
 
 
 exports.exportLeads = async (req, res, next) => {
+
+  const { exec } = require('child_process');
+  const util = require('util');
+
   try {
+    const startTime = Date.now();
+
+    const execPromise = util.promisify(exec);
+
+    async function runPythonScript() {
+        try {
+            // Use execPromise to run the python script
+            const { stdout, stderr } = await execPromise('python3 pymon.py',  { maxBuffer: 1024 * 1024 * 50 }); // 10 MB buffer
+            
+            if (stderr) {
+                console.error(`Error: ${stderr}`);
+            }
+            // console.log(`Output: ${stdout}`);
+            // temp = stdout;
+            return stdout.toString();
+            
+        } catch (error) {
+            console.error(`Execution error: ${error}`);
+        }
+    }
+    
+    // Execute the function
+    const output = await runPythonScript();
+
+    const endTime = Date.now();
+
+    let results = JSON.parse(output);
+
+    // console.log(temp.length);
+
+    const timeTaken1 = (endTime - startTime) / 1000; // Convert milliseconds to seconds
+
+    // return res.send(timeTaken1+"-----------------");
+    
+
+    // return res.send(results);
     let currentDateTZ = moment.tz(moment(), "Asia/Kolkata");
     let currentDate = currentDateTZ.clone().tz("Asia/Kolkata");
-    const startTime = Date.now();
-    const results = await Lead.find({});
-    const endTime = Date.now();
+
+    // let totalRecords = await Lead.countDocuments();
+    // const CHUNK_SIZE = 3000;
+    // let totalChunks = Math.ceil(totalRecords / CHUNK_SIZE);
+  
+    // for (let i = 0; i < totalChunks; i++) {
+    //   let results = await YourModel.find()
+    //     .skip(i * CHUNK_SIZE)
+    //     .limit(CHUNK_SIZE)
+    //     .exec();
+  
+    //   // Process your results here
+    //   console.log(`Chunk ${i + 1}:`, results);
+    // }
+    // let sleFlds = {
+    //   country_id: 1,
+    //   zone_id: 1,
+    //   school_id: 1,
+    //   type: 1,
+    //   lead_no: 1,
+    //   parent_email: 1,
+    //   lead_date: 1,
+    //   updatedAt: 1,
+    //   follow_due_date: 1,
+    //   parent_name: 1,
+    //   child_first_name: 1,
+    //   child_last_name: 1,
+    //   source_category: 1,
+    //   parent_know_aboutus: 1,
+    //   program_id: 1,
+    //   stage: 1,
+    //   status_id: 1,
+    //   substatus_id: 1,
+    //   action_taken: 1,
+    //   remark: 1,
+    //   initial_notes: 1,
+    //   updatedBy_name: 1
+    // }
+
+    // // console.log(totalRecords);
+    // const results = await Lead.find({},sleFlds);
+  
+    // const endTime = Date.now();
+    // const timeTaken1 = (endTime - startTime) / 1000; // Convert milliseconds to seconds
+
+    // return res.send(timeTaken1+"-----totalRecords");
     // let out  = 'Processing batch:'+ results.length+ ` - Time taken: ${timeTaken} seconds`;
     // console.log(out);
 
@@ -308,7 +391,8 @@ exports.exportLeads = async (req, res, next) => {
       return acc;
     }, {});
 
-    const timeTaken = (endTime - startTime) / 1000; // Convert milliseconds to seconds
+    // const timeTaken = (endTime - startTime) / 1000; // Convert milliseconds to seconds
+    // return res.send(countrysById);
 
     // const SubstatusesCollection = mongoose.connection.db.collection("substatuses")
     // const substatus = await SubstatusesCollection.find({}); // Use lean() to get plain JavaScript objects
@@ -329,9 +413,9 @@ exports.exportLeads = async (req, res, next) => {
     results.map((lead, i) => {
       dataset.push({
         sr_no: parseInt(`${i + 1}`),
-        country: countrysById[lead.country_id] || "",
-        zone: zoneById[lead.zone_id] || "",
-        center: centerById[lead.school_id],
+        country: countrysById[lead.country_id["$oid"]] || "",
+        zone: zoneById[lead.zone_id["$oid"]] || "",
+        center: centerById[lead.school_id["$oid"]],
         walkins: getLeadType(lead.type ? lead.type : ""),
         lead_id: lead.lead_no,
         parent_email: lead.parent_email,
@@ -344,11 +428,11 @@ exports.exportLeads = async (req, res, next) => {
         sourceCat: getSourceCatName(lead.source_category ? lead.source_category.trim() : "" || ""),
         sourcePrimary: lead.parent_know_aboutus && lead.parent_know_aboutus.length ? lead.parent_know_aboutus[0] : "",
         source: lead.parent_know_aboutus && lead.parent_know_aboutus.length ? lead.parent_know_aboutus.slice(1): "",
-        program: programById[lead.program_id] || "",
+        program: programById[lead.program_id["$oid"]] || "",
         followUpDue: dueDateFormat(lead.follow_due_date ? lead.follow_due_date : "", lead.follow_due_time, lead.lead_date, lead.do_followup, lead.someday_follow),
         stage: getLeadStage(lead.stage),
-        status: statusById[lead.status_id]|| "",
-        subStatus: substatusById[lead.substatus_id]|| "",
+        status: statusById[lead.status_id["$oid"]]|| "",
+        subStatus: substatusById[lead.substatus_id["$oid"]]|| "",
         actionTaken: lead.action_taken && lead.action_taken.length ? lead.action_taken.toString() : "",
         notes: getProperNotes(lead),
         updatedBy: lead.updatedBy_name
@@ -1354,29 +1438,29 @@ exports.exportFollowups = async (req, res, next) => {
       const dataset = [];
       leads.map((lead, i) => {
         dataset.push({
-          sr_no: parseInt(`${i + 1}`),
-          country: lead.country_name && lead.country_name.length ? lead.country_name[0].country_name : "",
+          country: "India",
           zone: lead.zone_name && lead.zone_name.length ? lead.zone_name[0].name : "",
           center: lead.school_id.school_display_name,
-          walkins: getLeadType(lead.type ? lead.type : ""),
+          walkins: lead.type || "",
           lead_id: lead.lead_no,
-          leadDate: lead.lead_date ? moment.utc(lead.lead_date).tz("Asia/Kolkata").format("DD/MM/YYYY ") : "",
-          leadUpdatedDate: lead.updatedAt ? moment.utc(lead.updatedAt).tz("Asia/Kolkata").format("DD/MM/YYYY  h:mm A") : "",
+          leadDate: lead.lead_date || "",
+          leadUpdatedDate: lead.updatedAt || "",
           // dueIn: dueDateFormatWithMoment(lead.follow_due_date ? lead.follow_due_date : "", lead.follow_due_time),
-          dueIn:lead.follow_due_date ? moment.utc(lead.follow_due_date).tz("Asia/Kolkata").format("DD/MM/YYYY  h:mm A") : "",
+          dueIn:lead.follow_due_date || "",
           leadName: lead.parent_name ? lead.parent_name : "",
           childFirstName: lead.child_first_name ? lead.child_first_name : "",
           childLastName: lead.child_last_name ? lead.child_last_name : "",
           sourceCat: getSourceCatName(lead.source_category ? lead.source_category.trim() : "" || ""),
           sourcePrimary: lead.parent_know_aboutus && lead.parent_know_aboutus.length ? lead.parent_know_aboutus[0] : "",
-          source: lead.parent_know_aboutus && lead.parent_know_aboutus.length ? lead.parent_know_aboutus.slice(1): "",
+          source: lead.parent_know_aboutus.toString() || "",
           program: lead.program_id && lead.program_id.program_name ? lead.program_id.program_name : "",
-          followUpDue: dueDateFormat(lead.follow_due_date ? lead.follow_due_date : "", lead.follow_due_time, lead.lead_date, lead.do_followup, lead.someday_follow),
+          followUpDue: lead.follow_due_date || "",
           stage: getLeadStage(lead.stage || ""),
           status: lead.status_id && lead.status_id.name ? lead.status_id.name : "",
-          subStatus: lead.substatus_name && lead.substatus_name.name ? lead.substatus_name.name : "",
-          actionTaken: lead.action_taken && lead.action_taken.length ? lead.action_taken.toString() : "",
-          notes: getProperNotes(lead),
+          subStatus: lead.substatus_name ? lead.substatus_name.name : "",
+          actionTaken: lead.action_taken.toString() || "",
+          // notes: getProperNotes(lead),
+          notes: lead.remark || lead.initial_notes,
           updatedBy: lead.updatedBy_name
         });
       });
