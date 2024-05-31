@@ -146,6 +146,8 @@ exports.exportLeads = async (req, res, next) => {
 
     const execPromise = util.promisify(exec);
 
+    console.log("exect start");
+
     async function runPythonScript() {
         try {
             // Use execPromise to run the python script
