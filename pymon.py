@@ -3,10 +3,10 @@ from pymongo import MongoClient
 from bson.json_util import dumps
 
 # Replace with your actual MongoDB URI
-MONGO_URI = 'mongodb://localhost:27017/staging?retryWrites=true&w=majority'
+MONGO_URI = 'mongodb://localhost:27017/test?retryWrites=true&w=majority'
 
 # Replace with your database and collection name
-DATABASE_NAME = "staging"
+DATABASE_NAME = "test"
 COLLECTION_NAME = "leads"
 
 # Connect to MongoDB
