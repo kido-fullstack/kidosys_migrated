@@ -5024,7 +5024,7 @@ exports.datatableFilter = async (req, res, next) => {
 
     aggregateQue.splice(aggregateQue.length - 2, 2);
 
-    const totalCount = await Lead.aggregate(aggregateQue);
+    const totalCount = await Lead.aggregate(aggregateQue).allowDiskUse(true);
     var newLds = 0;
     var prmsoMT = 0;
     totalCount.forEach((ele) => {
