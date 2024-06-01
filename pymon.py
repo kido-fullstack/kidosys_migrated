@@ -6,7 +6,6 @@ from bson.json_util import dumps
 MONGO_URI = 'mongodb://localhost:27017/staging?retryWrites=true&w=majority'
 # MONGO_URI = 'mongodb+srv://kido_admin:q8HeYTvfYwOyv4lz@kido.flmyjkt.mongodb.net/staging?retryWrites=true&w=majority'
 
-# Replace with your database and collection name
 DATABASE_NAME = "staging"
 COLLECTION_NAME = "leads"
 
