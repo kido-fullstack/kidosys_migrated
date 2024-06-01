@@ -445,14 +445,14 @@ exports.exportLeads = async (req, res, next) => {
 
     console.log("dataset ready");
 
-    const csvData = convertToCSV(dataset);
+    // const csvData = convertToCSV(dataset);
 
 
-    console.log("csv responded");
+    // console.log("csv responded");
 
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename="'+`Lead Export__${currentDate.format("DD-MMMM-YYYY hh:mm")}.csv`+'"');
-    return res.send(csvData);
+    // res.setHeader('Content-Type', 'text/csv');
+    // res.setHeader('Content-Disposition', 'attachment; filename="'+`Lead Export__${currentDate.format("DD-MMMM-YYYY hh:mm")}.csv`+'"');
+    // return res.send(csvData);
 
     Promise.all(dataset)
       .then(result => {

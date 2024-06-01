@@ -3,10 +3,11 @@ from pymongo import MongoClient
 from bson.json_util import dumps
 
 # Replace with your actual MongoDB URI
-MONGO_URI = 'mongodb://localhost:27017/test?retryWrites=true&w=majority'
+MONGO_URI = 'mongodb://localhost:27017/staging?retryWrites=true&w=majority'
+# MONGO_URI = 'mongodb+srv://kido_admin:q8HeYTvfYwOyv4lz@kido.flmyjkt.mongodb.net/staging?retryWrites=true&w=majority'
 
 # Replace with your database and collection name
-DATABASE_NAME = "test"
+DATABASE_NAME = "staging"
 COLLECTION_NAME = "leads"
 
 # Connect to MongoDB
@@ -42,13 +43,14 @@ sleFlds = {
 # Fetch all documents from the collection
 # documents = collection.find({},sleFlds)
 documents = collection.find({},sleFlds)
+# documents = collection.find({},sleFlds)
 
 # Convert documents to a list of dictionaries
 documents_list = list(documents)
 
 json_data = dumps(documents_list, indent = 2)
 
-print(json_data)
+print((json_data))
 # print( json.dumps( str( documents_list)))
 
 
