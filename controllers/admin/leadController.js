@@ -5020,7 +5020,7 @@ exports.datatableFilter = async (req, res, next) => {
       });
     }
 
-    const leads = await Lead.aggregate(aggregateQue);
+    const leads = await Lead.aggregate(aggregateQue).allowDiskUse(true);
 
     aggregateQue.splice(aggregateQue.length - 2, 2);
 
