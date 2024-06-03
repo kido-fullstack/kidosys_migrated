@@ -925,7 +925,7 @@ exports.addLeadPost_ext = async (req, res, next) => {
       initial_notes: req.body.remark,
       follow_due_date: dateByTimeZone,
       follow_due_time : "",
-      is_external: 1,
+      is_external: req.body.status_id == "63b3fa85f1f372a8e4fdb0e1" ? 1 : 2,
       external_source: "",
       cor_parent: req.body.cor_parent,
       company_name_parent: req.body.company_name_parent,

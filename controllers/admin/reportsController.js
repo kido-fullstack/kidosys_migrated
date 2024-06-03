@@ -176,7 +176,7 @@ exports.exportLeads = async (req, res, next) => {
 
     const timeTaken1 = (endTime - startTime) / 1000; // Convert milliseconds to seconds
 
-    // return res.send(timeTaken1+"-----------------");
+    // return res.send(results+"-----------------");
     
 
     // return res.send(results);
@@ -415,6 +415,9 @@ exports.exportLeads = async (req, res, next) => {
     // all data
     const dataset = [];
     results.map((lead, i) => {
+
+      console.log(lead.follow_due_time);
+
       dataset.push({
         sr_no: parseInt(`${i + 1}`),
         country: countrysById[lead.country_id["$oid"]] || "",
@@ -423,9 +426,9 @@ exports.exportLeads = async (req, res, next) => {
         walkins: getLeadType(lead.type ? lead.type : ""),
         lead_id: lead.lead_no,
         parent_email: lead.parent_email,
-        leadDate: lead.lead_date ? moment.utc(lead.lead_date).tz("Asia/Kolkata").format("DD/MM/YYYY ") : "",
-        leadUpdatedDate: lead.updatedAt ? moment.utc(lead.updatedAt).tz("Asia/Kolkata").format("DD/MM/YYYY  h:mm A") : "",
-        dueIn: dueDateFormatWithMoment(lead.follow_due_date ? lead.follow_due_date : "", lead.follow_due_time),
+        leadDate: lead.lead_date ? moment(lead.lead_date["$date"]).format("DD/MM/YYYY") : "",
+        leadUpdatedDate: lead.updatedAt ? moment(lead.updatedAt["$date"]).format("DD/MM/YYYY h:mm A") : "",
+        dueIn: dueDateFormatWithMoment(lead.follow_due_date["$date"] ? lead.follow_due_date["$date"] : "", lead.follow_due_time),
         leadName: lead.parent_name ? lead.parent_name : "",
         childFirstName: lead.child_first_name ? lead.child_first_name : "",
         childLastName: lead.child_last_name ? lead.child_last_name : "",
@@ -433,7 +436,7 @@ exports.exportLeads = async (req, res, next) => {
         sourcePrimary: lead.parent_know_aboutus && lead.parent_know_aboutus.length ? lead.parent_know_aboutus[0] : "",
         source: lead.parent_know_aboutus && lead.parent_know_aboutus.length ? lead.parent_know_aboutus.slice(1): "",
         program: programById[lead.program_id["$oid"]] || "",
-        followUpDue: dueDateFormat(lead.follow_due_date ? lead.follow_due_date : "", lead.follow_due_time, lead.lead_date, lead.do_followup, lead.someday_follow),
+        followUpDue: dueDateFormat(lead.follow_due_date["$date"] ? lead.follow_due_date["$date"] : "", lead.follow_due_time, lead.lead_date["$date"], lead.do_followup, lead.someday_follow),
         stage: getLeadStage(lead.stage),
         status: statusById[lead.status_id["$oid"]]|| "",
         subStatus: substatusById[lead.substatus_id["$oid"]]|| "",

@@ -24,6 +24,7 @@ sleFlds = {
     "lead_date": 1,
     "updatedAt": 1,
     "follow_due_date": 1,
+    "follow_due_time": 1,
     "parent_name": 1,
     "child_first_name": 1,
     "child_last_name": 1,
@@ -41,7 +42,8 @@ sleFlds = {
 
 # Fetch all documents from the collection
 # documents = collection.find({},sleFlds)
-documents = collection.find({},sleFlds)
+documents = collection.find({},sleFlds).limit(10).skip(0)
+# documents = collection.find({},sleFlds)
 # documents = collection.find({},sleFlds)
 
 # Convert documents to a list of dictionaries
