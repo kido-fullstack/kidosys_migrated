@@ -4818,7 +4818,7 @@ exports.datatableFilter = async (req, res, next) => {
 
     console.log(sortObj);
 
-    let lds = await Lead.find(findObj,sleFlds).sort(sortObj).limit(parseInt(req.query.iDisplayLength)).skip(parseInt(req.query.iDisplayStart)).allowDiskUse(true);
+    let lds = await Lead.find(findObj,sleFlds).sort(sortObj).limit(parseInt(req.query.iDisplayLength)).skip(parseInt(req.query.iDisplayStart));
 
     const totCount = await Lead.countDocuments(findObj);
     const newLds1 = await Lead.countDocuments({'is_external': '1'});
