@@ -428,7 +428,7 @@ exports.exportLeads = async (req, res, next) => {
         parent_email: lead.parent_email,
         leadDate: lead.lead_date ? moment(lead.lead_date["$date"]).format("DD/MM/YYYY") : "",
         leadUpdatedDate: lead.updatedAt ? moment(lead.updatedAt["$date"]).format("DD/MM/YYYY h:mm A") : "",
-        dueIn: dueDateFormatWithMoment(lead.follow_due_date["$date"] ? lead.follow_due_date["$date"] : "", lead.follow_due_time),
+        dueIn: lead.follow_due_date ? dueDateFormatWithMoment(lead.follow_due_date["$date"] ? lead.follow_due_date["$date"] : "", lead.follow_due_time) : "",
         leadName: lead.parent_name ? lead.parent_name : "",
         childFirstName: lead.child_first_name ? lead.child_first_name : "",
         childLastName: lead.child_last_name ? lead.child_last_name : "",
