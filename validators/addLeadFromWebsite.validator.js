@@ -15,6 +15,7 @@ const addLeadFromWebsiteSchema = Joi.object({
   child_first_name: Joi.string().optional().allow(''),
   company_name_parent: Joi.string().optional().allow(''),
   program_id: Joi.string().optional().allow(''),
+  school_code: Joi.string().optional().allow(''),
   parent_know_aboutus: Joi.array().optional().allow(null),
   source_category: Joi.string().optional().allow(''),
   child_dob: Joi.date().format('DD/MM/YYYY').optional().allow(null),

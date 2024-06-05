@@ -816,14 +816,17 @@ exports.addLeadPost_ext = async (req, res, next) => {
     let sec_parent_second_whatsapp = 0;
     let sec_parent_first_whatsapp = 0;
 
-    let zone = await Center.findOne({ "school_display_name": req.body.school_id });
+    let zone = await Center.findOne({ "school_display_name": req.body.school_id.trim() });
     const status = await StatusCollection.find({ _id: mongoose.Types.ObjectId(req.body.status_id) }).toArray();
+
+    // return zone
+    // return res.status(200).json(zone);    
 
     if(!zone){
       zone = await Center.findOne({ "school_display_name": "HO Centre" });
     }
 
-    let program = await Program.findOne({ "program_name": req.body.program_id });
+    let program = await Program.findOne({ "program_name": req.body.program_id.trim() });
 
     if(!program){
       program = await Program.findOne({ "program_name": "Other Program" });
@@ -922,7 +925,7 @@ exports.addLeadPost_ext = async (req, res, next) => {
       initial_notes: req.body.remark,
       follow_due_date: dateByTimeZone,
       follow_due_time : "",
-      is_external: 1,
+      is_external: req.body.status_id == "63b3fa85f1f372a8e4fdb0e1" ? 1 : 2,
       external_source: "",
       cor_parent: req.body.cor_parent,
       company_name_parent: req.body.company_name_parent,
@@ -1715,6 +1718,27 @@ exports.addLeadForWebIntegration = async (req, res, next) => {
     // if (!zone) {
     //   return res.status(400).json(response.responseError("Center not found", 400, {}, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
     // }
+
+    // if(req.body.school_code){
+    //   let cntrByScod = await Center.findOne({ school_code: req.body.school_code });
+    //   if(cntrByScod){
+    //     zone = cntrByScod;
+    //     console.log(cntrByScod);
+    //   }
+    // }
+    // return res.status(400).json(zone);
+   
+    let foundCenter = req.body.center_id ? req.body.center_id : "64a26f270754b33d31c62b79";
+
+    if(req.body.school_code){
+      let cntrByScod = await Center.findOne({ school_code: req.body.school_code });
+      if(cntrByScod){
+        zone = cntrByScod;
+        foundCenter = cntrByScod._id;
+      }
+    }
+
+    // -----------------------MAIL SETTING---------------------------
     if (zone && zone.school_name == "HEAD OFFICE") {
       mailSent = 0;
     } else {
@@ -1734,7 +1758,7 @@ exports.addLeadForWebIntegration = async (req, res, next) => {
         child_dob: req.body.child_dob,
         programcategory_id: mongoose.Types.ObjectId("64a27694d081b651a5b83db4"),
         program_id: mongoose.Types.ObjectId("64a276bdd081b651a5b83db8"),
-        school_id: req.body.center_id,
+        school_id: foundCenter,
         zone_id: zone ? zone.zone_id : null,
         country_id: zone ? zone.country_id : null,
         viewoption: null,
@@ -1804,7 +1828,7 @@ exports.addLeadForWebIntegration = async (req, res, next) => {
         child_pre_school: "",
         programcategory_id: req.body.programcategory_id ? req.body.programcategory_id : mongoose.Types.ObjectId("64a27694d081b651a5b83db4"),
         program_id: req.body.program_id ? req.body.program_id : mongoose.Types.ObjectId("64a276bdd081b651a5b83db8"),
-        school_id: req.body.center_id ? req.body.center_id : mongoose.Types.ObjectId("64a26f270754b33d31c62b79"),
+        school_id: foundCenter ? foundCenter : mongoose.Types.ObjectId("64a26f270754b33d31c62b79"),
         zone_id: zone ? zone.zone_id : null,
         country_id: zone ? zone.country_id : null,
         viewoption: null,

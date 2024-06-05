@@ -180,10 +180,10 @@ router.post('/add',
 );
 
 router.post('/addext', 
-  accountController.Auth,
-  accountController.checkToken,
-  Validator('addLead'),
-  handlers.requireAPIPermission(permission_name.LEAD_ADD),
+  // accountController.Auth,
+  // accountController.checkToken,
+  // Validator('addLead'),
+  // handlers.requireAPIPermission(permission_name.LEAD_ADD),
   leadsController.addLeadPost_ext
 );
 
