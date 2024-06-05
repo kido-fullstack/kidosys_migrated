@@ -41,8 +41,8 @@ sleFlds = {
 }
 
 # Fetch all documents from the collection
-# documents = collection.find({},sleFlds)
-documents = collection.find({},sleFlds).limit(10).skip(0)
+documents = collection.find({},sleFlds)
+# documents = collection.find({},sleFlds).limit(10).skip(0)
 # documents = collection.find({},sleFlds)
 # documents = collection.find({},sleFlds)
 

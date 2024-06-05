@@ -4629,7 +4629,7 @@ exports.datatableFilter = async (req, res, next) => {
     // ----------------------------LEAD PAGE datatable-----------------;
     // console.log('AAAAAAAAAAA');
     const stages = ["New Lead", "Enquiry Received", "Tour Booked", "Closed-Lead Lost", "Post Tour", "Closed-Enquiry Lost", "Closed - Won"];
-    const sortingArr = [" ","lead_no", "lead_date", "updatedAt", "parent_name", "child_first_name", "child_last_name", "stage_sort", "type", `${req.session.user.main && req.session.user.main == req.config.admin.main ? 'school_id.school_display_name' : 'child_first_name'}`, "source_category", "parent_know_aboutus",  "program_id.program_name",  "status_id.name","substatus_id.name", "programcategory_id.title",  "lead_no"];
+    const sortingArr = [" ","updatedAt", "lead_date", "updatedAt", "parent_name", "child_first_name", "child_last_name", "stage_sort", "type", `${req.session.user.main && req.session.user.main == req.config.admin.main ? 'school_id.school_display_name' : 'child_first_name'}`, "source_category", "parent_know_aboutus",  "program_id.program_name",  "status_id.name","substatus_id.name", "programcategory_id.title",  "lead_no"];
 
     let sleFlds = {
       'lead_no': 1,
@@ -4810,8 +4810,8 @@ exports.datatableFilter = async (req, res, next) => {
     let sortDirctn = (req.query.sSortDir_0 == 'asc') ? 1 : -1
     let sortObj = { updatedAt: sortDirctn };
 
-    if(req.query.iSortCol_0){
-      console.log(req.query.iSortCol_0);
+    if(req.query.iSortCol_0){      
+      // console.log(req.query.iSortCol_0);
       let srtInd = sortingArr[req.query.iSortCol_0];
       sortObj = {};
       sortObj[srtInd] = sortDirctn;
