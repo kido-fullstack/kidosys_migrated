@@ -456,12 +456,12 @@ exports.exportLeads = async (req, res, next) => {
       });
     });
 
-    let csvData = convertToCSV(dataset)
+    // let csvData = convertToCSV(dataset)
 
-    console.log("csv responded");
-    res.setHeader('Content-Type', 'text/csv');
-    res.setHeader('Content-Disposition', 'attachment; filename="'+`Lead Export__${currentDate.format("DD-MMMM-YYYY hh:mm")}.csv`+'"');
-    return res.send(csvData);
+    // console.log("csv responded");
+    // res.setHeader('Content-Type', 'text/csv');
+    // res.setHeader('Content-Disposition', 'attachment; filename="'+`Lead Export__${currentDate.format("DD-MMMM-YYYY hh:mm")}.csv`+'"');
+    // return res.send(csvData);
 
     Promise.all(dataset)
       .then(result => {
