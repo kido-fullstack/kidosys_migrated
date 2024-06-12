@@ -6300,7 +6300,6 @@ exports.datatableFollowupFilter = async (req, res, next) => {
       return acc;
     }, {});
 
-
     let usrCentrs= {status:"active"};
     if (!(req.session.user.main && req.session.user.main == req.config.admin.main)) {
       usrCentrs["_id"] = {$in: req.session.user.center_id};
