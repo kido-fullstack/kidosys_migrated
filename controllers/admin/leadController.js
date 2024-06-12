@@ -6403,6 +6403,22 @@ exports.datatableFollowupFilter = async (req, res, next) => {
       findObj["stage"] = req.query.sSearch_6;
     }
   
+    if (req.query.Searchkey_0 == 'true') {
+      findObj["do_followup"] = 0;
+      // findQue = {
+      //   do_followup: 0
+      // };
+      // // console.log(aggregateQue)
+      // _.remove(aggregateQue, '$match.do_followup');
+      // _.remove(aggregateQue, '$match.follow_due_date');
+      // aggregateQue.unshift({
+      //   '$match': {
+      //     'do_followup': 0
+      //   }
+      // });
+    }
+
+
     if (req.query.sSearch) { 
 
       findObj["$or"] = [
