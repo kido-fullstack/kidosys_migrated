@@ -6419,7 +6419,7 @@ exports.datatableFollowupFilter = async (req, res, next) => {
     }
 
     if (req.query.Searchkey_1 == "true") {
-      findObj["someday_follow"] = 0;
+      findObj["someday_follow"] = 1;
     }
 
     if (req.query.sSearch) { 
