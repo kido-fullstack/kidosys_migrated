@@ -336,6 +336,12 @@ try{
         }
       }
 
+      var sourcCateg =  finSocialData.campaign_name && finSocialData.campaign_name.includes("Event") ? "database/events" : "digital-lead";
+
+      if(finSocialData.campaign_name.includes("Hiring")){
+        sourcCateg = "database/events";
+        programId = "";
+      }
 
       // return res.send(finSocialData);
 
@@ -384,7 +390,7 @@ try{
         parent_whatsapp: finSocialData.phone_number,
         parent_second_whatsapp: 0,
         parent_first_whatsapp: 1,
-        source_category: finSocialData.campaign_name && finSocialData.campaign_name.includes("Event") ? "database/events" : "digital-lead",
+        source_category: sourcCateg,
         status_id: mongoose.Types.ObjectId("63b3fa85f1f372a8e4fdb0e1"),
         substatus_id: mongoose.Types.ObjectId("63b3fb6ff1f372a8e4fdb0eb"),
         stage: "New Lead",
