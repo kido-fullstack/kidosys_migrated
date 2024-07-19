@@ -379,6 +379,8 @@ block content
                           //- option(value=programcategory._id) #{programcategory.title}
                           if lead.parent_state
                             option(value=`${state.id}|${state._id}` selected=(state._id.toString() == lead.parent_state.toString())) #{state.state_name}
+                          else
+                            option(value=`${state.id}|${state._id}`) #{state.state_name}
                   .col-md-6.col-lg-4
                     .form-group
                       label(for='parent_city') City
@@ -391,11 +393,15 @@ block content
                         //-     option(value=`${city.id}|${city._id}` selected=(city._id.toString() == lead.parent_city.toString())) #{city.city_name}
                         each state in states
                           each city in citys
-                            if lead.parent_city
-                              if (state._id.toString() == lead.parent_state.toString())
-                                if(state.id == city.state_id)
+                            if state.id == city.state_id
+                              if lead.parent_city
+                                if (lead.parent_state && state._id.toString() == lead.parent_state.toString())
                                   option(value=`${city.id}|${city._id}` selected=(city._id.toString() == lead.parent_city.toString())) #{city.city_name}
-
+                                else
+                                  option(value=`${city.id}|${city._id}`) #{city.city_name}
+                              else
+                                if (lead.parent_state && state._id.toString() == lead.parent_state.toString())
+                                  option(value=`${city.id}|${city._id}`) #{city.city_name}
                   .col-md-6.col-lg-4
                     .form-group
                       label(for='parent_area') Area/Locality/Sector

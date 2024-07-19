@@ -3441,13 +3441,15 @@ exports.getEditLead = async (req, res, next) => {
         },
       ]);
 
+      const state_ids = await State.findOne({ _id: lead.parent_state });
+      const state_id = state_ids ? Number(state_ids.id) : null;
       // console.log(states, "states");
       const citys = await City.aggregate([
         {
           $match: {
-            country_id: country_ids
-              ? country_ids.country_id
-              : { $exists: false },
+            state_id: state_id
+              ? state_id
+              : { $exists: true },
           },
         },
       ]);
