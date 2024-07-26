@@ -15,18 +15,4 @@ router.get('/get',
   programCatController.GetProgramByCenter
 );
 
-// Duplicate API for Atto Frontend dev
-router.get('/get/by/center',
-  accountController.Auth,
-  accountController.checkToken,
-  programCatController.GetProByCenter
-);
-
-// Duplicate API for Atto Frontend dev
-router.get('/getbycenter',
-  accountController.Auth,
-  accountController.checkToken,
-  programCatController.GetProgramByCenter
-);
-
 module.exports = router;
