@@ -3,7 +3,7 @@ const router = express.Router();
 const programController = require('../../../controllers/api/programController');
 const accountController = require('../../../controllers/api/accountController');
 
-router.get('/getbycategory',
+router.get('/get',
   accountController.Auth,
   accountController.checkToken,
   programController.GetProByProCat
@@ -14,7 +14,7 @@ router.get('/all',
   programController.getAllProgram
 );
 
-router.get('/get',
+router.get('/getbycategory',
   accountController.Auth,
   accountController.checkToken,
   programController.getProgramByProgramCategory

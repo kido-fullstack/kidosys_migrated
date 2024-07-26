@@ -3,13 +3,13 @@ const router = express.Router();
 const programCatController = require('../../../controllers/api/programCatController');
 const accountController = require('../../../controllers/api/accountController');
 
-router.get('/getbycenter',
+router.get('/get/by/center',
   accountController.Auth,
   accountController.checkToken,
   programCatController.GetProByCenter
 );
 
-router.get('/get',
+router.get('/getbycenter',
   accountController.Auth,
   accountController.checkToken,
   programCatController.GetProgramByCenter
