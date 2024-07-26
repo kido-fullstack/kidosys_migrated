@@ -98,5 +98,34 @@ router.get('/otherclient/:message_id',
   quickResponseController.getOtherClientQuickResponse
 );
 
+router.get('/send/:message_id',
+  accountController.Auth,
+  accountController.checkToken,
+  handlers.requireAPIPermission(permission_name.MSG_LISTING),
+  quickResponseController.sendQuickResponseThroughList
+);
+
+router.get('/all/lead/list/:message_id/:page',
+  accountController.Auth,
+  accountController.checkToken,
+  handlers.requireAPIPermission(permission_name.MSG_LISTING),
+  quickResponseController.getAllLeadListQuickResponse
+);
+
+router.post('/send/message',
+  accountController.Auth,
+  accountController.checkToken,
+  handlers.requireAPIPermission(permission_name.MSG_LISTING),
+  Validator('sendMessage'),
+  quickResponseController.postSendMessageToLead
+);
+
+router.post('/send/email/multiple',
+  accountController.Auth,
+  accountController.checkToken,
+  handlers.requireAPIPermission(permission_name.MSG_LISTING),
+  quickResponseController.postSendEmailToMultipleLeads
+);
+
 
 module.exports = router;

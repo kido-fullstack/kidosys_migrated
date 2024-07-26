@@ -3,6 +3,9 @@ const router = express.Router();
 const accountController = require('../../../controllers/api/accountController');
 const centerController = require('../../../controllers/api/centerController');
 
+// Adding to support get geographical data API
+const Validator = require('../../../middlewares/Validator');
+
 router.get('/',
   centerController.test
 );
@@ -28,6 +31,19 @@ router.get('/all',
   accountController.Auth,
   accountController.checkToken,
   centerController.allCenter
+);
+
+router.get('/getbyuser',
+  accountController.Auth,
+  accountController.checkToken,
+  centerController.getByUser
+);
+
+router.post('/get/geographical/data',
+  accountController.Auth,
+  accountController.checkToken,
+  Validator('centerId'),
+  centerController.getDataByCenter
 );
 
 module.exports = router;

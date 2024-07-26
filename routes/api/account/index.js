@@ -24,4 +24,14 @@ router.get('/my',
   accountController.getMyAccount
 );
 
+router.post('/login/verify',
+  Validator('OTP'),
+  accountController.postLoginVerify
+);
+
+router.post('/resend/otp',
+  Validator('resendOTP'),
+  accountController.postResendOTP
+);
+
 module.exports = router;

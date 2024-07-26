@@ -5,6 +5,11 @@ const moment = require('moment');
 const helper = require('../../handlers/helper');
 const response = require('../../handlers/response');
 
+// Adding to support get data by center API.
+const State = mongoose.model('State');
+const Country = mongoose.model('Country');
+const City = mongoose.model('City');
+
 exports.test = (req, res, next) => {
   return res.json({
     message: 'API working'
@@ -120,6 +125,85 @@ exports.allCenter = async (req, res, next) => {
     }
   } catch (err) {
     helper.errorDetailsForControllers(err, "allCenter - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
+/* 
+  This method is responsible to get centers by user.
+  Previously removed by Sayyed. Adding back on Mayank & Rahul's requirement to test the API for mobile APK.
+*/
+exports.getByUser = async (req, res, next) => {
+  try {
+    let centers = [];
+    if (req.user && req.user.main == req.config.admin.main) {
+      // Admin
+      centers = await Center
+        .find({ status: "active" }, {
+          school_name: 1,
+          school_display_name: 1
+        })
+        .sort({ school_name: 1 });
+    } else {
+      // Non-Admin
+      const viewOption = await ViewOption.findOne({
+        _id: req.user.view_option
+      });
+      centers = await Center
+        .find({ _id: { $in: viewOption.centers }, status: "active" }, {
+          school_name: 1,
+          school_display_name: 1
+        })
+        .sort({ school_name: 1 });
+    }
+    return res.status(200).json(response.responseSuccess("Get center according to user!", centers, 200));
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "allCenter - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
+/* 
+  This method is responsible to get the data by center.
+  Previously removed by Sayyed. Adding back on Mayank & Rahul's requirement to test the API for mobile APK.
+*/
+exports.getDataByCenter = async (req, res, next) => {
+  try {
+    const center = await Center.findOne({
+      _id: req.body.center_id
+    });
+    if (center) {
+      if (center.state && center.city) {
+        const state = await State.findOne({
+          state_name: center.state
+        }, { id: 1, country_id: 1, state_name: 1,  });
+        const city = await City.findOne({
+          city_name: center.city
+        }, { id: 1, country_id: 1, city_name: 1, state_id: 1 })
+        if (state) {
+          var country = await Country.findOne({
+            country_id: state.country_id
+          }, { country_id: 1, country_code: 1, country_name: 1 })
+        }
+        return res.status(200).json(response.responseSuccess("Get data by center.", {
+          country: country || {},
+          state: state || {},
+          city: city || {}
+        }, 200));
+      } else {
+        return res.status(200).json(response.responseSuccess("Get data by center.", {
+          country: {},
+          state: {},
+          city: {}
+        }, 200));
+      }
+    } else {
+      return res.status(400).json(response.responseError('Center not found.', 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "getDataByCenter - post request", req.originalUrl, req.body, {}, "api", __filename);
     next(err);
     return;
   }
