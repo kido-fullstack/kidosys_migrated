@@ -116,7 +116,7 @@ router.post('/send/message',
   accountController.Auth,
   accountController.checkToken,
   handlers.requireAPIPermission(permission_name.MSG_LISTING),
-  Validator('sendMessage'),
+  // Validator('sendMessage'),
   quickResponseController.postSendMessageToLead
 );
 

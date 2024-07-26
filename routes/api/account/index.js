@@ -25,12 +25,12 @@ router.get('/my',
 );
 
 router.post('/login/verify',
-  Validator('OTP'),
+  // Validator('OTP'),
   accountController.postLoginVerify
 );
 
 router.post('/resend/otp',
-  Validator('resendOTP'),
+  // Validator('resendOTP'),
   accountController.postResendOTP
 );
 

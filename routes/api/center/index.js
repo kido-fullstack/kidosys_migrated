@@ -42,7 +42,7 @@ router.get('/getbyuser',
 router.post('/get/geographical/data',
   accountController.Auth,
   accountController.checkToken,
-  Validator('centerId'),
+  // Validator('centerId'),
   centerController.getDataByCenter
 );
 
