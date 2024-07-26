@@ -213,6 +213,7 @@ exports.exportLeads = async (req, res, next) => {
       parent_name: 1,
       child_first_name: 1,
       child_last_name: 1,
+      child_dob: 1,
       source_category: 1,
       parent_know_aboutus: 1,
       program_id: 1,
@@ -314,6 +315,11 @@ exports.exportLeads = async (req, res, next) => {
         displayName: "Child Last Name",
         headerStyle: {},
         width: 120
+      },
+      childDOB: {
+        displayName: "Child DOB",
+        headerStyle: {},
+        width: 80
       },
       sourceCat: {
         displayName: "Category",
@@ -442,6 +448,7 @@ exports.exportLeads = async (req, res, next) => {
         leadName: lead.parent_name ? lead.parent_name : "",
         childFirstName: lead.child_first_name ? lead.child_first_name : "",
         childLastName: lead.child_last_name ? lead.child_last_name : "",
+        childDOB: lead.child_dob ? moment(lead.child_dob).format("DD/MM/YYYY") : "",
         sourceCat: getSourceCatName(lead.source_category ? lead.source_category.trim() : "" || ""),
         sourcePrimary: lead.parent_know_aboutus && lead.parent_know_aboutus.length ? lead.parent_know_aboutus[0] : "",
         source: lead.parent_know_aboutus && lead.parent_know_aboutus.length ? lead.parent_know_aboutus.slice(1): "",
