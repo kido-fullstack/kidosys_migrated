@@ -589,11 +589,12 @@ block content
         function isEnrolledSelected() {
           return $('#substatus option:selected').text().trim().toLowerCase() === 'enrolled';
         }
-        if (isEnrolledSelected()) {
-          $('.btn-save-changes').hide();
-        } else {
-          $('.btn-save-changes').show();
-        }
+        //- Temp: Allow to display Save changes button for enrolled sub status.
+        //- if (isEnrolledSelected()) {
+        //-   $('.btn-save-changes').hide();
+        //- } else {
+        //-   $('.btn-save-changes').show();
+        //- }
         //- $('#substatus').change(function() {
         //-   if (isEnrolledSelected()) {
         //-     $('.btn-save-changes').hide();
