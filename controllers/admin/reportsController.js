@@ -321,6 +321,11 @@ exports.exportLeads = async (req, res, next) => {
         headerStyle: {},
         width: 80
       },
+      age: {
+        displayName: "Age (Today)",
+        headerStyle: {},
+        width: 80
+      },
       sourceCat: {
         displayName: "Category",
         headerStyle: {},
@@ -430,7 +435,6 @@ exports.exportLeads = async (req, res, next) => {
     // const endTime = Date.now();
     // const timeTaken1 = (endTime - startTime) / 1000; // Convert milliseconds to seconds
     // console.log(timeTaken1+"dataset ready");
-
     const dataset = [];
     results.map((lead, i) => {
       // console.log(lead.follow_due_time);
@@ -442,13 +446,14 @@ exports.exportLeads = async (req, res, next) => {
         walkins: getLeadType(lead.type ? lead.type : ""),
         lead_id: lead.lead_no,
         parent_email: lead.parent_email,
-        leadDate: lead.lead_date ? moment(lead.lead_date).format("DD/MM/YYYY") : "",
+        leadDate: lead.lead_date ? moment(lead.lead_date).format("DD/MM/YYYY h:mm A") : "",
         leadUpdatedDate: lead.updatedAt ? moment(lead.updatedAt).format("DD/MM/YYYY h:mm A") : "",
         dueIn: lead.follow_due_date ? dueDateFormatWithMoment(lead.follow_due_date ? lead.follow_due_date : "", lead.follow_due_time) : "",
         leadName: lead.parent_name ? lead.parent_name : "",
         childFirstName: lead.child_first_name ? lead.child_first_name : "",
         childLastName: lead.child_last_name ? lead.child_last_name : "",
         childDOB: lead.child_dob ? moment(lead.child_dob).format("DD/MM/YYYY") : "",
+        age: lead.child_dob ? helper.calculateAge(lead.child_dob) : "",
         sourceCat: getSourceCatName(lead.source_category ? lead.source_category.trim() : "" || ""),
         sourcePrimary: lead.parent_know_aboutus && lead.parent_know_aboutus.length ? lead.parent_know_aboutus[0] : "",
         source: lead.parent_know_aboutus && lead.parent_know_aboutus.length ? lead.parent_know_aboutus.slice(1): "",

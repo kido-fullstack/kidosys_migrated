@@ -229,3 +229,29 @@ exports.leadCounter = async () => {
   await count.save();
   return newLeadNumber;
 }
+
+exports.calculateAge = (dob) => {
+  const today = new Date();
+  const birthDate = new Date(dob);
+  let yearsDifference = today.getFullYear() - birthDate.getFullYear();
+  let monthsDifference = today.getMonth() - birthDate.getMonth();
+  if (monthsDifference < 0) {
+    yearsDifference--;
+    monthsDifference += 12;
+  } 
+  let age;
+  if (yearsDifference == 0 && monthsDifference > 0) {
+    age = monthsDifference + " months";
+  } else if (yearsDifference == 1 && monthsDifference == 0) {
+    age = yearsDifference + " year "; 
+  } else if (yearsDifference == 1 && monthsDifference == 1) {
+    age = yearsDifference + " year " + monthsDifference + " month";
+  } else if (yearsDifference == 1 && monthsDifference > 1) {
+    age = yearsDifference + " year " + monthsDifference + " months";
+  } else if (yearsDifference > 1 && monthsDifference > 1) {
+    age = yearsDifference + " years " + monthsDifference + " months";
+  } else {
+    age = 0 + " months";
+  }
+  return age;
+}
