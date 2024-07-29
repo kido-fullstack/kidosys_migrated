@@ -238,7 +238,7 @@ exports.calculateAge = (dob) => {
   if (monthsDifference < 0) {
     yearsDifference--;
     monthsDifference += 12;
-  } 
+  }
   let age;
   if (yearsDifference == 0 && monthsDifference > 0) {
     age = monthsDifference + " months";
@@ -251,7 +251,7 @@ exports.calculateAge = (dob) => {
   } else if (yearsDifference > 1 && monthsDifference > 1) {
     age = yearsDifference + " years " + monthsDifference + " months";
   } else {
-    age = 0 + " months";
+    age = yearsDifference + " years " + monthsDifference + " months";
   }
   return age;
 }
