@@ -27,6 +27,51 @@ exports.GetProByProCat = async (req, res, next) => {
   }
 };
 
+exports.GetProByProCatNew = async (req, res, next) => {
+  try {
+    const programs = await Program.find(
+      {
+        programcategory_id: req.body.cat_id,
+        status: "active",
+      }, { program_name: 1 })
+      .sort({ order: 1 });
+
+    if (programs.length) {
+      return res.status(200).json(response.responseSuccess("Programs according to program category.", programs, 200));
+    } else {
+      return res.status(400).json(response.responseError('No programs found.', 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "GetProByProCat - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
+exports.getProgramByProgramCategoryNew = async (req, res, next) => {
+  try {
+    if (req.query.programcategory_id) {
+      const programCats = await Program.find({ programcategory_id: mongoose.Types.ObjectId(req.query.programcategory_id) }, { program_name: 1 });
+      if (programCats) {
+        return res.status(200).json(response.responseSuccess("Program according to a ProgramCategory", programCats, 200));
+      } else {
+        return res.status(400).json(response.responseError("No program  found.", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+    } else {
+      const programCats = await Program.find({}, { program_name: 1 });
+      if (programCats) {
+        return res.status(200).json(response.responseSuccess("All Programs.", programCats, 200));
+      } else {
+        return res.status(400).json(response.responseError("No program  found.", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "getAllProgram - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
 exports.getAllProgram = async (req, res, next) => {
   try {
     let programs;
