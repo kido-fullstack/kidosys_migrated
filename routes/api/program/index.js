@@ -20,4 +20,16 @@ router.get('/get',
   programController.getProgramByProgramCategory
 );
 
+router.get('/get/new',
+  accountController.Auth,
+  accountController.checkToken,
+  programController.GetProByProCatNew
+);
+
+router.get('/getbycategory/new',
+  accountController.Auth,
+  accountController.checkToken,
+  programController.getProgramByProgramCategoryNew
+);
+
 module.exports = router;
