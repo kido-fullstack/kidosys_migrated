@@ -76,6 +76,124 @@ exports.getAllTodayLeads = async (req, res, next) => {
   }
 };
 
+exports.getAllTodayLeadsNew = async (req, res, next) => {
+  try {
+    let bookmarkedLeads = [];
+    const timeZone = momentZone.tz.guess();
+    let start = momentZone.tz(moment().valueOf(), "Asia/Kolkata").startOf('day').toDate();
+    let end = momentZone.tz(moment().valueOf(), "Asia/Kolkata").endOf('day').toDate();
+    const page = req.params.page || 1;
+    const limit = 10;
+    const skip = (page * limit) - limit;
+    console.log(req.query, "paramss")
+    let sorting_feild = { lead_date: -1 }
+    if (req.query) {
+      if (req.query.data) {
+        if (req.query.data == "asc") {
+          sorting_feild = { lead_date: 1 }
+        } else {
+          sorting_feild = { lead_date: -1 }
+        }
+      } else if (req.query.lead_name) {
+        if (req.query.lead_name == "asc") {
+          sorting_feild = { parent_name: 1 }
+        } else {
+          sorting_feild = { parent_name: -1 }
+        }
+      }
+    } else {
+      console.log("else")
+      sorting_feild = { lead_date: -1 }
+    }
+    console.log(sorting_feild)
+    // return
+    if (req.user && req.user.main == req.config.admin.main) {
+      const leadsPromise = Lead.leadDataNew(isAdmin = 1, start, end, req.user._id, skip, limit, null, sorting_feild)
+      const countPromise = Lead.leadCount(isAdmin = 1, start, end, null);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+      const pages = Math.ceil(count / limit);
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All Leads Today", { total_records: count, leads }, 200));
+    } else {
+      let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leadsPromise = Lead.leadDataNew(isAdmin = 0, start, end, req.user._id, skip, limit, objectIdArray, sorting_feild)
+      const countPromise = Lead.leadCount(isAdmin = 0, start, end, objectIdArray);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+      const pages = Math.ceil(count / limit);
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All Lead  Today", { total_records: count, leads }, 200));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "allLeadToday - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
 exports.getAllYesterdayLeads = async (req, res, next) => {
   try {
       const timeZone = momentZone.tz.guess();
@@ -123,6 +241,122 @@ exports.getAllYesterdayLeads = async (req, res, next) => {
         return res.status(400).json(response.responseError("Leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
       }
       return res.status(200).json(response.responseSuccess("All Lead  Yesterday", {total_records: count, leads}, 200));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "allLeadYesterday - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
+exports.getAllYesterdayLeadsNew = async (req, res, next) => {
+  try {
+    let bookmarkedLeads = [];
+    const timeZone = momentZone.tz.guess();
+    let start = momentZone.tz(moment().subtract(1, 'day').valueOf(), "Asia/Kolkata").startOf('day').toDate();
+    let end = momentZone.tz(moment().subtract(1, 'day').valueOf(), "Asia/Kolkata").endOf('day').toDate();
+    const page = req.params.page || 1;
+    const limit = 10;
+    const skip = (page * limit) - limit;
+    let sorting_feild = { lead_date: -1 }
+    if (req.query) {
+      if (req.query.data) {
+        if (req.query.data == "asc") {
+          sorting_feild = { lead_date: 1 }
+        } else {
+          sorting_feild = { lead_date: -1 }
+        }
+      } else if (req.query.lead_name) {
+        if (req.query.lead_name == "asc") {
+          sorting_feild = { parent_name: 1 }
+        } else {
+          sorting_feild = { parent_name: -1 }
+        }
+      }
+    } else {
+      console.log("else")
+      sorting_feild = { lead_date: -1 }
+    }
+    console.log(sorting_feild)
+    if (req.user && req.user.main == req.config.admin.main) {
+      const leadsPromise = Lead.leadDataNew(isAdmin = 1, start, end, req.user._id, skip, limit, null, sorting_feild)
+      const countPromise = Lead.leadCount(isAdmin = 1, start, end, null);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+      const pages = Math.ceil(count / limit);
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All Lead  Yesterday", { total_records: count, leads }, 200));
+    } else {
+      let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leadsPromise = Lead.leadDataNew(isAdmin = 0, start, end, req.user._id, skip, limit, objectIdArray, sorting_feild)
+      const countPromise = Lead.leadCount(isAdmin = 0, start, end, objectIdArray);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+      const pages = Math.ceil(count / limit);
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All Lead  Yesterday", { total_records: count, leads }, 200));
     }
   } catch (err) {
     helper.errorDetailsForControllers(err, "allLeadYesterday - get request", req.originalUrl, req.body, {}, "api", __filename);
@@ -295,6 +529,225 @@ exports.getAllOlderLeads = async (req, res, next) => {
   }
 };
 
+exports.getAllOlderLeadsNew = async (req, res, next) => {
+  try {
+    let bookmarkedLeads = [];
+    const timeZone = momentZone.tz.guess();
+    let start = momentZone.tz(moment().subtract(3650, 'day').valueOf(), "Asia/Kolkata").startOf('day').toDate(); // last 10 years
+    let end = momentZone.tz(moment().valueOf(), "Asia/Kolkata").endOf('day').toDate();
+    const page = req.params.page || 1;
+    const limit = 10;
+    const skip = (page * limit) - limit;
+    let sorting_feild = { lead_date: -1 }
+    if (req.query) {
+      if (req.query.data) {
+        if (req.query.data == "asc") {
+          sorting_feild = { lead_date: 1 }
+        } else {
+          sorting_feild = { lead_date: -1 }
+        }
+      } else if (req.query.lead_name) {
+        if (req.query.lead_name == "asc") {
+          sorting_feild = { parent_name: 1 }
+        } else {
+          sorting_feild = { parent_name: -1 }
+        }
+      }
+    } else {
+      console.log("else")
+      sorting_feild = { lead_date: -1 }
+    }
+    if (req.user && req.user.main == req.config.admin.main) {
+      const leadsPromise = Lead.leadDataNew(isAdmin = 1, start, end, req.user._id, skip, limit, null, sorting_feild)
+      const countPromise = Lead.leadCount(isAdmin = 1, start, end, null);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+      const pages = Math.ceil(count / limit);
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All Lead Older", { total_records: count, leads }, 200));
+    } else {
+      let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leadsPromise = Lead.leadDataNew(isAdmin = 0, start, end, req.user._id, skip, limit, objectIdArray, sorting_feild)
+      const countPromise = Lead.leadCount(isAdmin = 0, start, end, objectIdArray);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+      const pages = Math.ceil(count / limit);
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All Lead Older", { total_records: count, leads }, 200));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "allLeadThisWeek - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
+exports.getAllOlderNoPageLeads = async (req, res, next) => {
+  try {
+    let start = momentZone.tz(moment().subtract(3650, 'day').valueOf(), "Asia/Kolkata").startOf('day').toDate(); // last 10 years
+    let end = momentZone.tz(moment().valueOf(), "Asia/Kolkata").endOf('day').toDate();
+    let sorting_feild = { lead_date: -1 }
+    if (req.query) {
+      if (req.query.data) {
+        if (req.query.data == "asc") {
+          sorting_feild = { lead_date: 1 }
+        } else {
+          sorting_feild = { lead_date: -1 }
+        }
+      } else if (req.query.lead_name) {
+        if (req.query.lead_name == "asc") {
+          sorting_feild = { parent_name: 1 }
+        } else {
+          sorting_feild = { parent_name: -1 }
+        }
+      }
+    } else {
+      console.log("else")
+      sorting_feild = { lead_date: -1 }
+    }
+    if (req.user && req.user.main == req.config.admin.main) {
+      const leads = await Lead.leadNoPageData(isAdmin = 1, start, end, req.user._id, null, sorting_feild);
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All Lead Older", leads, 200));
+    } else {
+      let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leads = await Lead.leadNoPageData(isAdmin = 0, start, end, req.user._id, objectIdArray, sorting_feild);
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All Lead Older", leads, 200));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "allLeadThisWeek - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
 exports.getAllTodayEnquiry = async (req, res, next) => {
   try {
     const timeZone = momentZone.tz.guess();
@@ -335,6 +788,122 @@ exports.getAllTodayEnquiry = async (req, res, next) => {
   }
 };
 
+exports.getAllTodayEnquiryNew = async (req, res, next) => {
+  try {
+    let bookmarkedLeads = [];
+    const timeZone = momentZone.tz.guess();
+    let start = momentZone.tz(moment().valueOf(), "Asia/Kolkata").startOf('day').toDate();
+    let end = momentZone.tz(moment().valueOf(), "Asia/Kolkata").endOf('day').toDate();
+    const page = req.params.page || 1;
+    const limit = 10;
+    const skip = (page * limit) - limit;
+    let sorting_feild = { lead_date: -1 }
+    if (req.query) {
+      if (req.query.data) {
+        if (req.query.data == "asc") {
+          sorting_feild = { lead_date: 1 }
+        } else {
+          sorting_feild = { lead_date: -1 }
+        }
+      } else if (req.query.lead_name) {
+        if (req.query.lead_name == "asc") {
+          sorting_feild = { parent_name: 1 }
+        } else {
+          sorting_feild = { parent_name: -1 }
+        }
+      }
+    } else {
+      console.log("else")
+      sorting_feild = { lead_date: -1 }
+    }
+
+    if (req.user && req.user.main == req.config.admin.main) {
+      const leadsPromise = Lead.enquiryDataNew(isAdmin = 1, start, end, req.user._id, skip, limit, null, sorting_feild)
+      const countPromise = Lead.enquiryCount(isAdmin = 1, start, end, null)
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+      const pages = Math.ceil(count / limit);
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Enquiry not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All enquiries today", { total_records: count, leads }, 200));
+    } else {
+      let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leadsPromise = Lead.enquiryDataNew(isAdmin = 0, start, end, req.user._id, skip, limit, objectIdArray, sorting_feild);
+      const countPromise = Lead.enquiryCount(isAdmin = 0, start, end, objectIdArray);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+      const pages = Math.ceil(count / limit);
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "leads"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Enquiry not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All enquiries today", { total_records: count, leads }, 200));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "allenquirytoday - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
 exports.getAllYesterdayEnquiry = async (req, res, next) => {
   try {
       const timeZone = momentZone.tz.guess();
@@ -363,6 +932,122 @@ exports.getAllYesterdayEnquiry = async (req, res, next) => {
         return res.status(400).json(response.responseError("Enquiry not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
       }
       return res.status(200).json(response.responseSuccess("All enquiry yesterday!", {total_records: count, leads}, 200));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "allEnquiryYesterday - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
+exports.getAllYesterdayEnquiryNew = async (req, res, next) => {
+  try {
+    let bookmarkedLeads = [];
+    const timeZone = momentZone.tz.guess();
+    let start = momentZone.tz(moment().subtract(1, 'day').valueOf(), "Asia/Kolkata").startOf('day').toDate();
+    let end = momentZone.tz(moment().subtract(1, 'day').valueOf(), "Asia/Kolkata").endOf('day').toDate();
+    const page = req.params.page || 1;
+    const limit = 10;
+    const skip = (page * limit) - limit;
+    let sorting_feild = { lead_date: -1 };
+    if (req.query) {
+      if (req.query.data) {
+        if (req.query.data == "asc") {
+          sorting_feild = { lead_date: 1 }
+        } else {
+          sorting_feild = { lead_date: -1 }
+        }
+      } else if (req.query.lead_name) {
+        if (req.query.lead_name == "asc") {
+          sorting_feild = { parent_name: 1 }
+        } else {
+          sorting_feild = { parent_name: -1 }
+        }
+      }
+    } else {
+      console.log("else")
+      sorting_feild = { lead_date: -1 }
+    }
+    if (req.user && req.user.main == req.config.admin.main) {
+      // let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leadsPromise = Lead.enquiryDataNew(isAdmin = 1, start, end, req.user._id, skip, limit, null, sorting_feild)
+      const countPromise = Lead.enquiryCount(isAdmin = 1, start, end, null);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+      const pages = Math.ceil(count / limit);
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Enquiry not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All enquiry yesterday", { total_records: count, leads }, 200));
+    } else {
+      let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leadsPromise = Lead.enquiryDataNew(isAdmin = 0, start, end, req.user._id, skip, limit, objectIdArray, sorting_feild);
+      const countPromise = Lead.enquiryCount(isAdmin = 0, start, end, objectIdArray);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+      const pages = Math.ceil(count / limit);
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Enquiry not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All enquiry yesterday!", { total_records: count, leads }, 200));
     }
   } catch (err) {
     helper.errorDetailsForControllers(err, "allEnquiryYesterday - get request", req.originalUrl, req.body, {}, "api", __filename);
@@ -468,6 +1153,121 @@ exports.getAllOlderEnquiry = async (req, res, next) => {
         return res.status(400).json(response.responseError("Enquiry not found !", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
       }
       return res.status(200).json(response.responseSuccess("All Enquiry Older", {total_records: count, leads}, 200));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "allEnquiryThisWeek - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
+exports.getAllOlderEnquiryNew = async (req, res, next) => {
+  try {
+    let bookmarkedLeads = [];
+    const timeZone = momentZone.tz.guess();
+    let start = momentZone.tz(moment().subtract(3650, 'day').valueOf(), "Asia/Kolkata").startOf('day').toDate(); // last 10 years
+    let end = momentZone.tz(moment().valueOf(), "Asia/Kolkata").endOf('day').toDate();
+    const page = req.params.page || 1;
+    const limit = 10;
+    const skip = (page * limit) - limit;
+    let sorting_feild = { lead_date: -1 };
+    if (req.query) {
+      if (req.query.data) {
+        if (req.query.data == "asc") {
+          sorting_feild = { lead_date: 1 }
+        } else {
+          sorting_feild = { lead_date: -1 }
+        }
+      } else if (req.query.lead_name) {
+        if (req.query.lead_name == "asc") {
+          sorting_feild = { parent_name: 1 }
+        } else {
+          sorting_feild = { parent_name: -1 }
+        }
+      }
+    } else {
+      console.log("else")
+      sorting_feild = { lead_date: -1 }
+    }
+    if (req.user && req.user.main == req.config.admin.main) {
+      const leadsPromise = Lead.enquiryDataNew(isAdmin = 1, start, end, req.user._id, skip, limit, null, sorting_feild)
+      const countPromise = Lead.enquiryCount(isAdmin = 1, start, end, null);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+      const pages = Math.ceil(count / limit);
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Enquiry not found !", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All Enquiry Older", { total_records: count, leads }, 200));
+    } else {
+      let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leadsPromise = Lead.enquiryDataNew(isAdmin = 0, start, end, req.user._id, skip, limit, objectIdArray, sorting_feild);
+      const countPromise = Lead.enquiryCount(isAdmin = 0, start, end, objectIdArray);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+      const pages = Math.ceil(count / limit);
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Enquiry not found !", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All Enquiry Older", { total_records: count, leads }, 200));
     }
   } catch (err) {
     helper.errorDetailsForControllers(err, "allEnquiryThisWeek - get request", req.originalUrl, req.body, {}, "api", __filename);
@@ -820,7 +1620,7 @@ exports.addLeadPost_ext = async (req, res, next) => {
     const status = await StatusCollection.find({ _id: mongoose.Types.ObjectId(req.body.status_id) }).toArray();
 
     // return zone
-    // return res.status(200).json(zone);    
+    // return res.status(200).json(zone);
 
     if(!zone){
       zone = await Center.findOne({ "school_display_name": "HO Centre" });
@@ -1727,7 +2527,7 @@ exports.addLeadForWebIntegration = async (req, res, next) => {
     //   }
     // }
     // return res.status(400).json(zone);
-   
+
     let foundCenter = req.body.center_id ? req.body.center_id : "64a26f270754b33d31c62b79";
 
     if(req.body.school_code){
@@ -1933,6 +2733,993 @@ exports.refreshData = async (req, res, next) => {
     });
   } catch (err) {
     console.log(err);
+    return;
+  }
+};
+
+exports.getAllLast7DaysNoPageLeads = async (req, res, next) => {
+  try {
+    const startOfWeek = moment().subtract(7, 'days');
+    const endOfWeek = moment().subtract(1, 'days');
+    const start = momentZone.tz(`${startOfWeek}`, "Asia/Kolkata").startOf('day').toDate();
+    const end = momentZone.tz(`${endOfWeek}`, "Asia/Kolkata").startOf('day').toDate();
+
+    let sorting_feild = { lead_date: -1 }
+    if (req.query) {
+      if (req.query.data) {
+        if (req.query.data == "asc") {
+          sorting_feild = { lead_date: 1 }
+        } else {
+          sorting_feild = { lead_date: -1 }
+        }
+      } else if (req.query.lead_name) {
+        if (req.query.lead_name == "asc") {
+          sorting_feild = { parent_name: 1 }
+        } else {
+          sorting_feild = { parent_name: -1 }
+        }
+      }
+    } else {
+      console.log("else")
+      sorting_feild = { lead_date: -1 }
+    }
+
+    if (req.user && req.user.main == req.config.admin.main) {
+      const leads = await Lead.leadNoPageData(isAdmin = 1, start, end, req.user._id, null, sorting_feild);
+
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All last 7 days leads", leads, 200));
+    } else {
+      let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leads = await Lead.leadNoPageData(isAdmin = 0, start, end, req.user._id, objectIdArray, sorting_feild);
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All last 7 days leads", leads, 200));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "getAllLast7DaysLeads - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
+exports.getAllLast7DaysLeads = async (req, res, next) => {
+  try {
+    let bookmarkedLeads = [];
+    const startOfWeek = moment().subtract(7, 'days');
+    const endOfWeek = moment().subtract(1, 'days');
+    const start = momentZone.tz(`${startOfWeek}`, "Asia/Kolkata").startOf('day').toDate();
+    const end = momentZone.tz(`${endOfWeek}`, "Asia/Kolkata").startOf('day').toDate();
+
+    const page = req.params.page || 1;
+    const limit = 10;
+    const skip = (page * limit) - limit;
+
+    let sorting_feild = { lead_date: -1 }
+    if (req.query) {
+      if (req.query.data) {
+        if (req.query.data == "asc") {
+          sorting_feild = { lead_date: 1 }
+        } else {
+          sorting_feild = { lead_date: -1 }
+        }
+      } else if (req.query.lead_name) {
+        if (req.query.lead_name == "asc") {
+          sorting_feild = { parent_name: 1 }
+        } else {
+          sorting_feild = { parent_name: -1 }
+        }
+      }
+    } else {
+      console.log("else")
+      sorting_feild = { lead_date: -1 }
+    }
+
+    if (req.user && req.user.main == req.config.admin.main) {
+      const leadsPromise = Lead.leadDataNew(isAdmin = 1, start, end, req.user._id, skip, limit, null, sorting_feild);
+      const countPromise = Lead.leadCount(isAdmin = 1, start, end, null);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+      const pages = Math.ceil(count / limit);
+
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length && skip) {
+        return res.status(400).json(response.responseError("Leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All last 7 days leads", { total_records: count, leads }, 200));
+    } else {
+      let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leadsPromise = Lead.leadDataNew(isAdmin = 0, start, end, req.user._id, skip, limit, objectIdArray, sorting_feild)
+      const countPromise = Lead.leadCount(isAdmin = 0, start, end, objectIdArray);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+      const pages = Math.ceil(count / limit);
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All last 7 days leads", { total_records: count, leads }, 200));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "getAllLast7DaysLeads - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
+exports.getAllLast30DaysNoPageLeads = async (req, res, next) => {
+  try {
+    const startOfWeek = moment().subtract(30, 'days');
+    const endOfWeek = moment().subtract(1, 'days');
+    const start = momentZone.tz(`${startOfWeek}`, "Asia/Kolkata").startOf('day').toDate();
+    const end = momentZone.tz(`${endOfWeek}`, "Asia/Kolkata").startOf('day').toDate();
+
+    let sorting_feild = { lead_date: -1 }
+    if (req.query) {
+      if (req.query.data) {
+        if (req.query.data == "asc") {
+          sorting_feild = { lead_date: 1 }
+        } else {
+          sorting_feild = { lead_date: -1 }
+        }
+      } else if (req.query.lead_name) {
+        if (req.query.lead_name == "asc") {
+          sorting_feild = { parent_name: 1 }
+        } else {
+          sorting_feild = { parent_name: -1 }
+        }
+      }
+    } else {
+      console.log("else")
+      sorting_feild = { lead_date: -1 }
+    }
+
+    if (req.user && req.user.main == req.config.admin.main) {
+      const leads = await Lead.leadNoPageData(isAdmin = 1, start, end, req.user._id, null, sorting_feild);
+
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All last 30 days leads", leads, 200));
+    } else {
+      let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leads = await Lead.leadNoPageData(isAdmin = 0, start, end, req.user._id, objectIdArray, sorting_feild)
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All last 30 days leads", leads, 200));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "getAllLast30Days - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
+exports.getAllLast30Days = async (req, res, next) => {
+  try {
+    let bookmarkedLeads = [];
+    const startOfWeek = moment().subtract(30, 'days');
+    const endOfWeek = moment().subtract(1, 'days');
+    const start = momentZone.tz(`${startOfWeek}`, "Asia/Kolkata").startOf('day').toDate();
+    const end = momentZone.tz(`${endOfWeek}`, "Asia/Kolkata").startOf('day').toDate();
+
+    const page = req.params.page || 1;
+    const limit = 10;
+    const skip = (page * limit) - limit;
+
+    let sorting_feild = { lead_date: -1 }
+    if (req.query) {
+      if (req.query.data) {
+        if (req.query.data == "asc") {
+          sorting_feild = { lead_date: 1 }
+        } else {
+          sorting_feild = { lead_date: -1 }
+        }
+      } else if (req.query.lead_name) {
+        if (req.query.lead_name == "asc") {
+          sorting_feild = { parent_name: 1 }
+        } else {
+          sorting_feild = { parent_name: -1 }
+        }
+      }
+    } else {
+      console.log("else")
+      sorting_feild = { lead_date: -1 }
+    }
+
+    if (req.user && req.user.main == req.config.admin.main) {
+      const leadsPromise = Lead.leadDataNew(isAdmin = 1, start, end, req.user._id, skip, limit, null, sorting_feild);
+      const countPromise = Lead.leadCount(isAdmin = 1, start, end, null);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+      const pages = Math.ceil(count / limit);
+
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length && skip) {
+        return res.status(400).json(response.responseError("Leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All last 30 days leads", { total_records: count, leads }, 200));
+    } else {
+      let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leadsPromise = Lead.leadDataNew(isAdmin = 0, start, end, req.user._id, skip, limit, objectIdArray, sorting_feild)
+      const countPromise = Lead.leadCount(isAdmin = 0, start, end, objectIdArray);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+      const pages = Math.ceil(count / limit);
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All last 30 days leads", { total_records: count, leads }, 200));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "getAllLast30Days - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
+exports.getAllTodayNoPageLeads = async (req, res, next) => {
+  try {
+    let start = momentZone.tz(moment().valueOf(), "Asia/Kolkata").startOf('day').toDate();
+    let end = momentZone.tz(moment().valueOf(), "Asia/Kolkata").endOf('day').toDate();
+
+    let sorting_feild = { lead_date: -1 }
+    if (req.query) {
+      if (req.query.data) {
+        if (req.query.data == "asc") {
+          sorting_feild = { lead_date: 1 }
+        } else {
+          sorting_feild = { lead_date: -1 }
+        }
+      } else if (req.query.lead_name) {
+        if (req.query.lead_name == "asc") {
+          sorting_feild = { parent_name: 1 }
+        } else {
+          sorting_feild = { parent_name: -1 }
+        }
+      }
+    } else {
+      console.log("else")
+      sorting_feild = { lead_date: -1 }
+    }
+    console.log(sorting_feild)
+    // return
+    if (req.user && req.user.main == req.config.admin.main) {
+      const leads = await Lead.leadNoPageData(isAdmin = 1, start, end, req.user._id, null, sorting_feild);
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All Leads No Page Today", leads, 200));
+    } else {
+      let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leads = await Lead.leadNoPageData(isAdmin = 0, start, end, req.user._id, objectIdArray, sorting_feild)
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All Lead No Page Today", leads, 200));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "allLeadToday - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
+exports.getAllYesterdayNoPageLeads = async (req, res, next) => {
+  try {
+    let start = momentZone.tz(moment().subtract(1, 'day').valueOf(), "Asia/Kolkata").startOf('day').toDate();
+    let end = momentZone.tz(moment().subtract(1, 'day').valueOf(), "Asia/Kolkata").endOf('day').toDate();
+    let sorting_feild = { lead_date: -1 }
+    if (req.query) {
+      if (req.query.data) {
+        if (req.query.data == "asc") {
+          sorting_feild = { lead_date: 1 }
+        } else {
+          sorting_feild = { lead_date: -1 }
+        }
+      } else if (req.query.lead_name) {
+        if (req.query.lead_name == "asc") {
+          sorting_feild = { parent_name: 1 }
+        } else {
+          sorting_feild = { parent_name: -1 }
+        }
+      }
+    } else {
+      console.log("else")
+      sorting_feild = { lead_date: -1 }
+    }
+    console.log(sorting_feild)
+    if (req.user && req.user.main == req.config.admin.main) {
+      const leads = await Lead.leadNoPageData(isAdmin = 1, start, end, req.user._id, null, sorting_feild);
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All Lead No Page Yesterday", leads, 200));
+    } else {
+      let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leads = await Lead.leadNoPageData(isAdmin = 0, start, end, req.user._id, objectIdArray, sorting_feild);
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All Lead No Page Yesterday", leads, 200));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "allLeadYesterday - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
+exports.getAllTodayNoPageEnquiry = async (req, res, next) => {
+  try {
+    let start = momentZone.tz(moment().valueOf(), "Asia/Kolkata").startOf('day').toDate();
+    let end = momentZone.tz(moment().valueOf(), "Asia/Kolkata").endOf('day').toDate();
+
+    let sorting_feild = { lead_date: -1 }
+    if (req.query) {
+      if (req.query.data) {
+        if (req.query.data == "asc") {
+          sorting_feild = { lead_date: 1 }
+        } else {
+          sorting_feild = { lead_date: -1 }
+        }
+      } else if (req.query.lead_name) {
+        if (req.query.lead_name == "asc") {
+          sorting_feild = { parent_name: 1 }
+        } else {
+          sorting_feild = { parent_name: -1 }
+        }
+      }
+    } else {
+      console.log("else")
+      sorting_feild = { lead_date: -1 }
+    }
+
+    if (req.user && req.user.main == req.config.admin.main) {
+      const leads = await Lead.enquiryDataNoPage(isAdmin = 1, start, end, req.user._id, null, sorting_feild);
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Enquiry not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All enquiries today", leads, 200));
+    } else {
+      let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leads = await Lead.enquiryDataNoPage(isAdmin = 0, start, end, req.user._id, objectIdArray, sorting_feild);
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "leads"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Enquiry not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All enquiries today", leads, 200));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "allenquirytoday - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
+exports.getAllYesterdayNoPageEnquiry = async (req, res, next) => {
+  try {
+    let start = momentZone.tz(moment().subtract(1, 'day').valueOf(), "Asia/Kolkata").startOf('day').toDate();
+    let end = momentZone.tz(moment().subtract(1, 'day').valueOf(), "Asia/Kolkata").endOf('day').toDate();
+
+    let sorting_feild = { lead_date: -1 };
+    if (req.query) {
+      if (req.query.data) {
+        if (req.query.data == "asc") {
+          sorting_feild = { lead_date: 1 }
+        } else {
+          sorting_feild = { lead_date: -1 }
+        }
+      } else if (req.query.lead_name) {
+        if (req.query.lead_name == "asc") {
+          sorting_feild = { parent_name: 1 }
+        } else {
+          sorting_feild = { parent_name: -1 }
+        }
+      }
+    } else {
+      console.log("else")
+      sorting_feild = { lead_date: -1 }
+    }
+    if (req.user && req.user.main == req.config.admin.main) {
+      // let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leads = await Lead.enquiryDataNoPage(isAdmin = 1, start, end, req.user._id, null, sorting_feild);
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Enquiry not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All enquiry yesterday", leads, 200));
+    } else {
+      let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leads = await Lead.enquiryDataNoPage(isAdmin = 0, start, end, req.user._id, objectIdArray, sorting_feild);
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Enquiry not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All enquiry yesterday!", leads, 200));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "allEnquiryYesterday - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
+exports.getAllOlderNoPageEnquiry = async (req, res, next) => {
+  try {
+    let start = momentZone.tz(moment().subtract(3650, 'day').valueOf(), "Asia/Kolkata").startOf('day').toDate(); // last 10 years
+    let end = momentZone.tz(moment().valueOf(), "Asia/Kolkata").endOf('day').toDate();
+
+    let sorting_feild = { lead_date: -1 };
+    if (req.query) {
+      if (req.query.data) {
+        if (req.query.data == "asc") {
+          sorting_feild = { lead_date: 1 }
+        } else {
+          sorting_feild = { lead_date: -1 }
+        }
+      } else if (req.query.lead_name) {
+        if (req.query.lead_name == "asc") {
+          sorting_feild = { parent_name: 1 }
+        } else {
+          sorting_feild = { parent_name: -1 }
+        }
+      }
+    } else {
+      console.log("else")
+      sorting_feild = { lead_date: -1 }
+    }
+    if (req.user && req.user.main == req.config.admin.main) {
+      const leads = await Lead.enquiryDataNoPage(isAdmin = 1, start, end, req.user._id, null, sorting_feild);
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Enquiry not found !", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All Enquiry Older", leads, 200));
+    } else {
+      let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leads = await Lead.enquiryDataNoPage(isAdmin = 0, start, end, req.user._id, objectIdArray, sorting_feild);
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Enquiry not found !", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All Enquiry Older", leads, 200));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "allEnquiryThisWeek - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
     return;
   }
 };

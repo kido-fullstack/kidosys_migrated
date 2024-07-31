@@ -42,6 +42,20 @@ router.get('/all/yesterday/:page',
   followupsController.getAllYesterdayFollowups
 );
 
+router.get('/all/today/new/:page',
+  accountController.Auth,
+  accountController.checkToken,
+  handlers.requireAPIPermission(permission_name.FOLLOWUP_LISTING),
+  followupsController.getAllTodayFollowupsNew
+);
+
+router.get('/all/today/new',
+  accountController.Auth,
+  accountController.checkToken,
+  handlers.requireAPIPermission(permission_name.FOLLOWUP_LISTING),
+  followupsController.getAllTodayFollowupsNoPage
+);
+
 router.get('/all/yesterday',
   accountController.Auth,
   accountController.checkToken,
@@ -72,6 +86,20 @@ router.get('/all/someday',
   followupsController.getAllSomedayFollowups
 );
 
+router.get('/all/someday/new/:page',
+  accountController.Auth,
+  accountController.checkToken,
+  handlers.requireAPIPermission(permission_name.FOLLOWUP_LISTING),
+  followupsController.getAllSomedayFollowupsNew
+);
+
+router.get('/all/someday/new',
+  accountController.Auth,
+  accountController.checkToken,
+  handlers.requireAPIPermission(permission_name.FOLLOWUP_LISTING),
+  followupsController.getAllSomedayFollowupsNoPage
+);
+
 router.get('/all/nofollowup/:page',
   accountController.Auth,
   accountController.checkToken,
@@ -82,6 +110,20 @@ router.get('/all/nofollowup',
   accountController.Auth,
   accountController.checkToken,
   followupsController.getAllNofollowupFollowups
+);
+
+router.get('/all/nofollowup/new/:page',
+  accountController.Auth,
+  accountController.checkToken,
+  handlers.requireAPIPermission(permission_name.FOLLOWUP_LISTING),
+  followupsController.getAllNofollowupFollowupsNew
+);
+
+router.get('/all/nofollowup/new',
+  accountController.Auth,
+  accountController.checkToken,
+  handlers.requireAPIPermission(permission_name.FOLLOWUP_LISTING),
+  followupsController.getAllNofollowupFollowupsNoPage
 );
 
 router.get('/all/pastsevendays/:page',
