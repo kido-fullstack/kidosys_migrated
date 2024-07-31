@@ -318,6 +318,12 @@ router.get('/source/category',
   leadsController.dropdownSourceCategory
 );
 
+router.get('/source/category/new',
+  accountController.Auth,
+  accountController.checkToken,
+  leadsController.dropdownSourceCategoryNew
+);
+
 router.get('/stages',
   accountController.Auth,
   accountController.checkToken,
