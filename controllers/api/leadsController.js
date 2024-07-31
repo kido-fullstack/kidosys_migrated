@@ -2192,6 +2192,34 @@ exports.dropdownSourceCategory = async (req,res,next) => {
   }
 };
 
+exports.dropdownSourceCategoryNew = async (req, res, next) => {
+  try {
+    let datas = [
+      {
+        "source_name": "Direct Walk in",
+        "source_value": "direct-walk-in"
+      },
+      {
+        "source_name": "Digital Lead",
+        "source_value": "digital-lead"
+      },
+      {
+        "source_name": "Database/Events",
+        "source_value": "database/events"
+      }
+    ]
+    if (datas.length) {
+      return res.status(200).json(response.responseSuccess("All Source Category", datas, 200));
+    } else {
+      return res.status(400).json(response.responseError("No Data found.", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "dropdownSourceCategory - Post request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
 exports.dropdownStages = async (req, res, next) => {
   try {
     return res.status(200).json({
