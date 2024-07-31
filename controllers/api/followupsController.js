@@ -2458,3 +2458,102 @@ exports.getAllNofollowupFollowupsNoPage = async (req, res, next) => {
     return;
   }
 };
+
+exports.getFollowupsAllCounts = async (req, res, next) => {
+  try {
+    if (req.user && req.user.main == req.config.admin.main) {
+      // Admin
+
+      // last 5 years
+      let overdueStart = moment().subtract(760, 'day').tz("Asia/Kolkata").startOf('day').toDate();
+      let overdueEnd = moment().subtract(1, 'day').tz("Asia/Kolkata").endOf('day').toDate();
+      const overdueCount = await Lead.leadFollowCount(isAdmin = 1, overdueStart, overdueEnd, null);
+
+      // Upcoming 5 years
+      let upcomingStart = moment().add(1, 'day').tz("Asia/Kolkata").endOf('day').toDate();
+      let upcomingEnd = moment().add(760, 'day').tz("Asia/Kolkata").endOf('day').toDate();
+      const upcomingCount = await Lead.leadFollowCount(isAdmin = 1, upcomingStart, upcomingEnd, null);
+
+      // Someday
+      const somedayCount = await Lead.leadFollowSomedayCount(isAdmin = 1, null);
+
+      // no-followps
+      const noFollowup = await Lead.leadFollowNoCount(isAdmin = 1, null);
+
+      // today
+      let currentDate = moment().format("YYYY/MM/DD");
+      let todayStart = momentZone.tz(currentDate, "Asia/Kolkata").startOf('day').toDate();
+      let todayEnd = momentZone.tz(currentDate, "Asia/Kolkata").endOf('day').toDate();
+      const todayCount = await Lead.leadFollowCount(isAdmin = 1, todayStart, todayEnd, null);
+
+      const results = [{
+        name: "overdue",
+        total_records: overdueCount || 0
+      }, {
+        name: "upcoming",
+        total_records: upcomingCount || 0
+      }, {
+        name: "someday",
+        total_records: somedayCount || 0
+      }, {
+        name: "nofollowups",
+        total_records: noFollowup || 0
+      }, {
+        name: "today",
+        total_records: todayCount || 0
+      }];
+
+      return res.status(200).json(response.responseSuccess("All followups counts", results, 200));
+
+    } else {
+      // Non-Admin
+      let objectIdArray = req.user.center_id.map(center => mongoose.Types.ObjectId(center));
+
+      // last 5 years
+      let overdueStart = moment().subtract(760, 'day').tz("Asia/Kolkata").startOf('day').toDate();
+      let overdueEnd = moment().subtract(1, 'day').tz("Asia/Kolkata").endOf('day').toDate();
+      const overdueCount = await Lead.leadFollowCount(isAdmin = 0, overdueStart, overdueEnd, objectIdArray);
+
+      // Upcoming 5 years
+      let upcomingStart = moment().add(1, 'day').tz("Asia/Kolkata").endOf('day').toDate();
+      let upcomingEnd = moment().add(760, 'day').tz("Asia/Kolkata").endOf('day').toDate();
+      const upcomingCount = await Lead.leadFollowCount(isAdmin = 0, upcomingStart, upcomingEnd, objectIdArray);
+
+      // Someday
+      const somedayCount = await Lead.leadFollowSomedayCount(isAdmin = 0, objectIdArray);
+
+      // no-followps
+      const noFollowup = await Lead.leadFollowNoCount(isAdmin = 0, objectIdArray);
+
+      // today
+      let currentDate = moment().format("YYYY/MM/DD");
+      let todayStart = momentZone.tz(currentDate, "Asia/Kolkata").startOf('day').toDate();
+      let todayEnd = momentZone.tz(currentDate, "Asia/Kolkata").endOf('day').toDate();
+      const todayCount = await Lead.leadFollowCount(isAdmin = 0, todayStart, todayEnd, objectIdArray);
+
+      const results = [{
+        name: "overdue",
+        total_records: overdueCount || 0
+      }, {
+        name: "upcoming",
+        total_records: upcomingCount || 0
+      }, {
+        name: "someday",
+        total_records: somedayCount || 0
+      }, {
+        name: "nofollowups",
+        total_records: noFollowup || 0
+      }, {
+        name: "today",
+        total_records: todayCount || 0
+      }];
+
+      return res.status(200).json(response.responseSuccess("All followups counts", results, 200));
+    }
+  } catch (err) {
+    console.log(err);
+    helper.errorDetailsForControllers(err, "getFollowupsAllCounts - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
