@@ -42,14 +42,14 @@ router.get('/all/yesterday/:page',
   followupsController.getAllYesterdayFollowups
 );
 
-router.get('/all/today/new/:page',
+router.get('/all/new/today/:page',
   accountController.Auth,
   accountController.checkToken,
   handlers.requireAPIPermission(permission_name.FOLLOWUP_LISTING),
   followupsController.getAllTodayFollowupsNew
 );
 
-router.get('/all/today/new',
+router.get('/all/new/today',
   accountController.Auth,
   accountController.checkToken,
   handlers.requireAPIPermission(permission_name.FOLLOWUP_LISTING),
@@ -86,14 +86,14 @@ router.get('/all/someday',
   followupsController.getAllSomedayFollowups
 );
 
-router.get('/all/someday/new/:page',
+router.get('/all/new/someday/:page',
   accountController.Auth,
   accountController.checkToken,
   handlers.requireAPIPermission(permission_name.FOLLOWUP_LISTING),
   followupsController.getAllSomedayFollowupsNew
 );
 
-router.get('/all/someday/new',
+router.get('/all/new/someday',
   accountController.Auth,
   accountController.checkToken,
   handlers.requireAPIPermission(permission_name.FOLLOWUP_LISTING),
@@ -112,14 +112,14 @@ router.get('/all/nofollowup',
   followupsController.getAllNofollowupFollowups
 );
 
-router.get('/all/nofollowup/new/:page',
+router.get('/all/new/nofollowup/:page',
   accountController.Auth,
   accountController.checkToken,
   handlers.requireAPIPermission(permission_name.FOLLOWUP_LISTING),
   followupsController.getAllNofollowupFollowupsNew
 );
 
-router.get('/all/nofollowup/new',
+router.get('/all/new/nofollowup',
   accountController.Auth,
   accountController.checkToken,
   handlers.requireAPIPermission(permission_name.FOLLOWUP_LISTING),
@@ -229,6 +229,13 @@ router.post('/filter/:page',
   accountController.Auth,
   accountController.checkToken,
   followupsController.dropdownFilter
+);
+
+router.get('/all/counts',
+  accountController.Auth,
+  accountController.checkToken,
+  handlers.requireAPIPermission(permission_name.FOLLOWUP_LISTING),
+  followupsController.getFollowupsAllCounts
 );
 
 module.exports = router;

@@ -27,14 +27,14 @@ router.get('/all/today',
   leadsController.getAllTodayLeads
 );
 
-router.get('/all/today/new/:page',
+router.get('/all/new/today/:page',
   accountController.Auth,
   accountController.checkToken,
   handlers.requireAPIPermission(permission_name.LEAD_LISTING),
   leadsController.getAllTodayLeadsNew
 );
 
-router.get('/all/today/new',
+router.get('/all/new/today',
   accountController.Auth,
   accountController.checkToken,
   handlers.requireAPIPermission(permission_name.LEAD_LISTING),
@@ -55,14 +55,14 @@ router.get('/all/yesterday',
   leadsController.getAllYesterdayLeads
 );
 
-router.get('/all/yesterday/new/:page',
+router.get('/all/new/yesterday/:page',
   accountController.Auth,
   accountController.checkToken,
   handlers.requireAPIPermission(permission_name.LEAD_LISTING),
   leadsController.getAllYesterdayLeadsNew
 );
 
-router.get('/all/yesterday/new',
+router.get('/all/new/yesterday',
   accountController.Auth,
   accountController.checkToken,
   handlers.requireAPIPermission(permission_name.LEAD_LISTING),
@@ -111,14 +111,14 @@ router.get('/all/older',
   leadsController.getAllOlderLeads
 );
 
-router.get('/all/older/new/:page',
+router.get('/all/new/older/:page',
   accountController.Auth,
   accountController.checkToken,
   handlers.requireAPIPermission(permission_name.LEAD_LISTING),
   leadsController.getAllOlderLeadsNew
 );
 
-router.get('/all/older/new',
+router.get('/all/new/older',
   accountController.Auth,
   accountController.checkToken,
   handlers.requireAPIPermission(permission_name.LEAD_LISTING),
@@ -139,14 +139,14 @@ router.get('/all/enquiry/today',
   leadsController.getAllTodayEnquiry
 );
 
-router.get('/all/enquiry/today/new/:page',
+router.get('/all/new/enquiry/today/:page',
   accountController.Auth,
   accountController.checkToken,
   handlers.requireAPIPermission(permission_name.LEAD_LISTING),
   leadsController.getAllTodayEnquiryNew
 );
 
-router.get('/all/enquiry/today/new',
+router.get('/all/new/enquiry/today',
   accountController.Auth,
   accountController.checkToken,
   handlers.requireAPIPermission(permission_name.LEAD_LISTING),
@@ -167,14 +167,14 @@ router.get('/all/enquiry/yesterday',
   leadsController.getAllYesterdayEnquiry
 );
 
-router.get('/all/enquiry/yesterday/new/:page',
+router.get('/all/new/enquiry/yesterday/:page',
   accountController.Auth,
   accountController.checkToken,
   handlers.requireAPIPermission(permission_name.LEAD_LISTING),
   leadsController.getAllYesterdayEnquiryNew
 );
 
-router.get('/all/enquiry/yesterday/new',
+router.get('/all/new/enquiry/yesterday',
   accountController.Auth,
   accountController.checkToken,
   handlers.requireAPIPermission(permission_name.LEAD_LISTING),
@@ -223,14 +223,14 @@ router.get('/all/enquiry/older',
   leadsController.getAllOlderEnquiry
 );
 
-router.get('/all/enquiry/older/new/:page',
+router.get('/all/new/enquiry/older/:page',
   accountController.Auth,
   accountController.checkToken,
   handlers.requireAPIPermission(permission_name.LEAD_LISTING),
   leadsController.getAllOlderEnquiryNew
 );
 
-router.get('/all/enquiry/older/new',
+router.get('/all/new/enquiry/older',
   accountController.Auth,
   accountController.checkToken,
   handlers.requireAPIPermission(permission_name.LEAD_LISTING),
@@ -394,6 +394,34 @@ router.get('/all/last/thirty/days/:page',
   accountController.checkToken,
   handlers.requireAPIPermission(permission_name.LEAD_LISTING),
   leadsController.getAllLast30Days
+);
+
+router.get('/all/enquiry/last/seven/days',
+  accountController.Auth,
+  accountController.checkToken,
+  handlers.requireAPIPermission(permission_name.LEAD_LISTING),
+  leadsController.getAllLast7DaysNoPageEnquiry
+);
+
+router.get('/all/enquiry/last/seven/days/:page',
+  accountController.Auth,
+  accountController.checkToken,
+  handlers.requireAPIPermission(permission_name.LEAD_LISTING),
+  leadsController.getAllLast7DaysEnquiry
+);
+
+router.get('/all/enquiry/last/thirty/days',
+  accountController.Auth,
+  accountController.checkToken,
+  handlers.requireAPIPermission(permission_name.LEAD_LISTING),
+  leadsController.getAllLast30DaysNoPageEnquiry
+);
+
+router.get('/all/enquiry/last/thirty/days/:page',
+  accountController.Auth,
+  accountController.checkToken,
+  handlers.requireAPIPermission(permission_name.LEAD_LISTING),
+  leadsController.getAllLast30DaysEnquiry
 );
 
 module.exports = router;
