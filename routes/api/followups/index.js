@@ -24,6 +24,29 @@ router.get('/all/overdue',
   followupsController.getAllOverdueFollowups
 );
 
+router.post('/all/new/overdue/:page',
+  accountController.Auth,
+  accountController.checkToken,
+  handlers.requireAPIPermission(permission_name.FOLLOWUP_LISTING),
+  Validator('getOverdueFollowups'),
+  followupsController.getAllOverdueFollowupsNew
+);
+
+router.post('/all/new/overdue',
+  accountController.Auth,
+  accountController.checkToken,
+  handlers.requireAPIPermission(permission_name.FOLLOWUP_LISTING),
+  Validator('getOverdueFollowups'),
+  followupsController.getAllOverdueFollowupsNoPage
+);
+
+router.get('/all/filter/:page',
+  accountController.Auth,
+  accountController.checkToken,
+  handlers.requireAPIPermission(permission_name.LEAD_LISTING),
+  followupsController.allFollowupsFilter
+);
+
 router.get('/all/today/:page',
   accountController.Auth,
   accountController.checkToken,
