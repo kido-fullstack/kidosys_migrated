@@ -17,7 +17,6 @@ const editLeadSchema = Joi.object({
   parent_email: Joi.string().required(),
   parent_education: Joi.string().optional().allow(''),
   parent_profession: Joi.string().optional().allow(''),
-  parent_reference: Joi.string().optional().allow(''),
   secondary_parent_name: Joi.string().optional().allow(''),
   secondary_parent_type: Joi.string().optional().allow(''),
   secondary_first_contact: Joi.string().optional().allow(''),
@@ -47,6 +46,8 @@ const editLeadSchema = Joi.object({
   remark: Joi.string().optional().allow(''),
   sibling: Joi.number().integer(),
   action_taken: Joi.array().items(Joi.string()),
+  cor_parent: Joi.string().required(),
+  company_name_parent: Joi.string().optional().allow('')
 });
 
 module.exports = editLeadSchema;
