@@ -98,7 +98,7 @@ router.get('/otherclient/:message_id',
   quickResponseController.getOtherClientQuickResponse
 );
 
-router.get('/send/:message_id',
+router.get('/send/new/:message_id',
   accountController.Auth,
   accountController.checkToken,
   handlers.requireAPIPermission(permission_name.MSG_LISTING),
