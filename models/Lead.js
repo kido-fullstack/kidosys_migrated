@@ -425,6 +425,121 @@ leadSchema.statics.leadData = function (isAdmin, start, end, userId, skip, limit
   return this.aggregate(aggregateQue);
 };
 
+leadSchema.statics.leadDataNew = function (isAdmin, start, end, userId, skip, limit, objectIdArray, sorting_feild) {
+  let matchObj = {}
+  if (isAdmin) {
+    matchObj = {
+      $match: {
+        type: "lead",
+        lead_date: {
+          '$gte': start,
+          '$lte': end
+        }
+      }
+    };
+  } else {
+    matchObj = {
+      $match: {
+        school_id: { $in: objectIdArray },
+        type: "lead",
+        lead_date: {
+          '$gte': start,
+          '$lte': end
+        }
+      }
+    };
+  };
+  let aggregateQue = [
+    {
+      '$lookup': {
+        'from': 'statuses',
+        'localField': 'status_id',
+        'foreignField': '_id',
+        'as': 'status_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'substatuses',
+        'localField': 'substatus_id',
+        'foreignField': '_id',
+        'as': 'substatus_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$status_id',
+        // 'includeArrayIndex': 'string',
+        // 'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$unwind': {
+        'path': '$substatus_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'centers',
+        'localField': 'school_id',
+        'foreignField': '_id',
+        'as': 'school_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$school_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'programcategories',
+        'localField': 'programcategory_id',
+        'foreignField': '_id',
+        'as': 'programcategory_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$programcategory_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$lookup': {
+        'from': 'programs',
+        'localField': 'program_id',
+        'foreignField': '_id',
+        'as': 'program_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$program_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$project': {
+        'lead_date': 1,
+        'follow_due_date': 1,
+        'follow_due_time': 1,
+        'updatedAt': 1,
+        'parent_name': 1,
+        'stage': 1,
+        'type': 1,
+        'source_category': 1,
+        'parent_know_aboutus': 1,
+        'status_id.name': 1,
+        'substatus_id.name': 1,
+        'is_external': 1,
+        'is_dup': 1,
+        'dup_no': 1,
+        'lead_no': 1
+      }
+    }, {
+      '$sort': sorting_feild
+    }, {
+      '$skip': skip
+    }, {
+      '$limit': limit
+    }
+  ];
+  aggregateQue.unshift(matchObj);
+  // console.log(aggregateQue);
+  return this.aggregate(aggregateQue);
+};
+
 leadSchema.statics.leadCount = function (isAdmin, start, end, objectIdArray) {
   let matchObj = {};
   if (isAdmin) {
@@ -599,6 +714,123 @@ leadSchema.statics.enquiryData = function (isAdmin, start, end, userId, skip, li
   return this.aggregate(aggregateQue);
 };
 
+leadSchema.statics.enquiryDataNew = function (isAdmin, start, end, userId, skip, limit, objectIdArray, sorting_feild) {
+  let matchObj = {}
+  if (isAdmin) {
+    matchObj = {
+      $match: {
+        type: "enquiry",
+        lead_date: {
+          '$gte': start,
+          '$lte': end
+        }
+      }
+    };
+  } else {
+    matchObj = {
+      $match: {
+        school_id: { $in: objectIdArray },
+        type: "enquiry",
+        lead_date: {
+          '$gte': start,
+          '$lte': end
+        }
+      }
+    };
+  };
+  let aggregateQue = [
+    {
+      '$lookup': {
+        'from': 'statuses',
+        'localField': 'status_id',
+        'foreignField': '_id',
+        'as': 'status_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'substatuses',
+        'localField': 'substatus_id',
+        'foreignField': '_id',
+        'as': 'substatus_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$status_id',
+        // 'includeArrayIndex': 'string',
+        // 'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$unwind': {
+        'path': '$substatus_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'centers',
+        'localField': 'school_id',
+        'foreignField': '_id',
+        'as': 'school_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$school_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'programcategories',
+        'localField': 'programcategory_id',
+        'foreignField': '_id',
+        'as': 'programcategory_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$programcategory_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$lookup': {
+        'from': 'programs',
+        'localField': 'program_id',
+        'foreignField': '_id',
+        'as': 'program_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$program_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$project': {
+        'lead_date': 1,
+        'child_first_name': 1,
+        'child_last_name': 1,
+        'child_gender': 1,
+        'child_dob': 1,
+        'follow_due_date': 1,
+        'follow_due_time': 1,
+        'updatedAt': 1,
+        'parent_name': 1,
+        'stage': 1,
+        'type': 1,
+        'source_category': 1,
+        'parent_know_aboutus': 1,
+        'status_id.name': 1,
+        'substatus_id.name': 1,
+        'is_external': 1,
+        'is_dup': 1,
+        'dup_no': 1
+      }
+    }, {
+      '$sort': sorting_feild
+    }, {
+      '$skip': skip
+    }, {
+      '$limit': limit
+    }
+  ];
+  aggregateQue.unshift(matchObj);
+  return this.aggregate(aggregateQue);
+};
+
 leadSchema.statics.enquiryCount = function (isAdmin, start, end, objectIdArray) {
   let matchObj = {};
   if (isAdmin) {
@@ -630,6 +862,2816 @@ leadSchema.statics.reportCountDefault = function (date, timeZone, center_id) {
     },
     school_id: center_id
   });
+}
+
+leadSchema.statics.leadNoPageData = function (isAdmin, start, end, userId, objectIdArray, sorting_feild) {
+  let matchObj = {}
+  if (isAdmin) {
+    matchObj = {
+      $match: {
+        type: "lead",
+        lead_date: {
+          '$gte': start,
+          '$lte': end
+        }
+      }
+    };
+  } else {
+    matchObj = {
+      $match: {
+        school_id: { $in: objectIdArray },
+        type: "lead",
+        lead_date: {
+          '$gte': start,
+          '$lte': end
+        }
+      }
+    };
+  };
+  let aggregateQue = [
+    {
+      '$lookup': {
+        'from': 'statuses',
+        'localField': 'status_id',
+        'foreignField': '_id',
+        'as': 'status_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'substatuses',
+        'localField': 'substatus_id',
+        'foreignField': '_id',
+        'as': 'substatus_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$status_id',
+        // 'includeArrayIndex': 'string',
+        // 'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$unwind': {
+        'path': '$substatus_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'centers',
+        'localField': 'school_id',
+        'foreignField': '_id',
+        'as': 'school_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$school_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'programcategories',
+        'localField': 'programcategory_id',
+        'foreignField': '_id',
+        'as': 'programcategory_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$programcategory_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$lookup': {
+        'from': 'programs',
+        'localField': 'program_id',
+        'foreignField': '_id',
+        'as': 'program_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$program_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$project': {
+        'lead_date': 1,
+        'follow_due_date': 1,
+        'follow_due_time': 1,
+        'updatedAt': 1,
+        'parent_name': 1,
+        'stage': 1,
+        'type': 1,
+        'source_category': 1,
+        'parent_know_aboutus': 1,
+        'status_id.name': 1,
+        'substatus_id.name': 1,
+        'is_external': 1,
+        'is_dup': 1,
+        'dup_no': 1,
+        'lead_no': 1
+      }
+    }, {
+      '$sort': sorting_feild
+    }
+  ];
+  aggregateQue.unshift(matchObj);
+  // console.log(aggregateQue);
+  return this.aggregate(aggregateQue);
+};
+
+leadSchema.statics.leadFollowUpData = function (isAdmin, start, end, userId, skip, limit, objectIdArray, sorting_feild) {
+  let matchObj = {}
+  if (isAdmin) {
+    matchObj = {
+      $match: {
+        follow_due_date: {
+          '$gte': start,
+          '$lte': end
+        }
+      }
+    };
+  } else {
+    matchObj = {
+      $match: {
+        school_id: { $in: objectIdArray },
+        follow_due_date: {
+          '$gte': start,
+          '$lte': end
+        }
+      }
+    }
+  };
+  let aggregateQue = [
+    {
+      '$match': {
+        'do_followup': 1
+      }
+    },
+    {
+      '$lookup': {
+        'from': 'statuses',
+        'localField': 'status_id',
+        'foreignField': '_id',
+        'as': 'status_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'substatuses',
+        'localField': 'substatus_id',
+        'foreignField': '_id',
+        'as': 'substatus_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$status_id',
+        // 'includeArrayIndex': 'string',
+        // 'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$unwind': {
+        'path': '$substatus_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'centers',
+        'localField': 'school_id',
+        'foreignField': '_id',
+        'as': 'school_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$school_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'programcategories',
+        'localField': 'programcategory_id',
+        'foreignField': '_id',
+        'as': 'programcategory_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$programcategory_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$lookup': {
+        'from': 'programs',
+        'localField': 'program_id',
+        'foreignField': '_id',
+        'as': 'program_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$program_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$project': {
+        'updatedAt': 1,
+        'parent_name': 1,
+        'stage': 1,
+        'type': 1,
+        'source_category': 1,
+        'parent_know_aboutus': 1,
+        'status_id.name': 1,
+        'substatus_id.name': 1,
+        'is_external': 1,
+        'is_dup': 1,
+        'dup_no': 1,
+        'follow_due_date': 1,
+        'follow_due_time': 1
+      }
+    }, {
+      '$skip': skip
+    }, {
+      '$limit': limit
+    }, {
+      '$sort': sorting_feild
+    }
+  ];
+  aggregateQue.unshift(matchObj);
+  // console.log(aggregateQue);
+  return this.aggregate(aggregateQue);
+};
+
+leadSchema.statics.leadFollowCount = function (isAdmin, start, end, objectIdArray) {
+  let matchObj = {};
+  if (isAdmin) {
+    matchObj = {
+      do_followup: 1,
+      follow_due_date: {
+        '$gte': start,
+        '$lte': end
+      }
+    }
+  } else {
+    matchObj = {
+      do_followup: 1,
+      school_id: { $in: objectIdArray },
+      follow_due_date: {
+        '$gte': start,
+        '$lte': end
+      }
+    }
+  }
+  return this.countDocuments(matchObj);
+};
+
+leadSchema.statics.leadFollowUpDataNoPage = function (isAdmin, start, end, userId, objectIdArray, sorting_feild, countries, zones, centers, programs, knowus, sourceCategory, statusId, stage, nof, someday, searches) {
+  let matchObj = {}
+  if (isAdmin) {
+    matchObj = {
+      $match: {
+        follow_due_date: {
+          '$gte': start,
+          '$lte': end
+        }
+      }
+    };
+  } else {
+    matchObj = {
+      $match: {
+        school_id: { $in: objectIdArray },
+        follow_due_date: {
+          '$gte': start,
+          '$lte': end
+        }
+      }
+    }
+  };
+
+  let aggregateQue = [
+    {
+      '$match': {
+        'do_followup': 1
+      }
+    },
+    {
+      '$lookup': {
+        'from': 'statuses',
+        'localField': 'status_id',
+        'foreignField': '_id',
+        'as': 'status_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'substatuses',
+        'localField': 'substatus_id',
+        'foreignField': '_id',
+        'as': 'substatus_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$status_id',
+        // 'includeArrayIndex': 'string',
+        // 'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$unwind': {
+        'path': '$substatus_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'centers',
+        'localField': 'school_id',
+        'foreignField': '_id',
+        'as': 'school_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$school_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'programcategories',
+        'localField': 'programcategory_id',
+        'foreignField': '_id',
+        'as': 'programcategory_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$programcategory_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$lookup': {
+        'from': 'programs',
+        'localField': 'program_id',
+        'foreignField': '_id',
+        'as': 'program_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$program_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$project': {
+        'updatedAt': 1,
+        'parent_name': 1,
+        'stage': 1,
+        'type': 1,
+        'source_category': 1,
+        'parent_know_aboutus': 1,
+        'status_id.name': 1,
+        'substatus_id.name': 1,
+        'is_external': 1,
+        'is_dup': 1,
+        'dup_no': 1,
+        'follow_due_date': 1,
+        'follow_due_time': 1
+      }
+    }, {
+      '$sort': sorting_feild
+    }
+  ];
+
+  aggregateQue.unshift(matchObj);
+
+  if (countries) {
+    let country = JSON.parse(countries).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'country_id': { $in: country }
+      }
+    });
+  }
+
+  if (zones) {
+    let zone = JSON.parse(zones).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'zone_id': { $in: zone }
+      }
+    });
+  }
+
+  if (centers) {
+    let center = JSON.parse(centers).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'school_id': { $in: center }
+      }
+    });
+  }
+
+  if (programs) {
+    let program = JSON.parse(programs).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'program_id': { $in: program }
+      }
+    });
+  }
+
+  if (knowus) {
+    let knowUs = JSON.parse(knowus);
+    aggregateQue.unshift({
+      '$match': {
+        'parent_know_aboutus': { $in: knowUs }
+      }
+    });
+  }
+
+  if (sourceCategory) {
+    aggregateQue.unshift({
+      '$match': {
+        'source_category': sourceCategory
+      }
+    });
+  }
+
+  if (statusId) {
+    let status = JSON.parse(statusId).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'status_id': { $in: status }
+      }
+    });
+  }
+
+  if (stage) {
+    aggregateQue.unshift({
+      '$match': {
+        'stage': stage
+      }
+    });
+  }
+
+  if (searches) {
+    aggregateQue.unshift({
+      '$match': {
+        $or: [
+          {
+            parent_name: {
+              $regex: searches,
+              $options: 'i'
+            }
+          },
+          {
+            child_first_name: {
+              $regex: searches,
+              $options: 'i'
+            }
+          },
+          {
+            lead_no: {
+              $regex: searches,
+              $options: 'i'
+            }
+          },
+          {
+            child_last_name: {
+              $regex: searches,
+              $options: 'i'
+            }
+          },
+          {
+            parent_first_contact: {
+              $regex: searches,
+              $options: 'i'
+            }
+          },
+          {
+            parent_email: {
+              $regex: searches,
+              $options: 'i'
+            }
+          }
+        ]
+      }
+    });
+  }
+
+  if (nof) {
+    _.remove(aggregateQue, '$match.do_followup');
+    _.remove(aggregateQue, '$match.follow_due_date');
+    aggregateQue.unshift({
+      '$match': {
+        'do_followup': 0
+      }
+    });
+  }
+
+  if (someday) {
+    _.remove(aggregateQue, '$match.do_followup');
+    _.remove(aggregateQue, '$match.follow_due_date');
+    aggregateQue.unshift({
+      '$match': {
+        'someday_follow': 0
+      }
+    });
+  }
+
+  // console.log(aggregateQue);
+  return this.aggregate(aggregateQue);
+};
+
+leadSchema.statics.leadFollowUpNoData = function (isAdmin, userId, skip, limit, objectIdArray, sorting_feild) {
+  let matchObj = {}
+  if (isAdmin) {
+    matchObj = {
+      $match: {
+        do_followup: 0
+      }
+    }
+  } else {
+    matchObj = {
+      $match: {
+        do_followup: 0,
+        school_id: { $in: objectIdArray }
+      }
+    }
+  };
+  let aggregateQue = [
+    {
+      '$lookup': {
+        'from': 'statuses',
+        'localField': 'status_id',
+        'foreignField': '_id',
+        'as': 'status_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'substatuses',
+        'localField': 'substatus_id',
+        'foreignField': '_id',
+        'as': 'substatus_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$status_id',
+        // 'includeArrayIndex': 'string',
+        // 'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$unwind': {
+        'path': '$substatus_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'centers',
+        'localField': 'school_id',
+        'foreignField': '_id',
+        'as': 'school_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$school_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'programcategories',
+        'localField': 'programcategory_id',
+        'foreignField': '_id',
+        'as': 'programcategory_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$programcategory_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$lookup': {
+        'from': 'programs',
+        'localField': 'program_id',
+        'foreignField': '_id',
+        'as': 'program_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$program_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$project': {
+        'updatedAt': 1,
+        'parent_name': 1,
+        'stage': 1,
+        'type': 1,
+        'source_category': 1,
+        'parent_know_aboutus': 1,
+        'status_id.name': 1,
+        'substatus_id.name': 1,
+        'is_external': 1,
+        'is_dup': 1,
+        'dup_no': 1,
+        'follow_due_date': 1,
+        'follow_due_time': 1
+      }
+    }, {
+      '$skip': skip
+    }, {
+      '$limit': limit
+    }, {
+      '$sort': sorting_feild
+    }
+  ];
+  aggregateQue.unshift(matchObj);
+  // console.log(aggregateQue);
+  return this.aggregate(aggregateQue);
+};
+
+leadSchema.statics.leadFollowNoCount = function (isAdmin, objectIdArray) {
+  let matchObj = {};
+  if (isAdmin) {
+    matchObj = {
+      do_followup: 0
+    }
+  } else {
+    matchObj = {
+      do_followup: 0,
+      school_id: { $in: objectIdArray }
+    }
+  }
+  return this.countDocuments(matchObj);
+};
+
+leadSchema.statics.leadFollowUpNoDataNoPage = function (isAdmin, userId, objectIdArray, sorting_feild) {
+  let matchObj = {}
+  if (isAdmin) {
+    matchObj = {
+      $match: {
+        do_followup: 0
+      }
+    }
+  } else {
+    matchObj = {
+      $match: {
+        do_followup: 0,
+        school_id: { $in: objectIdArray }
+      }
+    }
+  };
+  let aggregateQue = [
+    {
+      '$lookup': {
+        'from': 'statuses',
+        'localField': 'status_id',
+        'foreignField': '_id',
+        'as': 'status_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'substatuses',
+        'localField': 'substatus_id',
+        'foreignField': '_id',
+        'as': 'substatus_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$status_id',
+        // 'includeArrayIndex': 'string',
+        // 'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$unwind': {
+        'path': '$substatus_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'centers',
+        'localField': 'school_id',
+        'foreignField': '_id',
+        'as': 'school_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$school_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'programcategories',
+        'localField': 'programcategory_id',
+        'foreignField': '_id',
+        'as': 'programcategory_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$programcategory_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$lookup': {
+        'from': 'programs',
+        'localField': 'program_id',
+        'foreignField': '_id',
+        'as': 'program_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$program_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$project': {
+        'updatedAt': 1,
+        'parent_name': 1,
+        'stage': 1,
+        'type': 1,
+        'source_category': 1,
+        'parent_know_aboutus': 1,
+        'status_id.name': 1,
+        'substatus_id.name': 1,
+        'is_external': 1,
+        'is_dup': 1,
+        'dup_no': 1,
+        'follow_due_date': 1,
+        'follow_due_time': 1
+      }
+    }, {
+      '$sort': sorting_feild
+    }
+  ];
+  aggregateQue.unshift(matchObj);
+  // console.log(aggregateQue);
+  return this.aggregate(aggregateQue);
+};
+
+leadSchema.statics.leadFollowUpSomedayData = function (isAdmin, userId, skip, limit, objectIdArray, sorting_feild) {
+  let matchObj = {}
+  if (isAdmin) {
+    matchObj = {
+      $match: {
+        someday_follow: 0
+      }
+    }
+  } else {
+    matchObj = {
+      $match: {
+        someday_follow: 0,
+        school_id: { $in: objectIdArray }
+      }
+    }
+  };
+  let aggregateQue = [
+    {
+      '$lookup': {
+        'from': 'statuses',
+        'localField': 'status_id',
+        'foreignField': '_id',
+        'as': 'status_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'substatuses',
+        'localField': 'substatus_id',
+        'foreignField': '_id',
+        'as': 'substatus_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$status_id',
+        // 'includeArrayIndex': 'string',
+        // 'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$unwind': {
+        'path': '$substatus_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'centers',
+        'localField': 'school_id',
+        'foreignField': '_id',
+        'as': 'school_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$school_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'programcategories',
+        'localField': 'programcategory_id',
+        'foreignField': '_id',
+        'as': 'programcategory_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$programcategory_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$lookup': {
+        'from': 'programs',
+        'localField': 'program_id',
+        'foreignField': '_id',
+        'as': 'program_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$program_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$project': {
+        'updatedAt': 1,
+        'parent_name': 1,
+        'stage': 1,
+        'type': 1,
+        'source_category': 1,
+        'parent_know_aboutus': 1,
+        'status_id.name': 1,
+        'substatus_id.name': 1,
+        'is_external': 1,
+        'is_dup': 1,
+        'dup_no': 1,
+        'follow_due_date': 1,
+        'follow_due_time': 1
+      }
+    }, {
+      '$skip': skip
+    }, {
+      '$limit': limit
+    }, {
+      '$sort': sorting_feild
+    }
+  ];
+  aggregateQue.unshift(matchObj);
+  // console.log(aggregateQue);
+  return this.aggregate(aggregateQue);
+};
+
+leadSchema.statics.leadFollowSomedayCount = function (isAdmin, objectIdArray) {
+  let matchObj = {};
+  if (isAdmin) {
+    matchObj = {
+      someday_follow: 0
+    }
+  } else {
+    matchObj = {
+      someday_follow: 0,
+      school_id: { $in: objectIdArray }
+    }
+  }
+  return this.countDocuments(matchObj);
+};
+
+leadSchema.statics.leadFollowUpSomedayDataNoPage = function (isAdmin, userId, objectIdArray, sorting_feild) {
+  let matchObj = {}
+  if (isAdmin) {
+    matchObj = {
+      $match: {
+        someday_follow: 0
+      }
+    }
+  } else {
+    matchObj = {
+      $match: {
+        someday_follow: 0,
+        school_id: { $in: objectIdArray }
+      }
+    }
+  };
+  let aggregateQue = [
+    {
+      '$lookup': {
+        'from': 'statuses',
+        'localField': 'status_id',
+        'foreignField': '_id',
+        'as': 'status_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'substatuses',
+        'localField': 'substatus_id',
+        'foreignField': '_id',
+        'as': 'substatus_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$status_id',
+        // 'includeArrayIndex': 'string',
+        // 'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$unwind': {
+        'path': '$substatus_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'centers',
+        'localField': 'school_id',
+        'foreignField': '_id',
+        'as': 'school_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$school_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'programcategories',
+        'localField': 'programcategory_id',
+        'foreignField': '_id',
+        'as': 'programcategory_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$programcategory_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$lookup': {
+        'from': 'programs',
+        'localField': 'program_id',
+        'foreignField': '_id',
+        'as': 'program_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$program_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$project': {
+        'updatedAt': 1,
+        'parent_name': 1,
+        'stage': 1,
+        'type': 1,
+        'source_category': 1,
+        'parent_know_aboutus': 1,
+        'status_id.name': 1,
+        'substatus_id.name': 1,
+        'is_external': 1,
+        'is_dup': 1,
+        'dup_no': 1,
+        'follow_due_date': 1,
+        'follow_due_time': 1
+      }
+    }, {
+      '$sort': sorting_feild
+    }
+  ];
+  aggregateQue.unshift(matchObj);
+  // console.log(aggregateQue);
+  return this.aggregate(aggregateQue);
+};
+
+leadSchema.statics.enquiryDataNoPage = function (isAdmin, start, end, userId, objectIdArray, sorting_feild) {
+  let matchObj = {}
+  if (isAdmin) {
+    matchObj = {
+      $match: {
+        type: "enquiry",
+        lead_date: {
+          '$gte': start,
+          '$lte': end
+        }
+      }
+    };
+  } else {
+    matchObj = {
+      $match: {
+        school_id: { $in: objectIdArray },
+        type: "enquiry",
+        lead_date: {
+          '$gte': start,
+          '$lte': end
+        }
+      }
+    };
+  };
+  let aggregateQue = [
+    {
+      '$lookup': {
+        'from': 'statuses',
+        'localField': 'status_id',
+        'foreignField': '_id',
+        'as': 'status_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'substatuses',
+        'localField': 'substatus_id',
+        'foreignField': '_id',
+        'as': 'substatus_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$status_id',
+        // 'includeArrayIndex': 'string',
+        // 'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$unwind': {
+        'path': '$substatus_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'centers',
+        'localField': 'school_id',
+        'foreignField': '_id',
+        'as': 'school_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$school_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'programcategories',
+        'localField': 'programcategory_id',
+        'foreignField': '_id',
+        'as': 'programcategory_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$programcategory_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$lookup': {
+        'from': 'programs',
+        'localField': 'program_id',
+        'foreignField': '_id',
+        'as': 'program_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$program_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$project': {
+        'lead_date': 1,
+        'child_first_name': 1,
+        'child_last_name': 1,
+        'child_gender': 1,
+        'child_dob': 1,
+        'follow_due_date': 1,
+        'follow_due_time': 1,
+        'updatedAt': 1,
+        'parent_name': 1,
+        'stage': 1,
+        'type': 1,
+        'source_category': 1,
+        'parent_know_aboutus': 1,
+        'status_id.name': 1,
+        'substatus_id.name': 1,
+        'is_external': 1,
+        'is_dup': 1,
+        'dup_no': 1
+      }
+    }, {
+      '$sort': sorting_feild
+    }
+  ];
+  aggregateQue.unshift(matchObj);
+  return this.aggregate(aggregateQue);
+};
+
+leadSchema.statics.followupsFilterData = function (isAdmin, startDate, endDate, userId, skip, limit, objectIdArray, sorting_feild, countries, zones, centers, programs, knowus, sourceCategory, statusId, stage, noFollowup, someday, searchData) {
+  let matchObj = {}
+  // console.log(objectIdArray);
+  if (isAdmin) {
+    matchObj = {
+      $match: {
+        type: "lead"
+      }
+    };
+  } else {
+    matchObj = {
+      $match: {
+        type: "lead",
+        school_id: { $in: objectIdArray },
+      }
+    }
+  };
+  let aggregateQue = [
+    {
+      '$match': {
+        'do_followup': 1
+      }
+    },
+    {
+      '$lookup': {
+        'from': 'statuses',
+        'localField': 'status_id',
+        'foreignField': '_id',
+        'as': 'status_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'substatuses',
+        'localField': 'substatus_id',
+        'foreignField': '_id',
+        'as': 'substatus_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$status_id',
+        // 'includeArrayIndex': 'string',
+        // 'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$unwind': {
+        'path': '$substatus_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'centers',
+        'localField': 'school_id',
+        'foreignField': '_id',
+        'as': 'school_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$school_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'programcategories',
+        'localField': 'programcategory_id',
+        'foreignField': '_id',
+        'as': 'programcategory_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$programcategory_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$lookup': {
+        'from': 'programs',
+        'localField': 'program_id',
+        'foreignField': '_id',
+        'as': 'program_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$program_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$project': {
+        'lead_date': 1,
+        'updatedAt': 1,
+        'parent_name': 1,
+        'stage': 1,
+        'type': 1,
+        'source_category': 1,
+        'parent_know_aboutus': 1,
+        'status_id.name': 1,
+        'substatus_id.name': 1,
+        'is_external': 1,
+        'is_dup': 1,
+        'dup_no': 1,
+        'follow_due_date': 1,
+        'follow_due_time': 1
+      }
+    }, {
+      '$skip': skip
+    }, {
+      '$limit': limit
+    }, {
+      '$sort': sorting_feild
+    }
+  ];
+
+  if (startDate && endDate) {
+    let start = momentZone.tz(`${startDate}`, "Asia/Kolkata").startOf('day').toDate();
+    let end = momentZone.tz(`${endDate}`, "Asia/Kolkata").endOf('day').toDate();
+    aggregateQue.unshift({
+      '$match': {
+        'lead_date': {
+          '$gte': start,
+          '$lte': end
+        }
+      }
+    });
+  }
+
+  if (countries) {
+    let country = JSON.parse(countries).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'country_id': { $in: country }
+      }
+    });
+  }
+
+  if (zones) {
+    let zone = JSON.parse(zones).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'zone_id': { $in: zone }
+      }
+    });
+  }
+
+  if (centers) {
+    let center = JSON.parse(centers).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'school_id': { $in: center }
+      }
+    });
+  }
+
+  if (programs) {
+    let program = JSON.parse(programs).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'program_id': { $in: program }
+      }
+    });
+  }
+
+  if (knowus) {
+    let knowUs = JSON.parse(knowus);
+    aggregateQue.unshift({
+      '$match': {
+        'parent_know_aboutus': { $in: knowUs }
+      }
+    });
+  }
+
+  if (sourceCategory) {
+    aggregateQue.unshift({
+      '$match': {
+        'source_category': sourceCategory
+      }
+    });
+  }
+
+  if (statusId) {
+    let status = JSON.parse(statusId).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'status_id': { $in: status }
+      }
+    });
+  }
+
+  if (stage) {
+    aggregateQue.unshift({
+      '$match': {
+        'stage': stage
+      }
+    });
+  }
+
+  if (searchData) {
+    aggregateQue.unshift({
+      '$match': {
+        $or: [
+          {
+            parent_name: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            child_first_name: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            lead_no: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            child_last_name: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            parent_first_contact: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            parent_email: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          }
+        ]
+      }
+    });
+  }
+
+  if (noFollowup == 1) {
+    _.remove(aggregateQue, '$match.do_followup');
+    aggregateQue.unshift({
+      '$match': {
+        'do_followup': 0
+      }
+    });
+  }
+
+  if (someday == 1) {
+    _.remove(aggregateQue, '$match.do_followup');
+    aggregateQue.unshift({
+      '$match': {
+        'someday_follow': 0
+      }
+    });
+  }
+
+  aggregateQue.unshift(matchObj);
+  // console.dir(aggregateQue);
+  return this.aggregate(aggregateQue);
+};
+
+leadSchema.statics.followupsFilterCountData = function (isAdmin, startDate, endDate, objectIdArray, countries, zones, centers, programs, knowus, sourceCategory, statusId, stage, noFollowup, someday, searchData) {
+  let matchObj = {}
+  if (isAdmin) {
+    matchObj = {
+      $match: {
+        type: "lead"
+      }
+    };
+  } else {
+    matchObj = {
+      $match: {
+        type: "lead",
+        school_id: { $in: objectIdArray }
+      }
+    }
+  };
+  let aggregateQue = [
+    {
+      '$match': {
+        'do_followup': 1
+      }
+    }
+  ];
+
+  if (startDate && endDate) {
+    let start = momentZone.tz(`${startDate}`, "Asia/Kolkata").startOf('day').toDate();
+    let end = momentZone.tz(`${endDate}`, "Asia/Kolkata").endOf('day').toDate();
+    aggregateQue.unshift({
+      '$match': {
+        'lead_date': {
+          '$gte': start,
+          '$lte': end
+        }
+      }
+    });
+  }
+
+  if (countries) {
+    let country = JSON.parse(countries).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'country_id': { $in: country }
+      }
+    });
+  }
+
+  if (zones) {
+    let zone = JSON.parse(zones).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'zone_id': { $in: zone }
+      }
+    });
+  }
+
+  if (centers) {
+    let center = JSON.parse(centers).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'school_id': { $in: center }
+      }
+    });
+  }
+
+  if (programs) {
+    let program = JSON.parse(programs).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'program_id': { $in: program }
+      }
+    });
+  }
+
+  if (knowus) {
+    let knowUs = JSON.parse(knowus);
+    aggregateQue.unshift({
+      '$match': {
+        'parent_know_aboutus': { $in: knowUs }
+      }
+    });
+  }
+
+  if (sourceCategory) {
+    aggregateQue.unshift({
+      '$match': {
+        'source_category': sourceCategory
+      }
+    });
+  }
+
+  if (statusId) {
+    let status = JSON.parse(statusId).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'status_id': { $in: status }
+      }
+    });
+  }
+
+  if (stage) {
+    aggregateQue.unshift({
+      '$match': {
+        'stage': stage
+      }
+    });
+  }
+
+  if (searchData) {
+    aggregateQue.unshift({
+      '$match': {
+        $or: [
+          {
+            parent_name: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            child_first_name: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            lead_no: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            child_last_name: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            parent_first_contact: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            parent_email: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          }
+        ]
+      }
+    });
+  }
+
+  if (noFollowup == 1) {
+    _.remove(aggregateQue, '$match.do_followup');
+    aggregateQue.unshift({
+      '$match': {
+        'do_followup': 0
+      }
+    });
+  }
+
+  if (someday == 1) {
+    _.remove(aggregateQue, '$match.do_followup');
+    aggregateQue.unshift({
+      '$match': {
+        'someday_follow': 0
+      }
+    });
+  }
+
+  aggregateQue.unshift(matchObj);
+  // console.log(aggregateQue);
+  return this.aggregate(aggregateQue);
+};
+
+leadSchema.statics.leadDataTourBooked = function (isAdmin, start, end, userId, skip, limit, objectIdArray, sorting_feild) {
+  let matchObj = {}
+  if (isAdmin) {
+    matchObj = {
+      $match: {
+        type: "lead",
+        stage: "Tour Booked",
+        lead_date: {
+          '$gte': start,
+          '$lte': end
+        }
+      }
+    };
+  } else {
+    matchObj = {
+      $match: {
+        school_id: { $in: objectIdArray },
+        type: "lead",
+        stage: "Tour Booked",
+        lead_date: {
+          '$gte': start,
+          '$lte': end
+        }
+      }
+    };
+  };
+  let aggregateQue = [
+    {
+      '$lookup': {
+        'from': 'statuses',
+        'localField': 'status_id',
+        'foreignField': '_id',
+        'as': 'status_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'substatuses',
+        'localField': 'substatus_id',
+        'foreignField': '_id',
+        'as': 'substatus_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$status_id',
+        // 'includeArrayIndex': 'string',
+        // 'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$unwind': {
+        'path': '$substatus_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'centers',
+        'localField': 'school_id',
+        'foreignField': '_id',
+        'as': 'school_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$school_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'programcategories',
+        'localField': 'programcategory_id',
+        'foreignField': '_id',
+        'as': 'programcategory_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$programcategory_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$lookup': {
+        'from': 'programs',
+        'localField': 'program_id',
+        'foreignField': '_id',
+        'as': 'program_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$program_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$project': {
+        'lead_date': 1,
+        'follow_due_date': 1,
+        'follow_due_time': 1,
+        'updatedAt': 1,
+        'parent_name': 1,
+        'stage': 1,
+        'type': 1,
+        'source_category': 1,
+        'parent_know_aboutus': 1,
+        'status_id.name': 1,
+        'substatus_id.name': 1,
+        'is_external': 1,
+        'is_dup': 1,
+        'dup_no': 1
+      }
+    }, {
+      '$sort': sorting_feild
+    }, {
+      '$skip': skip
+    }, {
+      '$limit': limit
+    }
+  ];
+  aggregateQue.unshift(matchObj);
+  // console.log(aggregateQue);
+  return this.aggregate(aggregateQue);
+};
+
+leadSchema.statics.leadCountTourBooked = function (isAdmin, start, end, objectIdArray) {
+  let matchObj = {};
+  if (isAdmin) {
+    matchObj = {
+      type: "lead",
+      stage: "Tour Booked",
+      lead_date: {
+        '$gte': start,
+        '$lte': end
+      }
+    }
+  } else {
+    matchObj = {
+      school_id: { $in: objectIdArray },
+      type: "lead",
+      stage: "Tour Booked",
+      lead_date: {
+        '$gte': start,
+        '$lte': end
+      }
+    }
+  }
+  return this.countDocuments(matchObj);
+};
+
+leadSchema.statics.leadDataTourBookedNoPage = function (isAdmin, start, end, userId, objectIdArray, sorting_feild) {
+  let matchObj = {}
+  if (isAdmin) {
+    matchObj = {
+      $match: {
+        type: "lead",
+        stage: "Tour Booked",
+        lead_date: {
+          '$gte': start,
+          '$lte': end
+        }
+      }
+    };
+  } else {
+    matchObj = {
+      $match: {
+        school_id: { $in: objectIdArray },
+        type: "lead",
+        stage: "Tour Booked",
+        lead_date: {
+          '$gte': start,
+          '$lte': end
+        }
+      }
+    };
+  };
+  let aggregateQue = [
+    {
+      '$lookup': {
+        'from': 'statuses',
+        'localField': 'status_id',
+        'foreignField': '_id',
+        'as': 'status_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'substatuses',
+        'localField': 'substatus_id',
+        'foreignField': '_id',
+        'as': 'substatus_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$status_id',
+        // 'includeArrayIndex': 'string',
+        // 'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$unwind': {
+        'path': '$substatus_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'centers',
+        'localField': 'school_id',
+        'foreignField': '_id',
+        'as': 'school_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$school_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'programcategories',
+        'localField': 'programcategory_id',
+        'foreignField': '_id',
+        'as': 'programcategory_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$programcategory_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$lookup': {
+        'from': 'programs',
+        'localField': 'program_id',
+        'foreignField': '_id',
+        'as': 'program_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$program_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$project': {
+        'lead_date': 1,
+        'follow_due_date': 1,
+        'follow_due_time': 1,
+        'updatedAt': 1,
+        'parent_name': 1,
+        'stage': 1,
+        'type': 1,
+        'source_category': 1,
+        'parent_know_aboutus': 1,
+        'status_id.name': 1,
+        'substatus_id.name': 1,
+        'is_external': 1,
+        'is_dup': 1,
+        'dup_no': 1
+      }
+    }, {
+      '$sort': sorting_feild
+    }
+  ];
+  aggregateQue.unshift(matchObj);
+  // console.log(aggregateQue);
+  return this.aggregate(aggregateQue);
+};
+
+leadSchema.statics.leadFilterData = function (isAdmin, startDate, endDate, userId, skip, limit, objectIdArray, sorting_feild, countries, zones, centers, programs, knowus, sourceCategory, statusId, stage, dup, searchData) {
+  let matchObj = {}
+  if (isAdmin) {
+    matchObj = {
+      $match: {
+        type: "lead"
+      }
+    };
+  } else {
+    matchObj = {
+      $match: {
+        school_id: { $in: objectIdArray },
+        type: "lead"
+      }
+    };
+  };
+
+  // aggregate query
+  let aggregateQue = [
+    {
+      '$lookup': {
+        'from': 'statuses',
+        'localField': 'status_id',
+        'foreignField': '_id',
+        'as': 'status_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'substatuses',
+        'localField': 'substatus_id',
+        'foreignField': '_id',
+        'as': 'substatus_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$status_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$substatus_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'centers',
+        'localField': 'school_id',
+        'foreignField': '_id',
+        'as': 'school_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$school_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'programcategories',
+        'localField': 'programcategory_id',
+        'foreignField': '_id',
+        'as': 'programcategory_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$programcategory_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$lookup': {
+        'from': 'programs',
+        'localField': 'program_id',
+        'foreignField': '_id',
+        'as': 'program_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$program_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$project': {
+        'follow_due_date': 1,
+        'follow_due_time': 1,
+        'lead_date': 1,
+        'updatedAt': 1,
+        'parent_name': 1,
+        'stage': 1,
+        'type': 1,
+        'source_category': 1,
+        'parent_know_aboutus': 1,
+        'status_id.name': 1,
+        'substatus_id.name': 1,
+        'is_external': 1,
+        'is_dup': 1,
+        'dup_no': 1
+      }
+    }, {
+      '$sort': sorting_feild
+    }, {
+      '$skip': skip
+    }, {
+      '$limit': limit
+    }
+  ];
+
+  if (startDate && endDate) {
+    let start = momentZone.tz(`${startDate}`, "Asia/Kolkata").startOf('day').toDate();
+    let end = momentZone.tz(`${endDate}`, "Asia/Kolkata").endOf('day').toDate();
+    aggregateQue.unshift({
+      '$match': {
+        'lead_date': {
+          '$gte': start,
+          '$lte': end
+        }
+      }
+    });
+  }
+
+  if (countries) {
+    let country = JSON.parse(countries).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'country_id': { $in: country }
+      }
+    });
+  }
+
+  if (zones) {
+    let zone = JSON.parse(zones).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'zone_id': { $in: zone }
+      }
+    });
+  }
+
+  if (centers) {
+    let center = JSON.parse(centers).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'school_id': { $in: center }
+      }
+    });
+  }
+
+  if (programs) {
+    let program = JSON.parse(programs).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'program_id': { $in: program }
+      }
+    });
+  }
+
+  if (knowus) {
+    let knowUs = JSON.parse(knowus);
+    aggregateQue.unshift({
+      '$match': {
+        'parent_know_aboutus': { $in: knowUs }
+      }
+    });
+  }
+
+  if (sourceCategory) {
+    aggregateQue.unshift({
+      '$match': {
+        'source_category': sourceCategory
+      }
+    });
+  }
+
+  if (statusId) {
+    let status = JSON.parse(statusId).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'status_id': { $in: status }
+      }
+    });
+  }
+
+  if (stage) {
+    aggregateQue.unshift({
+      '$match': {
+        'stage': stage
+      }
+    });
+  }
+
+  if (searchData) {
+    aggregateQue.unshift({
+      '$match': {
+        $or: [
+          {
+            parent_name: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            child_first_name: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            lead_no: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            child_last_name: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            parent_first_contact: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            parent_email: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          }
+        ]
+      }
+    });
+  }
+
+  if (dup == 1) {
+    aggregateQue.unshift({
+      '$match': {
+        'is_dup': 1
+      }
+    });
+  }
+
+  aggregateQue.unshift(matchObj);
+  return this.aggregate(aggregateQue);
+
+};
+
+leadSchema.statics.leadFilterCountData = function (isAdmin, startDate, endDate, objectIdArray, countries, zones, centers, programs, knowus, sourceCategory, statusId, stage, dup, searchData) {
+  let matchObj = {}
+  if (isAdmin) {
+    matchObj = {
+      $match: {
+        type: "lead"
+      }
+    };
+  } else {
+    matchObj = {
+      $match: {
+        school_id: { $in: objectIdArray },
+        type: "lead"
+      }
+    };
+  };
+
+  // aggregate query
+  let aggregateQue = [];
+
+  if (startDate && endDate) {
+    let start = momentZone.tz(`${startDate}`, "Asia/Kolkata").startOf('day').toDate();
+    let end = momentZone.tz(`${endDate}`, "Asia/Kolkata").endOf('day').toDate();
+    aggregateQue.unshift({
+      '$match': {
+        'lead_date': {
+          '$gte': start,
+          '$lte': end
+        }
+      }
+    });
+  }
+
+  if (countries) {
+    let country = JSON.parse(countries).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'country_id': { $in: country }
+      }
+    });
+  }
+
+  if (zones) {
+    let zone = JSON.parse(zones).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'zone_id': { $in: zone }
+      }
+    });
+  }
+
+  if (centers) {
+    let center = JSON.parse(centers).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'school_id': { $in: center }
+      }
+    });
+  }
+
+  if (programs) {
+    let program = JSON.parse(programs).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'program_id': { $in: program }
+      }
+    });
+  }
+
+  if (knowus) {
+    let knowUs = JSON.parse(knowus);
+    aggregateQue.unshift({
+      '$match': {
+        'parent_know_aboutus': { $in: knowUs }
+      }
+    });
+  }
+
+  if (sourceCategory) {
+    aggregateQue.unshift({
+      '$match': {
+        'source_category': sourceCategory
+      }
+    });
+  }
+
+  if (statusId) {
+    let status = JSON.parse(statusId).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'status_id': { $in: status }
+      }
+    });
+  }
+
+  if (stage) {
+    aggregateQue.unshift({
+      '$match': {
+        'stage': stage
+      }
+    });
+  }
+
+  if (searchData) {
+    aggregateQue.unshift({
+      '$match': {
+        $or: [
+          {
+            parent_name: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            child_first_name: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            lead_no: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            child_last_name: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            parent_first_contact: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            parent_email: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          }
+        ]
+      }
+    });
+  }
+
+  if (dup == 1) {
+    aggregateQue.unshift({
+      '$match': {
+        'is_dup': 1
+      }
+    });
+  }
+
+  aggregateQue.unshift(matchObj);
+  return this.aggregate(aggregateQue);
+}
+
+leadSchema.statics.enrolledNoPageData = function (isAdmin, start, end, userId, objectIdArray, sorting_feild) {
+  let matchObj = {}
+  if (isAdmin) {
+    matchObj = {
+      $match: {
+        type: "enquiry",
+        enrolled: 1,
+        lead_date: {
+          '$gte': start,
+          '$lte': end
+        }
+      }
+    };
+  } else {
+    matchObj = {
+      $match: {
+        school_id: { $in: objectIdArray },
+        type: "enquiry",
+        enrolled: 1,
+        lead_date: {
+          '$gte': start,
+          '$lte': end
+        }
+      }
+    };
+  };
+
+  let aggregateQue = [
+    {
+      '$lookup': {
+        'from': 'statuses',
+        'localField': 'status_id',
+        'foreignField': '_id',
+        'as': 'status_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'substatuses',
+        'localField': 'substatus_id',
+        'foreignField': '_id',
+        'as': 'substatus_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$status_id',
+        // 'includeArrayIndex': 'string',
+        // 'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$unwind': {
+        'path': '$substatus_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'centers',
+        'localField': 'school_id',
+        'foreignField': '_id',
+        'as': 'school_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$school_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'programcategories',
+        'localField': 'programcategory_id',
+        'foreignField': '_id',
+        'as': 'programcategory_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$programcategory_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$lookup': {
+        'from': 'programs',
+        'localField': 'program_id',
+        'foreignField': '_id',
+        'as': 'program_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$program_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$project': {
+        'child_first_name': 1,
+        'child_last_name': 1,
+        'child_gender': 1,
+        'child_dob': 1,
+        'follow_due_date': 1,
+        'follow_due_time': 1,
+        'updatedAt': 1,
+        'parent_name': 1,
+        'stage': 1,
+        'type': 1,
+        'source_category': 1,
+        'parent_know_aboutus': 1,
+        'status_id.name': 1,
+        'substatus_id.name': 1,
+        'is_external': 1,
+        'is_dup': 1,
+        'dup_no': 1
+      }
+    }, {
+      '$sort': sorting_feild
+    }
+  ];
+  aggregateQue.unshift(matchObj);
+  return this.aggregate(aggregateQue);
+};
+
+leadSchema.statics.enrolledData = function (isAdmin, start, end, userId, skip, limit, objectIdArray, sorting_feild) {
+  let matchObj = {}
+  if (isAdmin) {
+    matchObj = {
+      $match: {
+        type: "enquiry",
+        enrolled: 1,
+        lead_date: {
+          '$gte': start,
+          '$lte': end
+        }
+      }
+    };
+  } else {
+    matchObj = {
+      $match: {
+        school_id: { $in: objectIdArray },
+        type: "enquiry",
+        enrolled: 1,
+        lead_date: {
+          '$gte': start,
+          '$lte': end
+        }
+      }
+    };
+  };
+
+  let aggregateQue = [
+    {
+      '$lookup': {
+        'from': 'statuses',
+        'localField': 'status_id',
+        'foreignField': '_id',
+        'as': 'status_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'substatuses',
+        'localField': 'substatus_id',
+        'foreignField': '_id',
+        'as': 'substatus_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$status_id',
+        // 'includeArrayIndex': 'string',
+        // 'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$unwind': {
+        'path': '$substatus_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'centers',
+        'localField': 'school_id',
+        'foreignField': '_id',
+        'as': 'school_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$school_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'programcategories',
+        'localField': 'programcategory_id',
+        'foreignField': '_id',
+        'as': 'programcategory_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$programcategory_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$lookup': {
+        'from': 'programs',
+        'localField': 'program_id',
+        'foreignField': '_id',
+        'as': 'program_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$program_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$project': {
+        'child_first_name': 1,
+        'child_last_name': 1,
+        'child_gender': 1,
+        'child_dob': 1,
+        'follow_due_date': 1,
+        'follow_due_time': 1,
+        'updatedAt': 1,
+        'parent_name': 1,
+        'stage': 1,
+        'type': 1,
+        'source_category': 1,
+        'parent_know_aboutus': 1,
+        'status_id.name': 1,
+        'substatus_id.name': 1,
+        'is_external': 1,
+        'is_dup': 1,
+        'dup_no': 1
+      }
+    }, {
+      '$skip': skip
+    }, {
+      '$limit': limit
+    }, {
+      '$sort': sorting_feild
+    }
+  ];
+  aggregateQue.unshift(matchObj);
+  return this.aggregate(aggregateQue);
+};
+
+leadSchema.statics.enrolledCount = function (isAdmin, start, end, objectIdArray) {
+  let matchObj = {};
+  if (isAdmin) {
+    matchObj = {
+      type: "enquiry",
+      enrolled: 1,
+      lead_date: {
+        '$gte': start,
+        '$lte': end
+      }
+    }
+  } else {
+    matchObj = {
+      school_id: { $in: objectIdArray },
+      type: "enquiry",
+      enrolled: 1,
+      lead_date: {
+        '$gte': start,
+        '$lte': end
+      }
+    }
+  }
+  return this.countDocuments(matchObj);
+}
+
+leadSchema.statics.enquiryFilterData = function (isAdmin, startDate, endDate, userId, skip, limit, objectIdArray, sorting_feild, countries, zones, centers, programs, knowus, sourceCategory, statusId, stage, dup, searchData) {
+  let matchObj = {}
+  if (isAdmin) {
+    matchObj = {
+      $match: {
+        type: "enquiry"
+      }
+    };
+  } else {
+    matchObj = {
+      $match: {
+        school_id: { $in: objectIdArray },
+        type: "enquiry"
+      }
+    };
+  };
+
+  // aggregate query
+  let aggregateQue = [
+    {
+      '$lookup': {
+        'from': 'statuses',
+        'localField': 'status_id',
+        'foreignField': '_id',
+        'as': 'status_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'substatuses',
+        'localField': 'substatus_id',
+        'foreignField': '_id',
+        'as': 'substatus_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$status_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$substatus_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'centers',
+        'localField': 'school_id',
+        'foreignField': '_id',
+        'as': 'school_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$school_id'
+      }
+    }, {
+      '$lookup': {
+        'from': 'programcategories',
+        'localField': 'programcategory_id',
+        'foreignField': '_id',
+        'as': 'programcategory_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$programcategory_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$lookup': {
+        'from': 'programs',
+        'localField': 'program_id',
+        'foreignField': '_id',
+        'as': 'program_id'
+      }
+    }, {
+      '$unwind': {
+        'path': '$program_id',
+        'preserveNullAndEmptyArrays': true
+      }
+    }, {
+      '$project': {
+        'lead_date': 1,
+        'child_first_name': 1,
+        'child_last_name': 1,
+        'child_gender': 1,
+        'child_dob': 1,
+        'follow_due_date': 1,
+        'follow_due_time': 1,
+        'updatedAt': 1,
+        'parent_name': 1,
+        'stage': 1,
+        'type': 1,
+        'source_category': 1,
+        'parent_know_aboutus': 1,
+        'status_id.name': 1,
+        'substatus_id.name': 1,
+        'is_external': 1,
+        'is_dup': 1,
+        'dup_no': 1
+      }
+    }, {
+      '$skip': skip
+    }, {
+      '$limit': limit
+    }, {
+      '$sort': sorting_feild
+    }
+  ];
+
+  if (startDate && endDate) {
+    let start = momentZone.tz(`${startDate}`, "Asia/Kolkata").startOf('day').toDate();
+    let end = momentZone.tz(`${endDate}`, "Asia/Kolkata").endOf('day').toDate();
+    aggregateQue.unshift({
+      '$match': {
+        'lead_date': {
+          '$gte': start,
+          '$lte': end
+        }
+      }
+    });
+  }
+
+  if (countries) {
+    let country = JSON.parse(countries).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'country_id': { $in: country }
+      }
+    });
+  }
+
+  if (zones) {
+    let zone = JSON.parse(zones).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'zone_id': { $in: zone }
+      }
+    });
+  }
+
+  if (centers) {
+    let center = JSON.parse(centers).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'school_id': { $in: center }
+      }
+    });
+  }
+
+  if (programs) {
+    let program = JSON.parse(programs).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'program_id': { $in: program }
+      }
+    });
+  }
+
+  if (knowus) {
+    let knowUs = JSON.parse(knowus);
+    aggregateQue.unshift({
+      '$match': {
+        'parent_know_aboutus': { $in: knowUs }
+      }
+    });
+  }
+
+  if (sourceCategory) {
+    aggregateQue.unshift({
+      '$match': {
+        'source_category': sourceCategory
+      }
+    });
+  }
+
+  if (statusId) {
+    let status = JSON.parse(statusId).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'status_id': { $in: status }
+      }
+    });
+  }
+
+  if (stage) {
+    aggregateQue.unshift({
+      '$match': {
+        'stage': stage
+      }
+    });
+  }
+
+  if (searchData) {
+    aggregateQue.unshift({
+      '$match': {
+        $or: [
+          {
+            parent_name: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            child_first_name: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            lead_no: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            child_last_name: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            parent_first_contact: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            parent_email: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          }
+        ]
+      }
+    });
+  }
+
+  if (dup == 1) {
+    aggregateQue.unshift({
+      '$match': {
+        'is_dup': 1
+      }
+    });
+  }
+
+  aggregateQue.unshift(matchObj);
+  return this.aggregate(aggregateQue);
+}
+
+leadSchema.statics.enquiryFilterCountData = function (isAdmin, startDate, endDate, objectIdArray, countries, zones, centers, programs, knowus, sourceCategory, statusId, stage, dup, searchData) {
+  let matchObj = {}
+  if (isAdmin) {
+    matchObj = {
+      $match: {
+        type: "enquiry"
+      }
+    };
+  } else {
+    matchObj = {
+      $match: {
+        school_id: { $in: objectIdArray },
+        type: "enquiry"
+      }
+    };
+  };
+
+  // aggregate query
+  let aggregateQue = [];
+
+  if (startDate && endDate) {
+    let start = momentZone.tz(`${startDate}`, "Asia/Kolkata").startOf('day').toDate();
+    let end = momentZone.tz(`${endDate}`, "Asia/Kolkata").endOf('day').toDate();
+    aggregateQue.unshift({
+      '$match': {
+        'lead_date': {
+          '$gte': start,
+          '$lte': end
+        }
+      }
+    });
+  }
+
+  if (countries) {
+    let country = JSON.parse(countries).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'country_id': { $in: country }
+      }
+    });
+  }
+
+  if (zones) {
+    let zone = JSON.parse(zones).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'zone_id': { $in: zone }
+      }
+    });
+  }
+
+  if (centers) {
+    let center = JSON.parse(centers).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'school_id': { $in: center }
+      }
+    });
+  }
+
+  if (programs) {
+    let program = JSON.parse(programs).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'program_id': { $in: program }
+      }
+    });
+  }
+
+  if (knowus) {
+    let knowUs = JSON.parse(knowus);
+    aggregateQue.unshift({
+      '$match': {
+        'parent_know_aboutus': { $in: knowUs }
+      }
+    });
+  }
+
+  if (sourceCategory) {
+    aggregateQue.unshift({
+      '$match': {
+        'source_category': sourceCategory
+      }
+    });
+  }
+
+  if (statusId) {
+    let status = JSON.parse(statusId).map(s => mongoose.Types.ObjectId(s));
+    aggregateQue.unshift({
+      '$match': {
+        'status_id': { $in: status }
+      }
+    });
+  }
+
+  if (stage) {
+    aggregateQue.unshift({
+      '$match': {
+        'stage': stage
+      }
+    });
+  }
+
+  if (searchData) {
+    aggregateQue.unshift({
+      '$match': {
+        $or: [
+          {
+            parent_name: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            child_first_name: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            lead_no: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            child_last_name: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            parent_first_contact: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          },
+          {
+            parent_email: {
+              $regex: searchData,
+              $options: 'i'
+            }
+          }
+        ]
+      }
+    });
+  }
+
+  if (dup == 1) {
+    aggregateQue.unshift({
+      '$match': {
+        'is_dup': 1
+      }
+    });
+  }
+
+  aggregateQue.unshift(matchObj);
+  return this.aggregate(aggregateQue);
 }
 
 module.exports = mongoose.model('Lead', leadSchema);

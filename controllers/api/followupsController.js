@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const _ = require('lodash');
 const Followup = mongoose.model('Followup');
 const Lead = mongoose.model('Lead');
 const Center = mongoose.model('Center');
@@ -12,6 +13,260 @@ const mail = require("../../handlers/mail");
 
 exports.getAllFollowups = async (req, res, next) => {
   return res.send('jeu');
+};
+
+exports.getAllOverdueFollowupsNew = async (req, res, next) => {
+  try {
+    const page = req.params.page || 1;
+    const limit = 10;
+    const skip = (page * limit) - limit;
+
+    if (!req.body.startDate && !req.body.endDate) {
+      return res.status(400).json(response.responseError("Please provide startDate & endDate!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+    }
+
+    let start = momentZone.tz(`${req.body.startDate}`, "Asia/Kolkata").startOf('day').toDate();
+    let end = momentZone.tz(`${req.body.endDate}`, "Asia/Kolkata").endOf('day').toDate();
+
+    let sorting_feild = { lead_date: -1 }
+    if (req.query) {
+      if (req.query.data) {
+        if (req.query.data == "asc") {
+          sorting_feild = { lead_date: 1 };
+        } else {
+          sorting_feild = { lead_date: -1 };
+        }
+      } else if (req.query.lead_name) {
+        if (req.query.lead_name == "asc") {
+          sorting_feild = { parent_name: 1 };
+        } else {
+          sorting_feild = { parent_name: -1 };
+        }
+      }
+    } else {
+      console.log("else")
+      sorting_feild = { lead_date: -1 }
+    }
+
+    if (req.user && req.user.main == req.config.admin.main) {
+      // admin
+      const leadsPromise = Lead.leadFollowUpData(isAdmin = 1, start, end, req.user._id, skip, limit, null, sorting_feild)
+      const countPromise = Lead.leadFollowCount(isAdmin = 1, start, end, null);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length && skip) {
+        return res.status(400).json(response.responseError("Followup leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All followup leads", { total_records: count, leads }, 200));
+    } else {
+      // non-admin
+      let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leadsPromise = Lead.leadFollowUpData(isAdmin = 0, start, end, req.user._id, skip, limit, objectIdArray, sorting_feild)
+      const countPromise = Lead.leadFollowCount(isAdmin = 0, start, end, objectIdArray);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Followup leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All followup leads", { total_records: count, leads }, 200));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "allfollowupsToday - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
+exports.getAllOverdueFollowupsNoPage = async (req, res, next) => {
+  try {
+    if (!req.body.startDate && !req.body.endDate) {
+      return res.status(400).json(response.responseError("Please provide startDate & endDate!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+    }
+
+    let start = momentZone.tz(`${req.body.startDate}`, "Asia/Kolkata").startOf('day').toDate();
+    let end = momentZone.tz(`${req.body.endDate}`, "Asia/Kolkata").endOf('day').toDate();
+
+    let countries = req.query.countries || "";
+    let zones = req.query.zones || "";
+    let centers = req.query.centers || "";
+    let programs = req.query.programs || "";
+    let knowus = req.query.knowus || "";
+    let sourceCategory = req.query.sourceCategory || "";
+    let statusId = req.query.statusId || "";
+    let stage = req.query.stage || "";
+    let nof = req.query.nof ? parseInt(req.query.nof) : 0;
+    let someday = req.query.someday ? parseInt(req.query.someday) : 0;
+    let searches = req.query.searches || "";
+
+    let sorting_feild = { updatedAt: -1 }
+    if (req.query) {
+      if (req.query.data) {
+        if (req.query.data == "asc") {
+          sorting_feild = { updatedAt: 1 };
+        } else {
+          sorting_feild = { updatedAt: -1 };
+        }
+      } else if (req.query.lead_name) {
+        if (req.query.lead_name == "asc") {
+          sorting_feild = { parent_name: 1 };
+        } else {
+          sorting_feild = { parent_name: -1 };
+        }
+      }
+    } else {
+      console.log("else")
+      sorting_feild = { updatedAt: -1 }
+    }
+
+    if (req.user && req.user.main == req.config.admin.main) {
+      // admin
+      const leadsPromise = Lead.leadFollowUpDataNoPage(isAdmin = 1, start, end, req.user._id, null, sorting_feild, countries, zones, centers, programs, knowus, sourceCategory, statusId, stage, nof, someday, searches)
+      // const countPromise = Lead.leadFollowCount(isAdmin = 1, start, end, null, countries, zones, centers, programs, knowus, sourceCategory, statusId, stage, nof, someday, searches);
+      // const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+      const [leads] = await Promise.all([leadsPromise]);
+
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length && skip) {
+        return res.status(400).json(response.responseError("Followup leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All followup leads", { total_records: leads.length, leads }, 200));
+    } else {
+      // non-admin
+      let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leadsPromise = Lead.leadFollowUpDataNoPage(isAdmin = 0, start, end, req.user._id, objectIdArray, sorting_feild, countries, zones, centers, programs, knowus, sourceCategory, statusId, stage, nof, someday, searches)
+      // const countPromise = Lead.leadFollowCount(isAdmin = 0, start, end, objectIdArray, countries, zones, centers, programs, knowus, sourceCategory, statusId, stage, nof, someday, searches);
+      // const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+      const [leads] = await Promise.all([leadsPromise]);
+
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Followup leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All followup leads", { total_records: leads.length, leads }, 200));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "allfollowupsToday - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
 };
 
 exports.getAllOverdueFollowups = async (req, res, next) => {
@@ -218,6 +473,242 @@ exports.getAllTodayFollowups = async (req, res, next) => {
     }
   } catch (err) {
     helper.errorDetailsForControllers(err, "allfollowupsToday - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
+exports.getAllTodayFollowupsNew = async (req, res, next) => {
+  try {
+    const page = req.params.page || 1;
+    const limit = 10;
+    const skip = (page * limit) - limit;
+
+    let currentDate = moment().format("YYYY/MM/DD");
+
+    let start = momentZone.tz(currentDate, "Asia/Kolkata").startOf('day').toDate();
+    let end = momentZone.tz(currentDate, "Asia/Kolkata").endOf('day').toDate();
+
+    let sorting_feild = { lead_date: -1 }
+    if (req.query) {
+      if (req.query.data) {
+        if (req.query.data == "asc") {
+          sorting_feild = { lead_date: 1 };
+        } else {
+          sorting_feild = { lead_date: -1 };
+        }
+      } else if (req.query.lead_name) {
+        if (req.query.lead_name == "asc") {
+          sorting_feild = { parent_name: 1 };
+        } else {
+          sorting_feild = { parent_name: -1 };
+        }
+      }
+    } else {
+      console.log("else")
+      sorting_feild = { lead_date: -1 }
+    }
+
+    if (req.user && req.user.main == req.config.admin.main) {
+      // admin
+      const leadsPromise = Lead.leadFollowUpData(isAdmin = 1, start, end, req.user._id, skip, limit, null, sorting_feild)
+      const countPromise = Lead.leadFollowCount(isAdmin = 1, start, end, null);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length && skip) {
+        return res.status(400).json(response.responseError("Followup leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All followup leads", { total_records: count, leads }, 200));
+    } else {
+      // non-admin
+      let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leadsPromise = Lead.leadFollowUpData(isAdmin = 0, start, end, req.user._id, skip, limit, objectIdArray, sorting_feild)
+      const countPromise = Lead.leadFollowCount(isAdmin = 0, start, end, objectIdArray);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Followup leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All followup leads", { total_records: count, leads }, 200));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "getAllTodayFollowups - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
+exports.getAllTodayFollowupsNoPage = async (req, res, next) => {
+  try {
+    let currentDate = moment().format("YYYY/MM/DD");
+
+    let start = momentZone.tz(currentDate, "Asia/Kolkata").startOf('day').toDate();
+    let end = momentZone.tz(currentDate, "Asia/Kolkata").endOf('day').toDate();
+
+    let sorting_feild = { lead_date: -1 }
+    if (req.query) {
+      if (req.query.data) {
+        if (req.query.data == "asc") {
+          sorting_feild = { lead_date: 1 };
+        } else {
+          sorting_feild = { lead_date: -1 };
+        }
+      } else if (req.query.lead_name) {
+        if (req.query.lead_name == "asc") {
+          sorting_feild = { parent_name: 1 };
+        } else {
+          sorting_feild = { parent_name: -1 };
+        }
+      }
+    } else {
+      console.log("else")
+      sorting_feild = { lead_date: -1 }
+    }
+
+    if (req.user && req.user.main == req.config.admin.main) {
+      // admin
+      const leadsPromise = Lead.leadFollowUpDataNoPage(isAdmin = 1, start, end, req.user._id, null, sorting_feild)
+      const countPromise = Lead.leadFollowCount(isAdmin = 1, start, end, null);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length && skip) {
+        return res.status(400).json(response.responseError("Followup leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All followup leads", { total_records: count, leads }, 200));
+    } else {
+      // non-admin
+      let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leadsPromise = Lead.leadFollowUpDataNoPage(isAdmin = 0, start, end, req.user._id, objectIdArray, sorting_feild)
+      const countPromise = Lead.leadFollowCount(isAdmin = 0, start, end, objectIdArray);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Followup leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All followup leads", { total_records: count, leads }, 200));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "getAllTodayFollowups - get request", req.originalUrl, req.body, {}, "api", __filename);
     next(err);
     return;
   }
@@ -1136,6 +1627,232 @@ exports.getAllSomedayFollowups = async (req, res, next) => {
   }
 };
 
+exports.getAllSomedayFollowupsNew = async (req, res, next) => {
+  try {
+    const page = req.params.page || 1;
+    const limit = 10;
+    const skip = (page * limit) - limit;
+
+    let sorting_feild = { lead_date: -1 }
+    if (req.query) {
+      if (req.query.data) {
+        if (req.query.data == "asc") {
+          sorting_feild = { lead_date: 1 };
+        } else {
+          sorting_feild = { lead_date: -1 };
+        }
+      } else if (req.query.lead_name) {
+        if (req.query.lead_name == "asc") {
+          sorting_feild = { parent_name: 1 };
+        } else {
+          sorting_feild = { parent_name: -1 };
+        }
+      }
+    } else {
+      console.log("else")
+      sorting_feild = { lead_date: -1 }
+    }
+
+    if (req.user && req.user.main == req.config.admin.main) {
+      // admin
+      const leadsPromise = Lead.leadFollowUpSomedayData(isAdmin = 1, req.user._id, skip, limit, null, sorting_feild);
+      const countPromise = Lead.leadFollowSomedayCount(isAdmin = 1, null);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length && skip) {
+        return res.status(400).json(response.responseError("Followup leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All followup leads", { total_records: count, leads }, 200));
+    } else {
+      // non-admin
+      let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leadsPromise = Lead.leadFollowUpSomedayData(isAdmin = 0, req.user._id, skip, limit, objectIdArray, sorting_feild)
+      const countPromise = Lead.leadFollowSomedayCount(isAdmin = 0, null);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Followup leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All followup leads", { total_records: count, leads }, 200));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "getAllSomedayFollowups - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
+exports.getAllSomedayFollowupsNoPage = async (req, res, next) => {
+  try {
+    let sorting_feild = { lead_date: -1 }
+    if (req.query) {
+      if (req.query.data) {
+        if (req.query.data == "asc") {
+          sorting_feild = { lead_date: 1 };
+        } else {
+          sorting_feild = { lead_date: -1 };
+        }
+      } else if (req.query.lead_name) {
+        if (req.query.lead_name == "asc") {
+          sorting_feild = { parent_name: 1 };
+        } else {
+          sorting_feild = { parent_name: -1 };
+        }
+      }
+    } else {
+      console.log("else")
+      sorting_feild = { lead_date: -1 }
+    }
+
+    if (req.user && req.user.main == req.config.admin.main) {
+      // admin
+      const leadsPromise = Lead.leadFollowUpSomedayDataNoPage(isAdmin = 1, req.user._id, null, sorting_feild);
+      const countPromise = Lead.leadFollowSomedayCount(isAdmin = 1, null);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length && skip) {
+        return res.status(400).json(response.responseError("Followup leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All followup leads", { total_records: count, leads }, 200));
+    } else {
+      // non-admin
+      let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leadsPromise = Lead.leadFollowUpSomedayDataNoPage(isAdmin = 0, req.user._id, objectIdArray, sorting_feild)
+      const countPromise = Lead.leadFollowSomedayCount(isAdmin = 0, null);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Followup leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All followup leads", { total_records: count, leads }, 200));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "getAllSomedayFollowups - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
 exports.getAllNofollowupFollowups = async (req, res, next) => {
   try {
     const page = req.params.page || 1;
@@ -1218,6 +1935,121 @@ exports.getAllNofollowupFollowups = async (req, res, next) => {
     }
   } catch (err) {
     helper.errorDetailsForControllers(err, "getAllSomedayFollowups - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
+exports.getAllNofollowupFollowupsNew = async (req, res, next) => {
+  try {
+    const page = req.params.page || 1;
+    const limit = 10;
+    const skip = (page * limit) - limit;
+
+    let sorting_feild = { lead_date: -1 }
+    if (req.query) {
+      if (req.query.data) {
+        if (req.query.data == "asc") {
+          sorting_feild = { lead_date: 1 };
+        } else {
+          sorting_feild = { lead_date: -1 };
+        }
+      } else if (req.query.lead_name) {
+        if (req.query.lead_name == "asc") {
+          sorting_feild = { parent_name: 1 };
+        } else {
+          sorting_feild = { parent_name: -1 };
+        }
+      }
+    } else {
+      console.log("else")
+      sorting_feild = { lead_date: -1 }
+    }
+
+    if (req.user && req.user.main == req.config.admin.main) {
+      // admin
+      const leadsPromise = Lead.leadFollowUpNoData(isAdmin = 1, req.user._id, skip, limit, null, sorting_feild);
+      const countPromise = Lead.leadFollowNoCount(isAdmin = 1, null);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length && skip) {
+        return res.status(400).json(response.responseError("Followup leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All followup leads", { total_records: count, leads }, 200));
+    } else {
+      // non-admin
+      let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leadsPromise = Lead.leadFollowUpNoData(isAdmin = 0, req.user._id, skip, limit, objectIdArray, sorting_feild)
+      const countPromise = Lead.leadFollowNoCount(isAdmin = 0, objectIdArray);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Followup leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All followup leads", { total_records: count, leads }, 200));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "getAllNoFollowups - get request", req.originalUrl, req.body, {}, "api", __filename);
     next(err);
     return;
   }
@@ -1769,3 +2601,346 @@ exports.dropdownFilter = async (req,res,next) => {
     return;
   }
 }
+
+exports.getAllNofollowupFollowupsNoPage = async (req, res, next) => {
+  try {
+    let sorting_feild = { lead_date: -1 }
+    if (req.query) {
+      if (req.query.data) {
+        if (req.query.data == "asc") {
+          sorting_feild = { lead_date: 1 };
+        } else {
+          sorting_feild = { lead_date: -1 };
+        }
+      } else if (req.query.lead_name) {
+        if (req.query.lead_name == "asc") {
+          sorting_feild = { parent_name: 1 };
+        } else {
+          sorting_feild = { parent_name: -1 };
+        }
+      }
+    } else {
+      console.log("else")
+      sorting_feild = { lead_date: -1 }
+    }
+
+    if (req.user && req.user.main == req.config.admin.main) {
+      // admin
+      const leadsPromise = Lead.leadFollowUpNoDataNoPage(isAdmin = 1, req.user._id, null, sorting_feild);
+      const countPromise = Lead.leadFollowNoCount(isAdmin = 1, null);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length && skip) {
+        return res.status(400).json(response.responseError("Followup leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All followup leads", { total_records: count, leads }, 200));
+    } else {
+      // non-admin
+      let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leadsPromise = Lead.leadFollowUpNoDataNoPage(isAdmin = 0, req.user._id, objectIdArray, sorting_feild)
+      const countPromise = Lead.leadFollowNoCount(isAdmin = 0, objectIdArray);
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length) {
+        return res.status(400).json(response.responseError("Followup leads not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All followup leads", { total_records: count, leads }, 200));
+    }
+  } catch (err) {
+    helper.errorDetailsForControllers(err, "getAllNoFollowups - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
+exports.getFollowupsAllCounts = async (req, res, next) => {
+  try {
+    if (req.user && req.user.main == req.config.admin.main) {
+      // Admin
+
+      // last 5 years
+      let overdueStart = moment().subtract(760, 'day').tz("Asia/Kolkata").startOf('day').toDate();
+      let overdueEnd = moment().subtract(1, 'day').tz("Asia/Kolkata").endOf('day').toDate();
+      const overdueCount = await Lead.leadFollowCount(isAdmin = 1, overdueStart, overdueEnd, null);
+
+      // Upcoming 5 years
+      let upcomingStart = moment().add(1, 'day').tz("Asia/Kolkata").endOf('day').toDate();
+      let upcomingEnd = moment().add(760, 'day').tz("Asia/Kolkata").endOf('day').toDate();
+      const upcomingCount = await Lead.leadFollowCount(isAdmin = 1, upcomingStart, upcomingEnd, null);
+
+      // Someday
+      const somedayCount = await Lead.leadFollowSomedayCount(isAdmin = 1, null);
+
+      // no-followps
+      const noFollowup = await Lead.leadFollowNoCount(isAdmin = 1, null);
+
+      // today
+      let currentDate = moment().format("YYYY/MM/DD");
+      let todayStart = momentZone.tz(currentDate, "Asia/Kolkata").startOf('day').toDate();
+      let todayEnd = momentZone.tz(currentDate, "Asia/Kolkata").endOf('day').toDate();
+      const todayCount = await Lead.leadFollowCount(isAdmin = 1, todayStart, todayEnd, null);
+
+      const results = [{
+        name: "overdue",
+        total_records: overdueCount || 0
+      }, {
+        name: "upcoming",
+        total_records: upcomingCount || 0
+      }, {
+        name: "someday",
+        total_records: somedayCount || 0
+      }, {
+        name: "nofollowups",
+        total_records: noFollowup || 0
+      }, {
+        name: "today",
+        total_records: todayCount || 0
+      }];
+
+      return res.status(200).json(response.responseSuccess("All followups counts", results, 200));
+
+    } else {
+      // Non-Admin
+      let objectIdArray = req.user.center_id.map(center => mongoose.Types.ObjectId(center));
+
+      // last 5 years
+      let overdueStart = moment().subtract(760, 'day').tz("Asia/Kolkata").startOf('day').toDate();
+      let overdueEnd = moment().subtract(1, 'day').tz("Asia/Kolkata").endOf('day').toDate();
+      const overdueCount = await Lead.leadFollowCount(isAdmin = 0, overdueStart, overdueEnd, objectIdArray);
+
+      // Upcoming 5 years
+      let upcomingStart = moment().add(1, 'day').tz("Asia/Kolkata").endOf('day').toDate();
+      let upcomingEnd = moment().add(760, 'day').tz("Asia/Kolkata").endOf('day').toDate();
+      const upcomingCount = await Lead.leadFollowCount(isAdmin = 0, upcomingStart, upcomingEnd, objectIdArray);
+
+      // Someday
+      const somedayCount = await Lead.leadFollowSomedayCount(isAdmin = 0, objectIdArray);
+
+      // no-followps
+      const noFollowup = await Lead.leadFollowNoCount(isAdmin = 0, objectIdArray);
+
+      // today
+      let currentDate = moment().format("YYYY/MM/DD");
+      let todayStart = momentZone.tz(currentDate, "Asia/Kolkata").startOf('day').toDate();
+      let todayEnd = momentZone.tz(currentDate, "Asia/Kolkata").endOf('day').toDate();
+      const todayCount = await Lead.leadFollowCount(isAdmin = 0, todayStart, todayEnd, objectIdArray);
+
+      const results = [{
+        name: "overdue",
+        total_records: overdueCount || 0
+      }, {
+        name: "upcoming",
+        total_records: upcomingCount || 0
+      }, {
+        name: "someday",
+        total_records: somedayCount || 0
+      }, {
+        name: "nofollowups",
+        total_records: noFollowup || 0
+      }, {
+        name: "today",
+        total_records: todayCount || 0
+      }];
+
+      return res.status(200).json(response.responseSuccess("All followups counts", results, 200));
+    }
+  } catch (err) {
+    console.log(err);
+    helper.errorDetailsForControllers(err, "getFollowupsAllCounts - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
+
+exports.allFollowupsFilter = async (req, res, next) => {
+  try {
+    const page = req.params.page || 1;
+    const limit = 10;
+    const skip = (page * limit) - limit;
+
+    let startDate = req.query.start || "";
+    let endDate = req.query.end || "";
+    let countries = req.query.countries || "";
+    let zones = req.query.zones || "";
+    let centers = req.query.centers || "";
+    let programs = req.query.programs || "";
+    let knowus = req.query.knowus || "";
+    let sourceCategory = req.query.sourceCategory || "";
+    let statusId = req.query.statusId || "";
+    let stage = req.query.stage || "";
+    let noFollowup = req.query.noFollowup ? parseInt(req.query.noFollowup) : 0;
+    let someday = req.query.someday ? parseInt(req.query.someday) : 0;
+    let searches = req.query.searches || "";
+
+    let sorting_feild = { lead_date: -1 };
+    if (req.query) {
+      if (req.query.data) {
+        if (req.query.data == "asc") {
+          sorting_feild = { lead_date: 1 }
+        } else if (req.query.data == "desc") {
+          sorting_feild = { lead_date: -1 }
+        }
+      } else if (req.query.lead_name) {
+        if (req.query.lead_name == "asc") {
+          sorting_feild = { parent_name: 1 }
+        } else if (req.query.lead_name == "desc") {
+          sorting_feild = { parent_name: -1 }
+        }
+      }
+    } else {
+      sorting_feild = { lead_date: -1 }
+    }
+
+    if (req.user && req.user.main == req.config.admin.main) {
+      // Admin
+      const leadsPromise = Lead.followupsFilterData(isAdmin = 1, startDate, endDate, req.user._id, skip, limit, null, sorting_feild, countries, zones, centers, programs, knowus, sourceCategory, statusId, stage, noFollowup, someday, searches);
+
+      const countPromise = Lead.followupsFilterCountData(isAdmin = 1, startDate, endDate, null, countries, zones, centers, programs, knowus, sourceCategory, statusId, stage, noFollowup, someday, searches);
+
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length && skip) {
+        return res.status(400).json(response.responseError("Followups not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All filtered Followups!", { total_records: count.length, leads }, 200));
+    } else {
+      // Non-Admin
+      let objectIdArray = req.user.center_id.map(s => mongoose.Types.ObjectId(s));
+      const leadsPromise = Lead.followupsFilterData(isAdmin = 0, startDate, endDate, req.user._id, skip, limit, objectIdArray, sorting_feild, countries, zones, centers, programs, knowus, sourceCategory, statusId, stage, noFollowup, someday, searches);
+
+      const countPromise = Lead.followupsFilterCountData(isAdmin = 0, startDate, endDate, objectIdArray, countries, zones, centers, programs, knowus, sourceCategory, statusId, stage, noFollowup, someday, searches);
+
+      const [leads, count] = await Promise.all([leadsPromise, countPromise]);
+
+      // bookmark leads
+      const bookmarkLists = await Bookmark.findOne({
+        user_id: req.user._id,
+        type: "lead"
+      }, {
+        leads_data: 1
+      });
+
+      if (leads && leads.length) {
+        if (bookmarkLists) {
+          // Bookmark found
+          const leadBookmarkIds = bookmarkLists.leads_data && bookmarkLists.leads_data.length ? _.map(bookmarkLists.leads_data, function (id) {
+            return id.toString()
+          }) : []
+
+          _.map(leads, function (lead) {
+            if (leadBookmarkIds.includes(lead._id.toString())) {
+              lead.is_bookmark = 1;
+            } else {
+              lead.is_bookmark = 0;
+            }
+            return lead;
+          });
+        } else {
+          // Bookmark not found
+          _.map(leads, function (lead) {
+            return lead.is_bookmark = 0;
+          });
+        }
+      }
+      if (!leads.length && skip) {
+        return res.status(400).json(response.responseError("Followups not found!", 400, 400, req.originalUrl, req.body, moment().format('MMMM Do YYYY, h:mm:ss a')));
+      }
+      return res.status(200).json(response.responseSuccess("All filtered Followups!", { total_records: count.length, leads }, 200));
+    }
+  } catch (err) {
+    console.log(err);
+    helper.errorDetailsForControllers(err, "allFollowupsFilter - get request", req.originalUrl, req.body, {}, "api", __filename);
+    next(err);
+    return;
+  }
+};
