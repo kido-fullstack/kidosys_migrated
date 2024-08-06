@@ -4,6 +4,7 @@ const Acknowledgment = mongoose.model("Acknowledgment");
 const Lead = mongoose.model("Lead");
 const { IncomingForm } = require('formidable');
 const fs = require('fs');
+const _ = require('lodash');
 const path = require('path');
 const crypto = require('crypto');
 const uuid = require('uuid');
@@ -11,6 +12,7 @@ const Media = mongoose.model('Media');
 const moment = require('moment');
 const helper = require('../../handlers/helper');
 const response = require('../../handlers/response');
+const Response = mongoose.model('Response');
 const multer = require('multer');
 const formidable = require('formidable');
 
@@ -563,7 +565,7 @@ exports.getAllLeadQuickResponse = async (req,res,next) =>{
   }
 }
 
-/* 
+/*
   This method is responsible to send quick response through list
   Previously removed by Sayyed. Adding back on Mayank & Rahul's requirement to test the API for mobile APK.
 */
@@ -591,7 +593,7 @@ exports.sendQuickResponseThroughList = async (req, res, next) => {
   }
 };
 
-/* 
+/*
   This method is responsible to get all lead list quick response
   Previously removed by Sayyed. Adding back on Mayank & Rahul's requirement to test the API for mobile APK.
 */
