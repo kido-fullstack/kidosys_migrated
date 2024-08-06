@@ -299,7 +299,7 @@ block content
                         tr(role='row')
                           th(data-orderable="false") Actions
                           th(data-bSortable="false") Lead ID
-                          th Date
+                          th Created
                           th Updated
                           th Lead Name
                           th First Name
@@ -942,14 +942,22 @@ block content
 
         "drawCallback": function (settings) {
 
-          const totalEntries = settings.fnRecordsTotal();
-          total_records = totalEntries;
-          const newLeadsMessage = `${settings.json.newLds} new leads & ${settings.json.prmsoMT} without primary source from ${totalEntries} entries `;
+          //- const totalEntries = settings.fnRecordsTotal();
+          //- total_records = totalEntries;
+          //- const newLeadsMessage = `${settings.json.newLds} new leads & ${settings.json.prmsoMT} without primary source from ${totalEntries} entries `;
           //- const prmsoMTMessage = `${settings.json.prmsoMT} leads without any primary source from ${totalEntries} entries`;
-          $('.newleads').html(newLeadsMessage);
+          //- $('.newleads').html(newLeadsMessage);
           //- $('.prmsrcleads').html(prmsoMTMessage);
           // console.log('From Total Entries:', totalEntries);
-          // newLeadsCount = 0; 
+          // newLeadsCount = 0;
+          $('a[srchDt="all"]').html(`All <Br/> (${settings.json.allLeadsCount})`).css('text-align', 'center');
+          $('a[srchDt="New Lead"]').html(`New Lead <Br/> (${settings.json.newLeadsCount})`).css('text-align', 'center');
+          $('a[srchDt="Enquiry Received"]').html(`Enquiry Received <Br/> (${settings.json.enqRecievedCount})`).css('text-align', 'center');
+          $('a[srchDt="Tour Booked"]').html(`Tour Booked <Br/> (${settings.json.tourBookedCount})`).css('text-align', 'center');
+          $('a[srchDt="Closed-Lead Lost"]').html(`Closed-Lead Lost <Br/> (${settings.json.closedLeadLostCount})`).css('text-align', 'center');
+          $('a[srchDt="Post Tour"]').html(`Post Tour <Br/> (${settings.json.postTourCount})`).css('text-align', 'center');
+          $('a[srchDt="Closed-Enquiry Lost"]').html(`Closed-Enquiry Lost <Br/> (${settings.json.closedEnquiryLostCount})`).css('text-align', 'center');
+          $('a[srchDt="Closed - Won"]').html(`Closed - Won <Br/> (${settings.json.closedWonCount})`).css('text-align', 'center');
         },
         columns: colDT,
         fnServerParams: function (data, osettings) {

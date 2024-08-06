@@ -102,7 +102,7 @@ exports.allLeads = async (req, res, next) => {
       const centers = await Center.find({ _id: { $in: empObj.center_id }, status: "active" });
       datas.centers = centers;
       // {_id: {$nin :[ObjectId("64394ba0b858bfdf6844e96e")
-      console.log(empObj,"programss");
+      // console.log(empObj,"programss");
       // console.log(datas.centers,"-----------------------");
 
     }
@@ -4828,6 +4828,18 @@ exports.datatableFilter = async (req, res, next) => {
       parent_know_aboutus: { $exists: true, $type: "array", $size: 0 }
     })
 
+    // Object to get the count of all leads excluding the stage filter.
+    const {stage, ...allLeadsFilter } = findObj;
+    // Fetch the count of records for each tab.
+    const allLeadsCount = await Lead.countDocuments({...allLeadsFilter});
+    const newLeadsCount = await Lead.countDocuments({ ...findObj, 'stage': 'New Lead'});
+    const enqRecievedCount = await Lead.countDocuments({ ...findObj, 'stage': 'Enquiry Received'});
+    const tourBookedCount = await Lead.countDocuments({ ...findObj, 'stage': 'Tour Booked'});
+    const closedLeadLostCount = await Lead.countDocuments({ ...findObj, 'stage': 'Closed-Lead Lost'});
+    const postTourCount = await Lead.countDocuments({ ...findObj, 'stage': 'Post Tour'});
+    const closedEnquiryLostCount = await Lead.countDocuments({ ...findObj, 'stage': 'Closed-Enquiry Lost'});
+    const closedWonCount = await Lead.countDocuments({ ...findObj, 'stage': 'Closed - Won'});
+
     let out = [];
 
     for (let i = 0; i < lds.length; i++) {
@@ -4879,7 +4891,15 @@ exports.datatableFilter = async (req, res, next) => {
       "newLds": newLds1,
       "iTotalRecords": totCount,
       "iTotalDisplayRecords": totCount,
-      "prmsoMT":prmsoMT1
+      "prmsoMT":prmsoMT1,
+      "allLeadsCount": allLeadsCount,
+      "newLeadsCount": newLeadsCount,
+      "enqRecievedCount": enqRecievedCount,
+      "tourBookedCount": tourBookedCount,
+      "closedLeadLostCount": closedLeadLostCount,
+      "postTourCount": postTourCount,
+      "closedEnquiryLostCount": closedEnquiryLostCount,
+      "closedWonCount": closedWonCount
     }
 
     return res.send(resp);
