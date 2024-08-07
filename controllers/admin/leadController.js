@@ -4654,6 +4654,9 @@ exports.datatableFilter = async (req, res, next) => {
       'is_external': 1,
       'is_dup': 1,
       'dup_no': 1,
+      'follow_due_date': 1,
+      'remark': 1,
+      'updatedBy_name': 1
       // 'stage_sort':{
       //   $indexOfArray: [stages, "$stage"]
       // }
@@ -4880,7 +4883,10 @@ exports.datatableFilter = async (req, res, next) => {
         "createdAt":ele["createdAt"],
         "updatedAt":ele["updatedAt"],
         "lead_no_val": ele["lead_no"].replaceAll("LD",""),
-        "stage_sort": stages.indexOf(ele["stage"])
+        "stage_sort": stages.indexOf(ele["stage"]),
+        "follow_due_date": ele["follow_due_date"],
+        "notes": ele["remark"],
+        "updatedBy_name": ele["updatedBy_name"].toUpperCase()
     }
       out.push(temp);
     }
